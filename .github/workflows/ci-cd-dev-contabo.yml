@@ -1,0 +1,79 @@
+name: ci-cd-dev-contabo
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          
+      - run: npm install -g yarn
+      - run: yarn install
+      - run: npm run build:prod --no-verify #--if-present
+
+      - name: Zip Archive Release
+        run: |
+          cd dist
+          zip -r ../plannerdev.zip .
+        shell: bash
+
+      - name: List local directory contents
+        run: |
+          ls -la ./dist
+          ls -la plannerdev.zip
+
+      - name: 'SCP Deploy to Contabo Server'
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.CONTABO_PUB_IP }}
+          port: ${{ secrets.CONTABO_PORT }} # Use port from secrets
+          username: github
+          key: ${{ secrets.CONTABO_SSH_KEY }}
+          source: 'plannerdev.zip'
+          target: '/home/github/deployment_temp/'
+
+      - name: Write SSH key to file
+        run: |
+          echo "${{ secrets.CONTABO_SSH_KEY }}" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+          ls -la /tmp/ssh_key  # Verify the key file exists
+
+      - name: List remote directory contents before deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key -p ${{ secrets.CONTABO_PORT }} github@${{ secrets.CONTABO_PUB_IP }} 'ls -la /home/github/deployment_temp'
+
+      - name: ssh-pipeline
+        uses: cross-the-world/ssh-pipeline@v1.2.0
+        with:
+          host: ${{ secrets.CONTABO_PUB_IP }}
+          port: ${{ secrets.CONTABO_PORT }} # Use port from secrets
+          user: github
+          key: ${{ secrets.CONTABO_SSH_KEY }}
+          script: |
+            sudo rm -rf /var/www/planner-dev.microvision.co.ke/public_html/dist/*
+            sudo unzip /home/github/deployment_temp/plannerdev.zip -d /var/www/planner-dev.microvision.co.ke/public_html/dist/
+            sudo chown -R www-data:www-data /var/www/planner-dev.microvision.co.ke/public_html/dist
+            sudo find /var/www/planner-dev.microvision.co.ke/public_html/dist -type d -exec chmod 755 {} +
+            sudo find /var/www/planner-dev.microvision.co.ke/public_html/dist -type f -exec chmod 644 {} +
+            ls /var/www/planner-dev.microvision.co.ke/public_html/dist/
+            ls -la
+
+      - name: List remote directory contents after deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key -p ${{ secrets.CONTABO_PORT }} github@${{ secrets.CONTABO_PUB_IP }} 'ls -la /var/www/planner-dev.microvision.co.ke/public_html/dist'
+
+      - name: Clean up deployment temp
+        run: |
+          ssh -o StrictHostKeyChecking=no -i /tmp/ssh_key -p ${{ secrets.CONTABO_PORT }} github@${{ secrets.CONTABO_PUB_IP }} 'sudo rm /home/github/deployment_temp/plannerdev.zip'
