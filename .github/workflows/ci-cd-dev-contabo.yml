@@ -21,7 +21,7 @@ jobs:
           
       - run: npm install -g yarn
       - run: yarn install
-      - run: npm run build:prod --no-verify #--if-present
+      - run: npm run build
 
       - name: Zip Archive Release
         run: |
