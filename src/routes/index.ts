@@ -10,6 +10,12 @@ const routes: any[] = [
     // layout:false,
   },
   {
+    name: 'Login Page',
+    path: '/loginPage',
+    component: './LoginPage',
+    // layout:false,
+  },
+  {
     name: 'Access Control',
     path: '/access',
     component: './Access',
