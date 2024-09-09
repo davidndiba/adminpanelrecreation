@@ -1,4 +1,5 @@
 import { defineConfig } from '@umijs/max';
+// import logo from './../plannerv2/src/assets/Microvision LOgo.png';
 
 export default defineConfig({
   antd: {},
@@ -6,8 +7,15 @@ export default defineConfig({
   model: {},
   initialState: {},
   request: {},
+ locale:{default:"en-US", baseNavigator: false},
   layout: {
-    title: '@umijs/max',
+    title: 'Admin Panel',
+    layout: 'side',
+    contentWidth: 'Fluid',
+    fixedHeader: true,
+    fixSiderbar: true,
+    siderWidth: 200,
+    // logo: logo,
   },
   routes: [
     {
@@ -15,19 +23,30 @@ export default defineConfig({
       redirect: '/home',
     },
     {
-      name: '首页',
+      name: '',
       path: '/home',
       component: './Home',
+      // layout:false,
     },
     {
-      name: '权限演示',
+      name: 'Access Control',
       path: '/access',
       component: './Access',
     },
     {
-      name: ' CRUD 示例',
-      path: '/table',
-      component: './Table',
+      name: 'Activity Logs',
+      path: '/activity',
+      component: './Activity',
+    },
+    {
+      name: 'System Settings',
+      path: '/systemSettings',
+      component: './SystemSettings',
+    },
+    {
+      name: 'Maintenance',
+      path: '/maintenance',
+      component: './Maintenance',
     },
   ],
   npmClient: 'yarn',
