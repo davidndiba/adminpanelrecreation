@@ -33,6 +33,12 @@ export const errorConfig: RequestConfig = {
     },
     errorHandler: (error: any, opts: any) => {
       console.log(error?.response?.status, opts);
+      if (
+        error?.response?.status === 401 &&
+        history.location.pathname !== '/user/login'
+      ) {
+        return history.push('/user/login');
+      }
       if (opts?.skipErrorHandler) return;
       // 我们的 errorThrower 抛出的错误。
       if (error.name === 'BizError') {
@@ -82,7 +88,7 @@ export const errorConfig: RequestConfig = {
   requestInterceptors: [
     (config: any) => {
       if (config.login === undefined) {
-        const token = localStorage.getItem('tiex_t');
+        const token = localStorage.getItem('planner_t');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
           config.headers.Accept = `application/json`;

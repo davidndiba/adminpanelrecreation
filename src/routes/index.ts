@@ -1,7 +1,7 @@
 const routes: any[] = [
   {
     path: '/',
-    redirect: '/home',
+    redirect: '/access',
   },
   {
     name: '',
@@ -9,11 +9,22 @@ const routes: any[] = [
     component: './Home',
     // layout:false,
   },
+  // {
+  //   name: 'Login Page',
+  //   path: '/loginPage',
+  //   component: './LoginPage',
+  //   // layout:false,
+  // },
   {
-    name: 'Login Page',
-    path: '/loginPage',
-    component: './LoginPage',
-    // layout:false,
+    name: 'User',
+    layout: false,
+    routes: [
+      {
+        name: 'Login',
+        path: '/user/login',
+        component: './User/Login',
+      },
+    ],
   },
   {
     name: 'Access Control',
