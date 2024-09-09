@@ -65,11 +65,12 @@ export const errorConfig: RequestConfig = {
       } else if (error.response) {
         // console.log(error);
         // message.error(`Response status: ${error.response.status}`);
-       if (history.location.pathname !== '/home') notification.open({
-          placement: 'bottomRight',
-          message: `${error?.response?.data?.message ?? error.message}`,
-          type: 'error',
-        });
+        if (history.location.pathname !== '/home')
+          notification.open({
+            placement: 'bottomRight',
+            message: `${error?.response?.data?.message ?? error.message}`,
+            type: 'error',
+          });
       } else if (error.request) {
         message.error('None response! Please retry.');
       } else {
@@ -87,7 +88,7 @@ export const errorConfig: RequestConfig = {
           config.headers.Accept = `application/json`;
         }
       }
-      const url = "https://planner-dev-backend.microvision.co.ke/api/v1" + config?.url;
+      const url = API + config?.url;
       return { ...config, url };
     },
   ],
@@ -105,10 +106,13 @@ export const errorConfig: RequestConfig = {
       }
 
       if (status === 401 && history.location.pathname !== `/user/login`) {
-        localStorage.removeItem('tiex_t');
-        localStorage.removeItem('tiex_rf');
+        localStorage.removeItem('planner_t');
+        localStorage.removeItem('planner_rf');
 
-        notification.error({ message: 'Access Denied', placement: 'bottomRight' });
+        notification.error({
+          message: 'Access Denied',
+          placement: 'bottomRight',
+        });
         window.location.replace('/user/login');
       }
 
