@@ -522,11 +522,14 @@ import {
   Space,
   Typography,
 } from 'antd';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import { request } from 'umi';
 
 const { Title } = Typography;
-
+const dateStr = '2024-09-04T13:20:23.000000Z';
+const formattedDate = moment(dateStr).format('MMMM Do, YYYY, h:mm:ss A [UTC]');
+console.log(formattedDate);
 // Define types for user data
 interface User {
   id: string;
@@ -665,10 +668,20 @@ const Users: React.FC = () => {
   const stats = calculateStats();
 
   const columns: ProColumns<User>[] = [
-    { title: 'Name', dataIndex: 'display_name', key: 'display_name' },
+    { title: 'Name', dataIndex: 'firstname', key: 'firstname' },
     { title: 'Email', dataIndex: 'email', key: 'email' },
-    { title: 'IP Address', dataIndex: 'ip_address', key: 'ip_address' }, // Add IP Address
-    { title: 'Status', dataIndex: 'status', key: 'status' }, // Add Status
+    { title: 'IP Address', dataIndex: 'ip_address', key: 'ip_address' },
+    { title: 'Status', dataIndex: 'status', key: 'status' },
+    { title: 'Role', dataIndex: 'roles', key: 'roles' },
+    {
+      title: 'Created At',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      render: (text: string) => {
+        return moment(text).format('MMMM Do, YYYY, h:mm:ss A [UTC]');
+      },
+    },
+    // { title: 'Role', dataIndex: 'roles', key: 'roles' },
     {
       title: 'Actions',
       key: 'actions',

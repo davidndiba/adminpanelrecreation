@@ -1,29 +1,10 @@
-// import React from 'react';
-// import { ProTable } from '@ant-design/pro-components';
-
-// const Roles: React.FC = () => {
-//   const columns = [
-//     { title: 'Role', dataIndex: 'role', key: 'role' },
-//     { title: 'Description', dataIndex: 'description', key: 'description' },
-//     // Add more role fields here
-//   ];
-
-//   const data = [
-//     { key: 1, role: 'Admin', description: 'Full access to all resources' },
-//     // Add more role data here
-//   ];
-
-//   return <ProTable columns={columns} dataSource={data} rowKey="key" />;
-// };
-
-// export default Roles;
 // import React, { useState, useEffect } from 'react';
 // import { ProTable, ProColumns } from '@ant-design/pro-components';
-// import { Button, Space, Modal, Form, Input, message, Popconfirm } from 'antd';
+// import { Button, Space, Modal, Form, Input, message, Popconfirm, Card, Col, Row, Typography } from 'antd';
 // import { request } from 'umi';
-// import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+// import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, TeamOutlined, DatabaseOutlined, FileDoneOutlined } from '@ant-design/icons';
 
-// // const baseUrl = 'https://planner-dev-backend.microvision.co.ke/api/v1'; 
+// const { Title } = Typography;
 
 // interface Role {
 //   id: string;
@@ -135,8 +116,49 @@
 //     },
 //   ];
 
+//   // Mock data for statistics
+//   const stats = {
+//     totalRoles: roles.length,
+//     activeRoles: roles.filter(role => role.status === 'active').length,
+//     pendingRoles: roles.filter(role => role.status === 'pending').length,
+//     archivedRoles: roles.filter(role => role.status === 'archived').length,
+//   };
+
 //   return (
-//     <div>
+//     <div style={{ padding: '24px', backgroundColor: '#f0f2f5' }}>
+//       {/* Statistics Cards */}
+//       <Row gutter={16} style={{ marginBottom: '16px' }}>
+//         <Col span={6}>
+//           <Card bordered>
+//             <Title level={4}>Total Roles</Title>
+//             <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.totalRoles}</div>
+//             <UserOutlined style={{ fontSize: '36px', color: '#1890ff' }} />
+//           </Card>
+//         </Col>
+//         <Col span={6}>
+//           <Card bordered>
+//             <Title level={4}>Active Roles</Title>
+//             <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.activeRoles}</div>
+//             <TeamOutlined style={{ fontSize: '36px', color: '#52c41a' }} />
+//           </Card>
+//         </Col>
+//         <Col span={6}>
+//           <Card bordered>
+//             <Title level={4}>Pending Roles</Title>
+//             <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.pendingRoles}</div>
+//             <DatabaseOutlined style={{ fontSize: '36px', color: '#faad14' }} />
+//           </Card>
+//         </Col>
+//         <Col span={6}>
+//           <Card bordered>
+//             <Title level={4}>Archived Roles</Title>
+//             <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.archivedRoles}</div>
+//             <FileDoneOutlined style={{ fontSize: '36px', color: '#ff4d4f' }} />
+//           </Card>
+//         </Col>
+//       </Row>
+
+//       {/* Roles Table */}
 //       <Button
 //         type="primary"
 //         icon={<PlusOutlined />}
@@ -146,6 +168,7 @@
 //           form.resetFields();
 //           setIsModalVisible(true);
 //         }}
+//         style={{ marginBottom: '16px' }}
 //       >
 //         Add Role
 //       </Button>
@@ -209,11 +232,31 @@
 // };
 
 // export default Roles;
-import React, { useState, useEffect } from 'react';
-import { ProTable, ProColumns } from '@ant-design/pro-components';
-import { Button, Space, Modal, Form, Input, message, Popconfirm, Card, Col, Row, Typography } from 'antd';
+import {
+  DatabaseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  FileDoneOutlined,
+  PlusOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import { ProColumns, ProTable } from '@ant-design/pro-components';
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Row,
+  Space,
+  Typography,
+} from 'antd';
+import React, { useEffect, useState } from 'react';
 import { request } from 'umi';
-import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, TeamOutlined, DatabaseOutlined, FileDoneOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
@@ -221,6 +264,7 @@ interface Role {
   id: string;
   role: string;
   description: string;
+  status: string; // Assuming status is a part of the Role interface
 }
 
 const Roles: React.FC = () => {
@@ -233,8 +277,8 @@ const Roles: React.FC = () => {
   // Fetch roles
   const fetchRoles = async () => {
     try {
-      const response = await request(`/roles`);
-      setRoles(response.data);
+      const response = await request('/roles');
+      setRoles(response.data); // Update state with new roles data
     } catch (error) {
       message.error('Failed to fetch roles');
     }
@@ -247,13 +291,13 @@ const Roles: React.FC = () => {
   // Handle add role
   const handleAddRole = async (values: any) => {
     try {
-      await request(`/roles`, {
+      await request('/roles', {
         method: 'POST',
         data: values,
       });
       message.success('Role added successfully');
-      fetchRoles();
-      setIsModalVisible(false);
+      fetchRoles(); // Refresh roles list
+      setIsModalVisible(false); // Close modal
     } catch (error) {
       message.error('Failed to add role');
     }
@@ -267,8 +311,9 @@ const Roles: React.FC = () => {
         data: values,
       });
       message.success('Role updated successfully');
-      fetchRoles();
-      setSelectedRole(null);
+      fetchRoles(); // Refresh roles list
+      setIsModalVisible(false); // Close modal
+      setSelectedRole(null); // Clear selected role
     } catch (error) {
       message.error('Failed to update role');
     }
@@ -281,7 +326,7 @@ const Roles: React.FC = () => {
         method: 'DELETE',
       });
       message.success('Role deleted successfully');
-      fetchRoles();
+      fetchRoles(); // Refresh roles list
     } catch (error) {
       message.error('Failed to delete role');
     }
@@ -298,7 +343,7 @@ const Roles: React.FC = () => {
   };
 
   const columns: ProColumns<Role>[] = [
-    { title: 'Role', dataIndex: 'role', key: 'role' },
+    { title: 'Role', dataIndex: 'name', key: 'name' },
     { title: 'Description', dataIndex: 'description', key: 'description' },
     {
       title: 'Actions',
@@ -330,9 +375,9 @@ const Roles: React.FC = () => {
   // Mock data for statistics
   const stats = {
     totalRoles: roles.length,
-    activeRoles: roles.filter(role => role.status === 'active').length,
-    pendingRoles: roles.filter(role => role.status === 'pending').length,
-    archivedRoles: roles.filter(role => role.status === 'archived').length,
+    activeRoles: roles.filter((role) => role.status === 'active').length,
+    pendingRoles: roles.filter((role) => role.status === 'pending').length,
+    archivedRoles: roles.filter((role) => role.status === 'archived').length,
   };
 
   return (
@@ -342,28 +387,36 @@ const Roles: React.FC = () => {
         <Col span={6}>
           <Card bordered>
             <Title level={4}>Total Roles</Title>
-            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.totalRoles}</div>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
+              {stats.totalRoles}
+            </div>
             <UserOutlined style={{ fontSize: '36px', color: '#1890ff' }} />
           </Card>
         </Col>
         <Col span={6}>
           <Card bordered>
             <Title level={4}>Active Roles</Title>
-            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.activeRoles}</div>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
+              {stats.activeRoles}
+            </div>
             <TeamOutlined style={{ fontSize: '36px', color: '#52c41a' }} />
           </Card>
         </Col>
         <Col span={6}>
           <Card bordered>
             <Title level={4}>Pending Roles</Title>
-            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.pendingRoles}</div>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
+              {stats.pendingRoles}
+            </div>
             <DatabaseOutlined style={{ fontSize: '36px', color: '#faad14' }} />
           </Card>
         </Col>
         <Col span={6}>
           <Card bordered>
             <Title level={4}>Archived Roles</Title>
-            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>{stats.archivedRoles}</div>
+            <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
+              {stats.archivedRoles}
+            </div>
             <FileDoneOutlined style={{ fontSize: '36px', color: '#ff4d4f' }} />
           </Card>
         </Col>
@@ -394,8 +447,12 @@ const Roles: React.FC = () => {
       {selectedRole && (
         <div style={{ marginTop: 16 }}>
           <h2>Selected Role</h2>
-          <p><strong>Role:</strong> {selectedRole.role}</p>
-          <p><strong>Description:</strong> {selectedRole.description}</p>
+          <p>
+            <strong>Role:</strong> {selectedRole?.name}
+          </p>
+          <p>
+            <strong>Description:</strong> {selectedRole?.description}
+          </p>
         </div>
       )}
       <Modal
@@ -404,14 +461,14 @@ const Roles: React.FC = () => {
         onOk={() => {
           form
             .validateFields()
-            .then(values => {
-              if (isEditing) {
-                handleEditRole(selectedRole!.id, values);
+            .then((values) => {
+              if (isEditing && selectedRole) {
+                handleEditRole(selectedRole.id, values);
               } else {
                 handleAddRole(values);
               }
             })
-            .catch(info => {
+            .catch((info) => {
               console.log('Validate Failed:', info);
             });
         }}
@@ -432,7 +489,9 @@ const Roles: React.FC = () => {
           <Form.Item
             name="description"
             label="Description"
-            rules={[{ required: true, message: 'Please enter the description!' }]}
+            rules={[
+              { required: true, message: 'Please enter the description!' },
+            ]}
           >
             <Input />
           </Form.Item>
