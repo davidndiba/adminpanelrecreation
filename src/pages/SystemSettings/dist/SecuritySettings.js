@@ -1,35 +1,41 @@
+"use strict";
 // import React from 'react';
 // import { ProCard } from '@ant-design/pro-components';
 // import { Typography, Button, Modal, Form, Input, message, Divider } from 'antd'; // Import from antd
-
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+exports.__esModule = true;
 // const { Title } = Typography;
-
 // const SecuritySettings = () => {
 //   const [isModalVisible, setIsModalVisible] = React.useState(false);
 //   const [newSettingValue, setNewSettingValue] = React.useState('');
 //   const [settingType, setSettingType] = React.useState('');
-
 //   const showModal = (type) => {
 //     setSettingType(type);
 //     setIsModalVisible(true);
 //   };
-
 //   const handleOk = () => {
 //     // Implement save settings logic here
 //     message.success(`${settingType} updated successfully`);
 //     setIsModalVisible(false);
 //   };
-
 //   const handleCancel = () => {
 //     setIsModalVisible(false);
 //   };
-
 //   return (
 //     <ProCard title="" bordered>
 //       <div style={{ padding: '16px' }}>
 //         <Title level={4} style={{ marginBottom: '16px' }}>Security Settings</Title>
 //         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
 //           {/* Two-Factor Authentication */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -37,7 +43,6 @@
 //               <Button type="primary" onClick={() => showModal('Two-Factor Authentication')}>Configure</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Password Strength Policy */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -45,7 +50,6 @@
 //               <Button type="primary" onClick={() => showModal('Password Strength Policy')}>Update Policy</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Login Attempt Limits */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -53,7 +57,6 @@
 //               <Button type="primary" onClick={() => showModal('Login Attempt Limits')}>Set Limits</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* IP Whitelisting */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -61,7 +64,6 @@
 //               <Button type="primary" onClick={() => showModal('IP Whitelisting')}>Manage IPs</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Session Timeout */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -69,10 +71,8 @@
 //               <Button type="primary" onClick={() => showModal('Session Timeout')}>Configure Timeout</Button>
 //             </div>
 //           </ProCard>
-
 //         </div>
 //       </div>
-
 //       {/* Modal for Changing Settings */}
 //       <Modal
 //         title={`Configure ${settingType}`}
@@ -89,17 +89,12 @@
 //     </ProCard>
 //   );
 // };
-
 // export default SecuritySettings;
 // import React, { useState, useEffect } from 'react';
 // import { ProCard } from '@ant-design/pro-components';
 // import { Typography, Button, Modal, Form, Input, message, Switch } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
-
-
-
 // const PasswordSettings = () => {
 //   const [isModalVisible, setIsModalVisible] = useState(false);
 //   const [settingType, setSettingType] = useState('');
@@ -121,7 +116,6 @@
 //     enforce_password_history: 5
 //   });
 //   const [rememberMe, setRememberMe] = useState(true);
-
 //   // Fetch current password rules when the component mounts
 //   useEffect(() => {
 //     request(`/password-rules`, {
@@ -130,12 +124,10 @@
 //       .then((data) => setPasswordRules(data))
 //       .catch(() => message.error('Failed to fetch password rules'));
 //   }, []);
-
 //   const showModal = (type: string) => {
 //     setSettingType(type);
 //     setIsModalVisible(true);
 //   };
-
 //   const handleOk = () => {
 //     request(`/password-rules`, {
 //       method: 'POST',
@@ -147,7 +139,6 @@
 //       })
 //       .catch(() => message.error('Failed to update settings'));
 //   };
-
 //   const handleForcePasswordReset = () => {
 //     request(`/admin/reset-all-passwords`, {
 //       method: 'POST'
@@ -155,11 +146,9 @@
 //       .then(() => message.success('All user passwords have been reset'))
 //       .catch(() => message.error('Failed to force password reset'));
 //   };
-
 //   const handlePasswordRulesChange = (field: string, value: any) => {
 //     setPasswordRules(prev => ({ ...prev, [field]: value }));
 //   };
-
 //   return (
 //     <ProCard title="Password Settings" bordered>
 //       <div style={{ padding: '16px' }}>
@@ -172,7 +161,6 @@
 //               <Button type="primary" onClick={() => showModal('Password Strength Settings')}>Configure</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Remember Me Option */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -180,7 +168,6 @@
 //               <Switch checked={rememberMe} onChange={(checked) => setRememberMe(checked)} />
 //             </div>
 //           </ProCard>
-
 //           {/* Password Options */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -188,7 +175,6 @@
 //               <Button type="primary" onClick={() => showModal('Password Options')}>Update Options</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Password Strength */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -196,7 +182,6 @@
 //               <Button type="primary" onClick={() => showModal('Password Strength')}>Update Strength</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Force Password Reset */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -206,7 +191,6 @@
 //           </ProCard>
 //         </div>
 //       </div>
-
 //       {/* Modal for Changing Settings */}
 //       <Modal
 //         title={`Configure ${settingType}`}
@@ -264,17 +248,12 @@
 //     </ProCard>
 //   );
 // };
-
 // export default PasswordSettings;
 // import React, { useState, useEffect } from 'react';
 // import { ProCard } from '@ant-design/pro-components';
 // import { Typography, Button, Modal, Form, Input, message, Switch, Space } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
-
-
-
 // const PasswordSettings = () => {
 //   const [isModalVisible, setIsModalVisible] = useState(false);
 //   const [settingType, setSettingType] = useState('');
@@ -296,7 +275,6 @@
 //     enforce_password_history: 5
 //   });
 //   const [rememberMe, setRememberMe] = useState(true);
-
 //   // Fetch current password rules when the component mounts
 //   useEffect(() => {
 //     request(`/password-rules`, {
@@ -305,12 +283,10 @@
 //       .then((data) => setPasswordRules(data))
 //       .catch(() => message.error('Failed to fetch password rules'));
 //   }, []);
-
 //   const showModal = (type: string) => {
 //     setSettingType(type);
 //     setIsModalVisible(true);
 //   };
-
 //   const handleOk = () => {
 //     request(`/password-rules`, {
 //       method: 'POST',
@@ -322,7 +298,6 @@
 //       })
 //       .catch(() => message.error('Failed to update settings'));
 //   };
-
 //   const handleForcePasswordReset = () => {
 //     request(`/admin/reset-all-passwords`, {
 //       method: 'POST'
@@ -330,11 +305,9 @@
 //       .then(() => message.success('All user passwords have been reset'))
 //       .catch(() => message.error('Failed to force password reset'));
 //   };
-
 //   const handlePasswordRulesChange = (field: string, value: any) => {
 //     setPasswordRules(prev => ({ ...prev, [field]: value }));
 //   };
-
 //   return (
 //     <ProCard title="Password Settings" bordered>
 //       <div style={{ padding: '16px' }}>
@@ -347,7 +320,6 @@
 //               <Button type="primary" onClick={() => showModal('Password Strength Settings')}>Configure</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Remember Me Option */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -355,7 +327,6 @@
 //               <Switch checked={rememberMe} onChange={(checked) => setRememberMe(checked)} />
 //             </div>
 //           </ProCard>
-
 //           {/* Password Options */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -363,7 +334,6 @@
 //               <Button type="primary" onClick={() => showModal('Password Options')}>Update Options</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Force Password Reset */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -373,7 +343,6 @@
 //           </ProCard>
 //         </Space>
 //       </div>
-
 //       {/* Modal for Changing Settings */}
 //       <Modal
 //         title={`Configure ${settingType}`}
@@ -482,7 +451,6 @@
 //               </Form.Item>
 //             </>
 //           )}
-
 //           {settingType === 'Password Options' && (
 //             <>
 //               <Form.Item label="Minimum Length">
@@ -507,15 +475,12 @@
 //     </ProCard>
 //   );
 // };
-
 // export default PasswordSettings;
 // import React, { useState, useEffect } from 'react';
 // import { ProCard } from '@ant-design/pro-components';
 // import { Typography, Switch, message, Space, Form, InputNumber } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
-
 // const PasswordSettings = () => {
 //   const [passwordRules, setPasswordRules] = useState<any>({
 //     min_length: 8,
@@ -532,7 +497,6 @@
 //     enforce_password_history: 5,
 //   });
 //   const [rememberMe, setRememberMe] = useState(true);
-
 //   // Fetch current password rules when the component mounts
 //   useEffect(() => {
 //     request(`/password-rules`, {
@@ -541,7 +505,6 @@
 //       .then((data) => setPasswordRules(data))
 //       .catch(() => message.error('Failed to fetch password rules'));
 //   }, []);
-
 //   // Handle API updates
 //   const handlePasswordRulesChange = (field: string, value: any) => {
 //     setPasswordRules((prev) => ({ ...prev, [field]: value }));
@@ -552,7 +515,6 @@
 //       .then(() => message.success('Password setting updated successfully'))
 //       .catch(() => message.error('Failed to update setting'));
 //   };
-
 //   const handleForcePasswordReset = () => {
 //     request(`/admin/reset-all-passwords`, {
 //       method: 'POST'
@@ -560,13 +522,11 @@
 //       .then(() => message.success('All user passwords have been reset'))
 //       .catch(() => message.error('Failed to force password reset'));
 //   };
-
 //   return (
 //     <ProCard title="Password Settings" bordered>
 //       <div style={{ padding: '16px' }}>
 //         <Title level={4} style={{ marginBottom: '24px' }}>Password Management</Title>
 //         <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          
 //           {/* Password Strength Settings */}
 //           <ProCard bordered>
 //             <Space direction="vertical" style={{ width: '100%' }}>
@@ -588,7 +548,6 @@
 //               </div>
 //             </Space>
 //           </ProCard>
-
 //           {/* Remember Me Option */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -596,7 +555,6 @@
 //               <Switch checked={rememberMe} onChange={(checked) => setRememberMe(checked)} />
 //             </div>
 //           </ProCard>
-
 //           {/* Password Options Toggles */}
 //           <ProCard bordered>
 //             <Space direction="vertical" style={{ width: '100%' }}>
@@ -666,7 +624,6 @@
 //               </div>
 //             </Space>
 //           </ProCard>
-
 //           {/* Force Password Reset */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -679,164 +636,99 @@
 //     </ProCard>
 //   );
 // };
-
 // export default PasswordSettings;
-import React, { useState, useEffect } from 'react';
-import { ProCard } from '@ant-design/pro-components';
-import { Typography, Switch, message, Space, Form, InputNumber, Button, Collapse, Row, Col } from 'antd';
-import { request } from 'umi';
-
-const { Title } = Typography;
-const { Panel } = Collapse;
-
-const PasswordSettings = () => {
-  const [passwordRules, setPasswordRules] = useState<any>({
-    min_length: 8,
-    max_length: 20,
-    require_uppercase: true,
-    require_lowercase: true,
-    require_number: true,
-    require_special_character: true,
-    disallow_repeated_characters: false,
-    disallow_spaces: true,
-    disallow_common_passwords: true,
-    disallow_sequential_characters: true,
-    disallow_username_in_password: true,
-    enforce_password_history: 5,
-  });
-  const [rememberMe, setRememberMe] = useState(true);
-
-  // Fetch current password rules when the component mounts
-  useEffect(() => {
-    request(`/password-rules`, {
-      method: 'GET'
-    })
-      .then((data) => setPasswordRules(data))
-      .catch(() => message.error('Failed to fetch password rules'));
-  }, []);
-
-  // Handle API updates
-  const handlePasswordRulesChange = (field: string, value: any) => {
-    setPasswordRules((prev) => ({ ...prev, [field]: value }));
-    request(`/password-rules`, {
-      method: 'POST',
-      data: { [field]: value },
-    })
-      .then(() => message.success('Password setting updated successfully'))
-      .catch(() => message.error('Failed to update setting'));
-  };
-
-  const handleForcePasswordReset = () => {
-    request(`/admin/reset-all-passwords`, {
-      method: 'POST'
-    })
-      .then(() => message.success('All user passwords have been reset'))
-      .catch(() => message.error('Failed to force password reset'));
-  };
-
-  return (
-    <div style={{ position: 'absolute', top: '20px', left: '20px', width: '100%', maxWidth: '800px' }}>
-      <ProCard title="Password Settings" bordered>
-        <div style={{ padding: '16px' }}>
-          <Title level={4} style={{ marginBottom: '24px' }}>Password Management</Title>
-          <Collapse defaultActiveKey={['1', '2', '3']} accordion>
-            {/* Password Strength Settings */}
-            <Panel header="Password Strength Settings" key="1">
-              <Form layout="vertical" size="small">
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item label="Minimum Password Length">
-                      <InputNumber
-                        min={1}
-                        value={passwordRules.min_length}
-                        onChange={(value) => handlePasswordRulesChange('min_length', value)}
-                        style={{ width: '100%' }}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="Maximum Password Length">
-                      <InputNumber
-                        min={1}
-                        value={passwordRules.max_length}
-                        onChange={(value) => handlePasswordRulesChange('max_length', value)}
-                        style={{ width: '100%' }}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form>
-            </Panel>
-
-            {/* Password Options Toggles */}
-            <Panel header="Password Options" key="2">
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-                {Object.keys(passwordRules).map((key) => {
-                  if (typeof passwordRules[key] === 'boolean') {
-                    return (
-                      <div key={key} style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ flex: '1' }}>{formatLabel(key)}</span>
-                        <Switch
-                          checked={passwordRules[key]}
-                          onChange={(checked) => handlePasswordRulesChange(key, checked)}
-                        />
-                      </div>
-                    );
-                  }
-                  if (typeof passwordRules[key] === 'number') {
-                    return (
-                      <div key={key} style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <Form.Item label={formatLabel(key)} style={{ margin: 0 }}>
-                          <InputNumber
-                            min={1}
-                            value={passwordRules[key]}
-                            onChange={(value) => handlePasswordRulesChange(key, value)}
-                            style={{ width: '100%' }}
-                          />
-                        </Form.Item>
-                      </div>
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-            </Panel>
-
-            {/* Remember Me Option */}
-            <Panel header="Remember Me Option" key="3">
-              <Form layout="vertical" size="small">
-                <Form.Item>
-                  <Space>
-                    <div>Allow "Remember Me" Option</div>
-                    <Switch checked={rememberMe} onChange={(checked) => setRememberMe(checked)} />
-                  </Space>
-                </Form.Item>
-              </Form>
-            </Panel>
-
-            {/* Force Password Reset */}
-            <Panel header="Force Password Reset" key="4">
-              <Form layout="vertical" size="small">
-                <Form.Item>
-                  <Button type="primary" danger onClick={handleForcePasswordReset}>
-                    Reset All Passwords
-                  </Button>
-                </Form.Item>
-              </Form>
-            </Panel>
-          </Collapse>
-        </div>
-      </ProCard>
-    </div>
-  );
+var react_1 = require("react");
+var pro_components_1 = require("@ant-design/pro-components");
+var antd_1 = require("antd");
+var umi_1 = require("umi");
+var Title = antd_1.Typography.Title;
+var Panel = antd_1.Collapse.Panel;
+var PasswordSettings = function () {
+    var _a = react_1.useState({
+        min_length: 8,
+        max_length: 20,
+        require_uppercase: true,
+        require_lowercase: true,
+        require_number: true,
+        require_special_character: true,
+        disallow_repeated_characters: false,
+        disallow_spaces: true,
+        disallow_common_passwords: true,
+        disallow_sequential_characters: true,
+        disallow_username_in_password: true,
+        enforce_password_history: 5
+    }), passwordRules = _a[0], setPasswordRules = _a[1];
+    var _b = react_1.useState(true), rememberMe = _b[0], setRememberMe = _b[1];
+    // Fetch current password rules when the component mounts
+    react_1.useEffect(function () {
+        umi_1.request("/password-rules", {
+            method: 'GET'
+        })
+            .then(function (data) { return setPasswordRules(data); })["catch"](function () { return antd_1.message.error('Failed to fetch password rules'); });
+    }, []);
+    // Handle API updates
+    var handlePasswordRulesChange = function (field, value) {
+        var _a;
+        setPasswordRules(function (prev) {
+            var _a;
+            return (__assign(__assign({}, prev), (_a = {}, _a[field] = value, _a)));
+        });
+        umi_1.request("/password-rules", {
+            method: 'POST',
+            data: (_a = {}, _a[field] = value, _a)
+        })
+            .then(function () { return antd_1.message.success('Password setting updated successfully'); })["catch"](function () { return antd_1.message.error('Failed to update setting'); });
+    };
+    var handleForcePasswordReset = function () {
+        umi_1.request("/admin/reset-all-passwords", {
+            method: 'POST'
+        })
+            .then(function () { return antd_1.message.success('All user passwords have been reset'); })["catch"](function () { return antd_1.message.error('Failed to force password reset'); });
+    };
+    return (react_1["default"].createElement("div", { style: { position: 'absolute', top: '20px', left: '20px', width: '100%', maxWidth: '800px' } },
+        react_1["default"].createElement(pro_components_1.ProCard, { title: "Password Settings", bordered: true },
+            react_1["default"].createElement("div", { style: { padding: '16px' } },
+                react_1["default"].createElement(Title, { level: 4, style: { marginBottom: '24px' } }, "Password Management"),
+                react_1["default"].createElement(antd_1.Collapse, { defaultActiveKey: ['1', '2', '3'], accordion: true },
+                    react_1["default"].createElement(Panel, { header: "Password Strength Settings", key: "1" },
+                        react_1["default"].createElement(antd_1.Form, { layout: "vertical", size: "small" },
+                            react_1["default"].createElement(antd_1.Row, { gutter: 16 },
+                                react_1["default"].createElement(antd_1.Col, { span: 12 },
+                                    react_1["default"].createElement(antd_1.Form.Item, { label: "Minimum Password Length" },
+                                        react_1["default"].createElement(antd_1.InputNumber, { min: 1, value: passwordRules.min_length, onChange: function (value) { return handlePasswordRulesChange('min_length', value); }, style: { width: '100%' } }))),
+                                react_1["default"].createElement(antd_1.Col, { span: 12 },
+                                    react_1["default"].createElement(antd_1.Form.Item, { label: "Maximum Password Length" },
+                                        react_1["default"].createElement(antd_1.InputNumber, { min: 1, value: passwordRules.max_length, onChange: function (value) { return handlePasswordRulesChange('max_length', value); }, style: { width: '100%' } })))))),
+                    react_1["default"].createElement(Panel, { header: "Password Options", key: "2" },
+                        react_1["default"].createElement("div", { style: { display: 'flex', flexWrap: 'wrap', gap: '16px' } }, Object.keys(passwordRules).map(function (key) {
+                            if (typeof passwordRules[key] === 'boolean') {
+                                return (react_1["default"].createElement("div", { key: key, style: { flex: '1 1 200px', display: 'flex', alignItems: 'center', gap: '8px' } },
+                                    react_1["default"].createElement("span", { style: { flex: '1' } }, formatLabel(key)),
+                                    react_1["default"].createElement(antd_1.Switch, { checked: passwordRules[key], onChange: function (checked) { return handlePasswordRulesChange(key, checked); } })));
+                            }
+                            if (typeof passwordRules[key] === 'number') {
+                                return (react_1["default"].createElement("div", { key: key, style: { flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '8px' } },
+                                    react_1["default"].createElement(antd_1.Form.Item, { label: formatLabel(key), style: { margin: 0 } },
+                                        react_1["default"].createElement(antd_1.InputNumber, { min: 1, value: passwordRules[key], onChange: function (value) { return handlePasswordRulesChange(key, value); }, style: { width: '100%' } }))));
+                            }
+                            return null;
+                        }))),
+                    react_1["default"].createElement(Panel, { header: "Remember Me Option", key: "3" },
+                        react_1["default"].createElement(antd_1.Form, { layout: "vertical", size: "small" },
+                            react_1["default"].createElement(antd_1.Form.Item, null,
+                                react_1["default"].createElement(antd_1.Space, null,
+                                    react_1["default"].createElement("div", null, "Allow \"Remember Me\" Option"),
+                                    react_1["default"].createElement(antd_1.Switch, { checked: rememberMe, onChange: function (checked) { return setRememberMe(checked); } }))))),
+                    react_1["default"].createElement(Panel, { header: "Force Password Reset", key: "4" },
+                        react_1["default"].createElement(antd_1.Form, { layout: "vertical", size: "small" },
+                            react_1["default"].createElement(antd_1.Form.Item, null,
+                                react_1["default"].createElement(antd_1.Button, { type: "primary", danger: true, onClick: handleForcePasswordReset }, "Reset All Passwords")))))))));
 };
-
 // Helper function to format labels for form fields
-const formatLabel = (key: string) => {
-  return key
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase())
-    .replace(/Password$/, 'Password');
+var formatLabel = function (key) {
+    return key
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, function (char) { return char.toUpperCase(); })
+        .replace(/Password$/, 'Password');
 };
-
-export default PasswordSettings;
+exports["default"] = PasswordSettings;

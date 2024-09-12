@@ -1,30 +1,26 @@
+"use strict";
 // import React from 'react';
 // import { ProCard, Button, Divider, Input } from '@ant-design/pro-components';
 // import { Typography, Modal, Form, message } from 'antd'; // Import from antd
-
+exports.__esModule = true;
 // const { Title } = Typography; // Correct import from antd
-
 // const GeneralSettings = () => {
 //   // State management for general settings
 //   const [setting1, setSetting1] = React.useState('Value 1');
 //   const [setting2, setSetting2] = React.useState('Value 2');
 //   const [isModalVisible, setIsModalVisible] = React.useState(false);
 //   const [newSettingValue, setNewSettingValue] = React.useState('');
-
 //   const showModal = () => {
 //     setIsModalVisible(true);
 //   };
-
 //   const handleOk = () => {
 //     // Implement save settings logic here
 //     setIsModalVisible(false);
 //     message.success('Settings updated successfully');
 //   };
-
 //   const handleCancel = () => {
 //     setIsModalVisible(false);
 //   };
-
 //   return (
 //     <ProCard title="General Settings" bordered>
 //       <Title level={4}>Setting 1</Title>
@@ -46,7 +42,6 @@
 //           </Button>
 //         </div>
 //       </ProCard>
-
 //       {/* Modal for Changing Setting */}
 //       <Modal
 //         title="Change Setting"
@@ -63,34 +58,28 @@
 //     </ProCard>
 //   );
 // };
-
 // export default GeneralSettings;
 // import React from 'react';
 // import { ProCard } from '@ant-design/pro-components';
 // import { Typography, Modal, Form, Input, message, Button, Divider } from 'antd'; // Import from antd
 // const { Title } = Typography;
-
 // const GeneralSettings = () => {
 //   // State management for general settings
 //   const [setting1, setSetting1] = React.useState('Value 1');
 //   const [setting2, setSetting2] = React.useState('Value 2');
 //   const [isModalVisible, setIsModalVisible] = React.useState(false);
 //   const [newSettingValue, setNewSettingValue] = React.useState('');
-
 //   const showModal = () => {
 //     setIsModalVisible(true);
 //   };
-
 //   const handleOk = () => {
 //     // Implement save settings logic here
 //     setIsModalVisible(false);
 //     message.success('Settings updated successfully');
 //   };
-
 //   const handleCancel = () => {
 //     setIsModalVisible(false);
 //   };
-
 //   return (
 //     <ProCard title="General Settings" bordered>
 //       <Title level={4}>Setting 1</Title>
@@ -112,7 +101,6 @@
 //           </Button>
 //         </div>
 //       </ProCard>
-
 //       {/* Modal for Changing Setting */}
 //       <Modal
 //         title="Change Setting"
@@ -129,16 +117,13 @@
 //     </ProCard>
 //   );
 // };
-
 // export default GeneralSettings;
 // import React from 'react';
 // import { ProCard } from '@ant-design/pro-components';
 // import { Typography, Modal, Form, Input, message, Button, Divider, TimePicker } from 'antd'; // Import from antd
 // import { useState } from 'react';
 // import dayjs from 'dayjs';
-
 // const { Title } = Typography;
-
 // const GeneralSettings = () => {
 //   // State management for settings
 //   const [location, setLocation] = useState('Factory Location');
@@ -148,17 +133,14 @@
 //   const [operatingHours, setOperatingHours] = useState('09:00 - 17:00');
 //   const [maintenanceSchedule, setMaintenanceSchedule] = useState('Weekly');
 //   const [productionCapacity, setProductionCapacity] = useState('1000 units/day');
-
 //   const [isModalVisible, setIsModalVisible] = useState(false);
 //   const [selectedSetting, setSelectedSetting] = useState('');
 //   const [newValue, setNewValue] = useState('');
-
 //   const showModal = (setting) => {
 //     setSelectedSetting(setting);
 //     setNewValue(setting === 'Operating Hours' ? '' : ''); // Custom handling for time picker
 //     setIsModalVisible(true);
 //   };
-
 //   const handleOk = () => {
 //     switch (selectedSetting) {
 //       case 'Factory Location':
@@ -188,11 +170,9 @@
 //     setIsModalVisible(false);
 //     message.success('Settings updated successfully');
 //   };
-
 //   const handleCancel = () => {
 //     setIsModalVisible(false);
 //   };
-
 //   return (
 //     <ProCard title="" bordered>
 //       <div style={{ padding: '16px' }}>
@@ -205,7 +185,6 @@
 //               <Button type="primary" onClick={() => showModal('Factory Location')}>Change Location</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Website URL */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -213,7 +192,6 @@
 //               <Button type="primary" onClick={() => showModal('Website URL')}>Change URL</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Contact Email */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -221,7 +199,6 @@
 //               <Button type="primary" onClick={() => showModal('Contact Email')}>Change Email</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Support Phone Number */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -229,7 +206,6 @@
 //               <Button type="primary" onClick={() => showModal('Support Phone Number')}>Change Phone</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Operating Hours */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -237,7 +213,6 @@
 //               <Button type="primary" onClick={() => showModal('Operating Hours')}>Change Hours</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Maintenance Schedule */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -245,7 +220,6 @@
 //               <Button type="primary" onClick={() => showModal('Maintenance Schedule')}>Update Schedule</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Production Capacity */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -255,7 +229,6 @@
 //           </ProCard>
 //         </div>
 //       </div>
-
 //       {/* Modal for Changing Setting */}
 //       <Modal
 //         title={`Change ${selectedSetting}`}
@@ -280,18 +253,13 @@
 //     </ProCard>
 //   );
 // };
-
 // export default GeneralSettings;
 // import React, { useState, useEffect } from 'react';
 // import { ProCard } from '@ant-design/pro-components';
 // import { Typography, Modal, Form, Input, message, Button, Select } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
 // const { Option } = Select;
-
-
-
 // const GeneralSettings = () => {
 //   // State management for settings
 //   const [systemStatus, setSystemStatus] = useState('Online');
@@ -304,7 +272,6 @@
 //   const [isModalVisible, setIsModalVisible] = useState(false);
 //   const [selectedSetting, setSelectedSetting] = useState<string>('');
 //   const [newValue, setNewValue] = useState<any>('');
-
 //   // Fetch the default timezone and list of timezones
 //   useEffect(() => {
 //     // Fetch current system timezone
@@ -318,7 +285,6 @@
 //         }
 //       })
 //       .catch(() => message.error('Failed to fetch system timezone'));
-
 //     // Fetch available timezones
 //     request(`/timezones`, { method: 'GET' })
 //       .then((response: any) => {
@@ -330,7 +296,6 @@
 //       })
 //       .catch(() => message.error('Failed to fetch timezones'));
 //   }, []);
-
 //   const showModal = (setting: string) => {
 //     setSelectedSetting(setting);
 //     if (setting === 'System Timezone') {
@@ -340,7 +305,6 @@
 //     }
 //     setIsModalVisible(true);
 //   };
-
 //   const handleOk = () => {
 //     switch (selectedSetting) {
 //       case 'System Status':
@@ -367,11 +331,9 @@
 //     setIsModalVisible(false);
 //     message.success('Settings updated successfully');
 //   };
-
 //   const handleCancel = () => {
 //     setIsModalVisible(false);
 //   };
-
 //   return (
 //     <ProCard title="" bordered>
 //       <div style={{ padding: '16px' }}>
@@ -384,7 +346,6 @@
 //               <Button type="primary" onClick={() => showModal('System Status')}>Change Status</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* System Name */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -392,7 +353,6 @@
 //               <Button type="primary" onClick={() => showModal('System Name')}>Change Name</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Contact Email */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -400,7 +360,6 @@
 //               <Button type="primary" onClick={() => showModal('Contact Email')}>Change Email</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Contact Phone Number */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -408,7 +367,6 @@
 //               <Button type="primary" onClick={() => showModal('Contact Phone Number')}>Change Phone</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* System Timezone */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -416,7 +374,6 @@
 //               <Button type="primary" onClick={() => showModal('System Timezone')}>Change Timezone</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Language Preference */}
 //           <ProCard bordered>
 //             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -426,7 +383,6 @@
 //           </ProCard>
 //         </div>
 //       </div>
-
 //       {/* Modal for Changing Setting */}
 //       <Modal
 //         title={`Change ${selectedSetting}`}
@@ -472,15 +428,12 @@
 //     </ProCard>
 //   );
 // };
-
 // export default GeneralSettings;
 // import React, { useState, useEffect } from 'react';
 // import { Form, Input, message, Button, Select, Typography, Switch } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
 // const { Option } = Select;
-
 // const GeneralSettings = () => {
 //   const [systemStatus, setSystemStatus] = useState('Online');
 //   const [systemName, setSystemName] = useState('My System');
@@ -489,7 +442,6 @@
 //   const [systemTimezone, setSystemTimezone] = useState('');
 //   const [languagePreference, setLanguagePreference] = useState('English');
 //   const [timezones, setTimezones] = useState<string[]>([]);
-
 //   useEffect(() => {
 //     // Fetch current system settings
 //     request(`/system-settings`, { method: 'GET' })
@@ -514,7 +466,6 @@
 //         }
 //       })
 //       .catch(() => message.error('Failed to fetch system settings'));
-
 //     // Fetch available timezones
 //     request(`/timezones`, { method: 'GET' })
 //       .then((response: any) => {
@@ -526,7 +477,6 @@
 //       })
 //       .catch(() => message.error('Failed to fetch timezones'));
 //   }, []);
-
 //   const handleUpdateSettings = (updatedData: any) => {
 //     request(`/system-settings`, {
 //       method: 'PUT',
@@ -541,7 +491,6 @@
 //       })
 //       .catch(() => message.error('Failed to update settings'));
 //   };
-
 //   return (
 //     <div style={{ padding: '24px' }}>
 //       <Title level={4} style={{ marginBottom: '16px' }}>General Settings</Title>
@@ -559,7 +508,6 @@
 //             unCheckedChildren="Offline"
 //           />
 //         </Form.Item>
-
 //         {/* System Name */}
 //         <Form.Item label="System Name">
 //           <Input
@@ -570,7 +518,6 @@
 //             }}
 //           />
 //         </Form.Item>
-
 //         {/* Contact Email */}
 //         <Form.Item label="Contact Email">
 //           <Input
@@ -581,7 +528,6 @@
 //             }}
 //           />
 //         </Form.Item>
-
 //         {/* Contact Phone Number */}
 //         <Form.Item label="Contact Phone Number">
 //           <Input
@@ -592,7 +538,6 @@
 //             }}
 //           />
 //         </Form.Item>
-
 //         {/* System Timezone */}
 //         <Form.Item label="System Timezone">
 //           <Select
@@ -609,7 +554,6 @@
 //             ))}
 //           </Select>
 //         </Form.Item>
-
 //         {/* Language Preference */}
 //         <Form.Item label="Language Preference">
 //           <Select
@@ -628,15 +572,12 @@
 //     </div>
 //   );
 // };
-
 // export default GeneralSettings;
 // import React, { useState, useEffect } from 'react';
 // import { Form, Input, message, Switch, Select, Typography, Row, Col, Card } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
 // const { Option } = Select;
-
 // const GeneralSettings = () => {
 //   const [systemStatus, setSystemStatus] = useState('Online');
 //   const [systemName, setSystemName] = useState('My System');
@@ -645,7 +586,6 @@
 //   const [systemTimezone, setSystemTimezone] = useState('');
 //   const [languagePreference, setLanguagePreference] = useState('English');
 //   const [timezones, setTimezones] = useState<any[]>([]);
-
 //   useEffect(() => {
 //     // Fetch current system settings
 //     request(`/system-settings`, { method: 'GET' })
@@ -670,7 +610,6 @@
 //         }
 //       })
 //       .catch(() => message.error('Failed to fetch system settings'));
-
 //     // Fetch available timezones
 //     request('/time-zones', { method: 'GET' })
 //       .then((response: any) => {
@@ -682,7 +621,6 @@
 //       })
 //       .catch(() => message.error('Failed to fetch timezones'));
 //   }, []);
-
 //   const handleUpdateSettings = (updatedData: any) => {
 //     request(`/system-settings`, {
 //       method: 'PUT',
@@ -697,7 +635,6 @@
 //       })
 //       .catch(() => message.error('Failed to update settings'));
 //   };
-
 //   return (
 //     <Row justify="center" align="middle" style={{ minHeight: '100vh' }}>
 //       <Col span={24} md={16} lg={12}>
@@ -717,7 +654,6 @@
 //                 unCheckedChildren="Offline"
 //               />
 //             </Form.Item>
-
 //             {/* System Name */}
 //             <Form.Item label="System Name">
 //               <Input
@@ -728,7 +664,6 @@
 //                 }}
 //               />
 //             </Form.Item>
-
 //             {/* Contact Email */}
 //             <Form.Item label="Contact Email">
 //               <Input
@@ -739,7 +674,6 @@
 //                 }}
 //               />
 //             </Form.Item>
-
 //             {/* Contact Phone Number */}
 //             <Form.Item label="Contact Phone Number">
 //               <Input
@@ -750,7 +684,6 @@
 //                 }}
 //               />
 //             </Form.Item>
-
 //             {/* System Timezone */}
 //             <Form.Item label="System Timezone">
 //               <Select
@@ -767,7 +700,6 @@
 //                 ))}
 //               </Select>
 //             </Form.Item>
-
 //             {/* Language Preference */}
 //             <Form.Item label="Language Preference">
 //               <Select
@@ -788,16 +720,13 @@
 //     </Row>
 //   );
 // };
-
 // export default GeneralSettings;
 // import React, { useState, useEffect } from 'react';
 // import { Form, Input, message, Button, Select, Typography, Switch, Card } from 'antd';
 // import { request } from 'umi';
 // import moment from 'moment-timezone';
-
 // const { Title } = Typography;
 // const { Option } = Select;
-
 // const GeneralSettings = () => {
 //   const [systemStatus, setSystemStatus] = useState('Online');
 //   const [systemName, setSystemName] = useState('My System');
@@ -807,7 +736,6 @@
 //   const [languagePreference, setLanguagePreference] = useState('English');
 //   const [timezones, setTimezones] = useState<string[]>([]);
 //   const [currentTime, setCurrentTime] = useState<string>('');
-
 //   useEffect(() => {
 //     // Fetch current system settings
 //     request(`/system-settings`, { method: 'GET' })
@@ -833,7 +761,6 @@
 //         }
 //       })
 //       .catch(() => message.error('Failed to fetch system settings'));
-
 //     // Fetch available timezones
 //     request(`/time-zones`, { method: 'GET' })
 //       .then((response: any) => {
@@ -846,7 +773,6 @@
 //       })
 //       .catch(() => message.error('Failed to fetch timezones'));
 //   }, []);
-
 //   const handleUpdateSettings = (updatedData: any) => {
 //     request(`/system-settings`, {
 //       method: 'PUT',
@@ -864,19 +790,16 @@
 //       })
 //       .catch(() => message.error('Failed to update settings'));
 //   };
-
 //   const updateClock = (timezone: string) => {
 //     if (timezone) {
 //       const updateCurrentTime = () => {
 //         const now = moment().tz(timezone).format('YYYY-MM-DD HH:mm:ss');
 //         setCurrentTime(now);
 //       };
-
 //       updateCurrentTime(); // Set initial time
 //       setInterval(updateCurrentTime, 1000); // Update every second
 //     }
 //   };
-
 //   return (
 //     <div style={{ display: 'flex', flexDirection: 'row', height: '100vh', padding: '24px' }}>
 //       <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
@@ -898,7 +821,6 @@
 //                 unCheckedChildren="Offline"
 //               />
 //             </Form.Item>
-
 //             {/* System Name */}
 //             <Form.Item label="System Name">
 //               <Input
@@ -909,7 +831,6 @@
 //                 }}
 //               />
 //             </Form.Item>
-
 //             {/* Contact Email */}
 //             <Form.Item label="Contact Email">
 //               <Input
@@ -920,7 +841,6 @@
 //                 }}
 //               />
 //             </Form.Item>
-
 //             {/* Contact Phone Number */}
 //             <Form.Item label="Contact Phone Number">
 //               <Input
@@ -931,7 +851,6 @@
 //                 }}
 //               />
 //             </Form.Item>
-
 //             {/* System Timezone */}
 //             <Form.Item label="System Timezone">
 //               <Select
@@ -948,7 +867,6 @@
 //                 ))}
 //               </Select>
 //             </Form.Item>
-
 //             {/* Language Preference */}
 //             <Form.Item label="Language Preference">
 //               <Select
@@ -966,7 +884,6 @@
 //           </Form>
 //         </Card>
 //       </div>
-
 //       <div style={{ position: 'fixed', top: 0, right: 0, padding: '24px' }}>
 //         <Card title="Current Time" style={{ width: 250 }}>
 //           <div>{currentTime}</div>
@@ -975,172 +892,114 @@
 //     </div>
 //   );
 // };
-
 // export default GeneralSettings;
-import React, { useState, useEffect } from 'react';
-import { Form, Input, message, Select, Typography, Switch, Card } from 'antd';
-import { request } from 'umi';
-import moment from 'moment-timezone';
-
-const { Title } = Typography;
-const { Option } = Select;
-
-const GeneralSettings = () => {
-  const [form] = Form.useForm();
-  const [timezones, setTimezones] = useState<string[]>([]);
-  const [currentTime, setCurrentTime] = useState<string>('');
-  const [timezone, setTimezone] = useState<string>('');
-  const [clockInterval, setClockInterval] = useState<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    // Fetch current system settings
-    request(`/system-settings`, { method: 'GET' })
-      .then((response: any) => {
-        if (response.settings) {
-          const { settings, current_system_time } = response;
-          form.setFieldsValue({
-            system_status: settings.system_status,
-            system_name: settings.system_name,
-            contact_email: settings.contact_email,
-            contact_phone: settings.contact_phone,
-            timezone: settings.timezone,
-            language_preference: settings.language_preference,
-          });
-          setTimezone(settings.timezone); // Set timezone for clock
-          setCurrentTime(current_system_time);
-          updateClock(settings.timezone); // Update clock with initial timezone
-        } else {
-          message.error('Failed to fetch system settings');
-        }
-      })
-      .catch(() => message.error('Failed to fetch system settings'));
-
-    // Fetch available timezones
-    request(`/time-zones`, { method: 'GET' })
-      .then((response: any) => {
-        if (response.success === 'true' && Array.isArray(response.data)) {
-          setTimezones(response.data.map((tz: any) => tz.zone_name));
-        } else {
-          message.error('Timezone data is not in the expected format');
-        }
-      })
-      .catch(() => message.error('Failed to fetch timezones'));
-
-    // Cleanup interval on unmount
-    return () => {
-      if (clockInterval) {
-        clearInterval(clockInterval);
-      }
+var react_1 = require("react");
+var antd_1 = require("antd");
+var umi_1 = require("umi");
+var moment_timezone_1 = require("moment-timezone");
+var Title = antd_1.Typography.Title;
+var Option = antd_1.Select.Option;
+var GeneralSettings = function () {
+    var form = antd_1.Form.useForm()[0];
+    var _a = react_1.useState([]), timezones = _a[0], setTimezones = _a[1];
+    var _b = react_1.useState(''), currentTime = _b[0], setCurrentTime = _b[1];
+    var _c = react_1.useState(''), timezone = _c[0], setTimezone = _c[1];
+    var _d = react_1.useState(null), clockInterval = _d[0], setClockInterval = _d[1];
+    react_1.useEffect(function () {
+        // Fetch current system settings
+        umi_1.request("/system-settings", { method: 'GET' })
+            .then(function (response) {
+            if (response.settings) {
+                var settings = response.settings, current_system_time = response.current_system_time;
+                form.setFieldsValue({
+                    system_status: settings.system_status,
+                    system_name: settings.system_name,
+                    contact_email: settings.contact_email,
+                    contact_phone: settings.contact_phone,
+                    timezone: settings.timezone,
+                    language_preference: settings.language_preference
+                });
+                setTimezone(settings.timezone); // Set timezone for clock
+                setCurrentTime(current_system_time);
+                updateClock(settings.timezone); // Update clock with initial timezone
+            }
+            else {
+                antd_1.message.error('Failed to fetch system settings');
+            }
+        })["catch"](function () { return antd_1.message.error('Failed to fetch system settings'); });
+        // Fetch available timezones
+        umi_1.request("/time-zones", { method: 'GET' })
+            .then(function (response) {
+            if (response.success === 'true' && Array.isArray(response.data)) {
+                setTimezones(response.data.map(function (tz) { return tz.zone_name; }));
+            }
+            else {
+                antd_1.message.error('Timezone data is not in the expected format');
+            }
+        })["catch"](function () { return antd_1.message.error('Failed to fetch timezones'); });
+        // Cleanup interval on unmount
+        return function () {
+            if (clockInterval) {
+                clearInterval(clockInterval);
+            }
+        };
+    }, []);
+    var handleUpdateSettings = function (updatedData) {
+        umi_1.request("/system-settings", {
+            method: 'PUT',
+            data: updatedData
+        })
+            .then(function (response) {
+            if (response.message === 'Settings updated successfully') {
+                antd_1.message.success('Settings updated successfully');
+            }
+            else {
+                antd_1.message.error('Failed to update settings');
+            }
+        })["catch"](function () { return antd_1.message.error('Failed to update settings'); });
     };
-  }, []);
-
-  const handleUpdateSettings = (updatedData: any) => {
-    request(`/system-settings`, {
-      method: 'PUT',
-      data: updatedData,
-    })
-      .then((response: any) => {
-        if (response.message === 'Settings updated successfully') {
-          message.success('Settings updated successfully');
-        } else {
-          message.error('Failed to update settings');
+    var updateClock = function (timezone) {
+        if (clockInterval) {
+            clearInterval(clockInterval);
         }
-      })
-      .catch(() => message.error('Failed to update settings'));
-  };
-
-  const updateClock = (timezone: string) => {
-    if (clockInterval) {
-      clearInterval(clockInterval);
-    }
-
-    const updateCurrentTime = () => {
-      const now = moment().tz(timezone).format('YYYY-MM-DD HH:mm:ss');
-      setCurrentTime(now);
+        var updateCurrentTime = function () {
+            var now = moment_timezone_1["default"]().tz(timezone).format('YYYY-MM-DD HH:mm:ss');
+            setCurrentTime(now);
+        };
+        updateCurrentTime(); // Set initial time
+        var interval = setInterval(updateCurrentTime, 1000); // Update every second
+        setClockInterval(interval); // Store the interval ID for clearing
     };
-
-    updateCurrentTime(); // Set initial time
-    const interval = setInterval(updateCurrentTime, 1000); // Update every second
-    setClockInterval(interval); // Store the interval ID for clearing
-  };
-
-  const onFieldChange = (changedValues: any) => {
-    if (changedValues.timezone) {
-      setTimezone(changedValues.timezone);
-      updateClock(changedValues.timezone);
-    }
-
-    handleUpdateSettings(changedValues);
-  };
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', height: '100vh', padding: '24px' }}>
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-        <Card
-          title={<Title level={4}>General Settings</Title>}
-          style={{ width: 500, marginRight: '16px', borderRadius: '8px' }}
-        >
-          <Form form={form} layout="vertical" onValuesChange={onFieldChange}>
-            {/* System Status */}
-            <Form.Item name="system_status" label="System Status">
-              <Switch
-                checked={form.getFieldValue('system_status') === 'Online'}
-                onChange={(checked) => form.setFieldsValue({ system_status: checked ? 'Online' : 'Offline' })}
-                checkedChildren="Online"
-                unCheckedChildren="Offline"
-              />
-            </Form.Item>
-
-            {/* System Name */}
-            <Form.Item name="system_name" label="System Name">
-              <Input />
-            </Form.Item>
-
-            {/* Contact Email */}
-            <Form.Item name="contact_email" label="Contact Email">
-              <Input />
-            </Form.Item>
-
-            {/* Contact Phone Number */}
-            <Form.Item name="contact_phone" label="Contact Phone Number">
-              <Input />
-            </Form.Item>
-
-            {/* System Timezone */}
-            <Form.Item name="timezone" label="System Timezone">
-              <Select>
-                {timezones.map((timezone) => (
-                  <Option key={timezone} value={timezone}>
-                    {timezone}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            {/* Language Preference */}
-            <Form.Item name="language_preference" label="Language Preference">
-              <Select>
-                <Option value="English">English</Option>
-                <Option value="Spanish">Spanish</Option>
-                <Option value="French">French</Option>
-              </Select>
-            </Form.Item>
-          </Form>
-        </Card>
-      </div>
-
-      <div style={{ position: 'fixed', top: 0, right: 0, padding: '24px', width: '250px' }}>
-        <Card title="Current Time" style={{ width: '100%', textAlign: 'center', borderRadius: '8px' }}>
-          <Title level={5} style={{ margin: 0, fontSize: '24px' }}>
-            {currentTime}
-          </Title>
-          <div style={{ marginTop: '8px', color: '#888' }}>
-            <small>Updated Every Second</small>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
+    var onFieldChange = function (changedValues) {
+        if (changedValues.timezone) {
+            setTimezone(changedValues.timezone);
+            updateClock(changedValues.timezone);
+        }
+        handleUpdateSettings(changedValues);
+    };
+    return (react_1["default"].createElement("div", { style: { display: 'flex', flexDirection: 'row', height: '100vh', padding: '24px' } },
+        react_1["default"].createElement("div", { style: { flex: 1, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' } },
+            react_1["default"].createElement(antd_1.Card, { title: react_1["default"].createElement(Title, { level: 4 }, "General Settings"), style: { width: 500, marginRight: '16px', borderRadius: '8px' } },
+                react_1["default"].createElement(antd_1.Form, { form: form, layout: "vertical", onValuesChange: onFieldChange },
+                    react_1["default"].createElement(antd_1.Form.Item, { name: "system_status", label: "System Status" },
+                        react_1["default"].createElement(antd_1.Switch, { checked: form.getFieldValue('system_status') === 'Online', onChange: function (checked) { return form.setFieldsValue({ system_status: checked ? 'Online' : 'Offline' }); }, checkedChildren: "Online", unCheckedChildren: "Offline" })),
+                    react_1["default"].createElement(antd_1.Form.Item, { name: "system_name", label: "System Name" },
+                        react_1["default"].createElement(antd_1.Input, null)),
+                    react_1["default"].createElement(antd_1.Form.Item, { name: "contact_email", label: "Contact Email" },
+                        react_1["default"].createElement(antd_1.Input, null)),
+                    react_1["default"].createElement(antd_1.Form.Item, { name: "contact_phone", label: "Contact Phone Number" },
+                        react_1["default"].createElement(antd_1.Input, null)),
+                    react_1["default"].createElement(antd_1.Form.Item, { name: "timezone", label: "System Timezone" },
+                        react_1["default"].createElement(antd_1.Select, null, timezones.map(function (timezone) { return (react_1["default"].createElement(Option, { key: timezone, value: timezone }, timezone)); }))),
+                    react_1["default"].createElement(antd_1.Form.Item, { name: "language_preference", label: "Language Preference" },
+                        react_1["default"].createElement(antd_1.Select, null,
+                            react_1["default"].createElement(Option, { value: "English" }, "English"),
+                            react_1["default"].createElement(Option, { value: "Spanish" }, "Spanish"),
+                            react_1["default"].createElement(Option, { value: "French" }, "French")))))),
+        react_1["default"].createElement("div", { style: { position: 'fixed', top: 0, right: 0, padding: '24px', width: '250px' } },
+            react_1["default"].createElement(antd_1.Card, { title: "Current Time", style: { width: '100%', textAlign: 'center', borderRadius: '8px' } },
+                react_1["default"].createElement(Title, { level: 5, style: { margin: 0, fontSize: '24px' } }, currentTime),
+                react_1["default"].createElement("div", { style: { marginTop: '8px', color: '#888' } },
+                    react_1["default"].createElement("small", null, "Updated Every Second"))))));
 };
-
-export default GeneralSettings;
+exports["default"] = GeneralSettings;

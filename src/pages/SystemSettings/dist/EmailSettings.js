@@ -1,3 +1,4 @@
+"use strict";
 // import { ProCard } from '@ant-design/pro-components';
 // import {
 //   Button,
@@ -13,17 +14,15 @@
 // } from 'antd';
 // import { useEffect, useState } from 'react';
 // import { request } from 'umi'; // Import request from umi for API calls
-
+exports.__esModule = true;
 // const { Title } = Typography;
 // const { Panel } = Collapse;
-
 // const EmailSettings = () => {
 //   const [isModalVisible, setIsModalVisible] = useState(false);
 //   const [emails, setEmails] = useState<any[]>([]);
 //   const [emailDetailsVisible, setEmailDetailsVisible] = useState<string | null>(
 //     null,
 //   );
-
 //   // Fetch emails for viewing
 //   useEffect(() => {
 //     const fetchEmails = async () => {
@@ -39,10 +38,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchEmails();
 //   }, []);
-
 //   // Handle email deletion
 //   const handleDeleteEmail = async (emailId: string) => {
 //     try {
@@ -54,7 +51,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   const handleComposeEmail = async (values: any) => {
 //     try {
 //       await request('/compose-email', {
@@ -68,7 +64,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   const emailColumns = [
 //     {
 //       title: 'Recipient',
@@ -113,9 +108,7 @@
 //       ),
 //     },
 //   ];
-
 //   const emailDetails = emails.find((email) => email.id === emailDetailsVisible);
-
 //   return (
 //     <ProCard title="" bordered>
 //       <div style={{ padding: '16px' }}>
@@ -138,7 +131,6 @@
 //               </Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Email Template */}
 //           <ProCard bordered>
 //             <div
@@ -152,7 +144,6 @@
 //               <Button type="primary">View Template</Button>
 //             </div>
 //           </ProCard>
-
 //           {/* Email Logs/Queue */}
 //           <ProCard bordered>
 //             <div
@@ -204,7 +195,6 @@
 //           </ProCard>
 //         </div>
 //       </div>
-
 //       {/* Modal for Composing Email */}
 //       <Modal
 //         title="Compose Email"
@@ -248,7 +238,6 @@
 //     </ProCard>
 //   );
 // };
-
 // export default EmailSettings;
 // import React, { useState, useEffect } from 'react';
 // import { ProCard } from '@ant-design/pro-components';
@@ -267,12 +256,10 @@
 //   Typography,
 // } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
 // const { Panel } = Collapse;
 // const { TabPane } = Tabs;
 // const { Option } = Select;
-
 // const EmailSettings = () => {
 //   const [form] = Form.useForm();
 //   const [currentConfig, setCurrentConfig] = useState<any>({});
@@ -281,7 +268,6 @@
 //   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
 //   const [emails, setEmails] = useState<any[]>([]);
 //   const [isModalVisible, setIsModalVisible] = useState(false);
-
 //   // Fetch email configuration
 //   useEffect(() => {
 //     const fetchEmailConfig = async () => {
@@ -306,10 +292,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchEmailConfig();
 //   }, [form]);
-
 //   // Fetch server options
 //   useEffect(() => {
 //     const fetchServerOptions = async () => {
@@ -326,10 +310,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchServerOptions();
 //   }, []);
-
 //   // Fetch email templates
 //   useEffect(() => {
 //     const fetchTemplates = async () => {
@@ -345,10 +327,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchTemplates();
 //   }, []);
-
 //   // Fetch single template
 //   const fetchTemplate = async (templateId: string) => {
 //     try {
@@ -363,7 +343,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Handle update email configuration
 //   const handleUpdateConfig = async (values: any) => {
 //     try {
@@ -377,7 +356,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Handle email deletion
 //   const handleDeleteEmail = async (emailId: string) => {
 //     try {
@@ -389,7 +367,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Handle compose email
 //   const handleComposeEmail = async (values: any) => {
 //     try {
@@ -404,7 +381,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Fetch sent emails
 //   useEffect(() => {
 //     const fetchEmails = async () => {
@@ -420,10 +396,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchEmails();
 //   }, []);
-
 //   // Columns for email logs
 //   const emailColumns = [
 //     {
@@ -458,7 +432,6 @@
 //       ),
 //     },
 //   ];
-
 //   return (
 //     <ProCard title="Email Settings" bordered>
 //       <Tabs defaultActiveKey="1">
@@ -542,7 +515,6 @@
 //             </Form>
 //           </ProCard>
 //         </TabPane>
-
 //         {/* Email Template Tab */}
 //         <TabPane tab="Email Template" key="2">
 //           <ProCard bordered>
@@ -631,7 +603,6 @@
 //             </div>
 //           </ProCard>
 //         </TabPane>
-
 //         {/* Queue Tab */}
 //         <TabPane tab="Queue" key="3">
 //           <ProCard bordered>
@@ -645,7 +616,6 @@
 //             />
 //           </ProCard>
 //         </TabPane>
-
 //         {/* Compose Email Tab */}
 //         <TabPane tab="Compose Email" key="4">
 //           <ProCard bordered>
@@ -690,7 +660,6 @@
 //           </ProCard>
 //         </TabPane>
 //       </Tabs>
-
 //       {/* Compose Email Modal */}
 //       <Modal
 //         title="Compose Email"
@@ -739,7 +708,6 @@
 //     </ProCard>
 //   );
 // };
-
 // export default EmailSettings;
 // import React, { useState, useEffect } from 'react';
 // import { ProCard } from '@ant-design/pro-components';
@@ -758,12 +726,10 @@
 //   Typography,
 // } from 'antd';
 // import { request } from 'umi';
-
 // const { Title } = Typography;
 // const { Panel } = Collapse;
 // const { TabPane } = Tabs;
 // const { Option } = Select;
-
 // const EmailSettings= () => {
 //   const [form] = Form.useForm();
 //   const [currentConfig, setCurrentConfig] = useState<any>({});
@@ -773,8 +739,6 @@
 //   const [emails, setEmails] = useState<any[]>([]);
 //   const [isModalVisible, setIsModalVisible] = useState(false);
 //   const [isTestEmailModalVisible, setIsTestEmailModalVisible] = useState(false);
-  
-
 //   // Fetch email configuration
 //   useEffect(() => {
 //     const fetchEmailConfig = async () => {
@@ -799,10 +763,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchEmailConfig();
 //   }, [form]);
-
 //   // Fetch server options
 //   useEffect(() => {
 //     const fetchServerOptions = async () => {
@@ -818,10 +780,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchServerOptions();
 //   }, []);
-
 //   // Fetch email templates
 //   useEffect(() => {
 //     const fetchTemplates = async () => {
@@ -837,10 +797,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchTemplates();
 //   }, []);
-
 //   // Fetch single template
 //   const fetchTemplate = async (templateId: string) => {
 //     try {
@@ -855,7 +813,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Handle update email configuration
 //   const handleUpdateConfig = async (values: any) => {
 //     try {
@@ -869,7 +826,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Handle email deletion
 //   const handleDeleteEmail = async (emailId: string) => {
 //     try {
@@ -881,7 +837,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Handle compose email
 //   const handleComposeEmail = async (values: any) => {
 //     try {
@@ -896,7 +851,6 @@
 //       console.error(error);
 //     }
 //   };
-
 //   // Handle sending test email
 //   const handleSendTestEmail = async (values: any) => {
 //     try {
@@ -911,7 +865,6 @@
 //       console.error(error);
 //     }
 //   };
- 
 //   // Fetch sent emails
 //   useEffect(() => {
 //     const fetchEmails = async () => {
@@ -927,10 +880,8 @@
 //         console.error(error);
 //       }
 //     };
-
 //     fetchEmails();
 //   }, []);
-
 //   // Columns for email logs
 //   const emailColumns = [
 //     {
@@ -965,7 +916,6 @@
 //       ),
 //     },
 //   ];
-
 //   return (
 //     <ProCard title="Email Settings" bordered>
 //       <Tabs defaultActiveKey="1">
@@ -1046,7 +996,6 @@
 //             </Form>
 //           </ProCard>
 //         </TabPane>
-
 //         {/* Email Template Tab */}
 //         <TabPane tab="Email Template" key="2">
 //           <ProCard bordered>
@@ -1104,7 +1053,6 @@
 //             </div>
 //           </ProCard>
 //         </TabPane>
-
 //         {/* Email Logs Tab */}
 //         <TabPane tab="Email Logs" key="3">
 //           <ProCard bordered>
@@ -1112,7 +1060,6 @@
 //           </ProCard>
 //         </TabPane>
 //       </Tabs>
-
 //       {/* Test Email Modal */}
 //       <Modal
 //         title="Compose Email"
@@ -1161,73 +1108,61 @@
 //     </ProCard>
 //   );
 // };
-
 // export default EmailSettings;
 // 
-import React from 'react';
-import { Tabs } from 'antd';
-import Settings from './Settings';
-import EmailTemplate from './EmailTemplate';
-import Queue from './Queue';
-import SendEmail from './SendEmail';
-import { ProCard } from '@ant-design/pro-components';
-
-const { TabPane } = Tabs;
-
-const EmailManagement = () => {
-  return (
-    <ProCard title="Email Management" bordered>
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Settings" key="1">
-          <Settings />
-        </TabPane>
-        <TabPane tab="Email Template" key="2">
-          <EmailTemplate />
-        </TabPane>
-        <TabPane tab="Queue" key="3">
-          <Queue />
-        </TabPane>
-        <TabPane tab="Send Email" key="4">
-          <SendEmail />
-        </TabPane>
-      </Tabs>
-    </ProCard>
-  );
+var react_1 = require("react");
+var antd_1 = require("antd");
+var Settings_1 = require("./Settings");
+var EmailTemplate_1 = require("./EmailTemplate");
+var Queue_1 = require("./Queue");
+var SendEmail_1 = require("./SendEmail");
+var pro_components_1 = require("@ant-design/pro-components");
+var TabPane = antd_1.Tabs.TabPane;
+var EmailManagement = function () {
+    return (react_1["default"].createElement(pro_components_1.ProCard, { title: "Email Management", bordered: true },
+        react_1["default"].createElement(antd_1.Tabs, { defaultActiveKey: "1" },
+            react_1["default"].createElement(TabPane, { tab: "Settings", key: "1" },
+                react_1["default"].createElement(Settings_1["default"], null)),
+            react_1["default"].createElement(TabPane, { tab: "Email Template", key: "2" },
+                react_1["default"].createElement(EmailTemplate_1["default"], null)),
+            react_1["default"].createElement(TabPane, { tab: "Queue", key: "3" },
+                react_1["default"].createElement(Queue_1["default"], null)),
+            react_1["default"].createElement(TabPane, { tab: "Send Email", key: "4" },
+                react_1["default"].createElement(SendEmail_1["default"], null)))));
 };
-
-export default EmailManagement;
-
-  {/* <Modal
-        title={selectedTemplate ? 'Edit Template' : 'Create Template'}
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        onOk={handleSave}
-        width={800}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item name="name" label="Template Name" rules={[{ required: true, message: 'Please input the template name!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="subject" label="Subject" rules={[{ required: true, message: 'Please input the subject!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="provider" label="Select Provider">
-            <Select onChange={(value) => setEditor(value)}>
-              <Option value="ckeditor">CKEditor</Option>
-              <Option value="beefree">BeeFree</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="body" label="Template Body">
-            {editor === 'ckeditor' && (
-              <CKEditor
-                editor={ClassicEditor}
-                data={form.getFieldValue('body')}
-                onChange={(event, editor) => form.setFieldsValue({ body: editor.getData() })}
-              />
-            )}
-            {editor === 'beefree' && (
-              <Input.TextArea rows={10} />
-            )}
-          </Form.Item>
-        </Form>
-      </Modal> */}
+exports["default"] = EmailManagement;
+{ /* <Modal
+      title={selectedTemplate ? 'Edit Template' : 'Create Template'}
+      visible={isModalVisible}
+      onCancel={() => setIsModalVisible(false)}
+      onOk={handleSave}
+      width={800}
+    >
+      <Form form={form} layout="vertical">
+        <Form.Item name="name" label="Template Name" rules={[{ required: true, message: 'Please input the template name!' }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="subject" label="Subject" rules={[{ required: true, message: 'Please input the subject!' }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item name="provider" label="Select Provider">
+          <Select onChange={(value) => setEditor(value)}>
+            <Option value="ckeditor">CKEditor</Option>
+            <Option value="beefree">BeeFree</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item name="body" label="Template Body">
+          {editor === 'ckeditor' && (
+            <CKEditor
+              editor={ClassicEditor}
+              data={form.getFieldValue('body')}
+              onChange={(event, editor) => form.setFieldsValue({ body: editor.getData() })}
+            />
+          )}
+          {editor === 'beefree' && (
+            <Input.TextArea rows={10} />
+          )}
+        </Form.Item>
+      </Form>
+    </Modal> */
+}
