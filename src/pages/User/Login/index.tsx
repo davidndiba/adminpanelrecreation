@@ -348,7 +348,7 @@ const LoginPage: React.FC = () => {
     try {
       const response = await request(`/auth/login`, {
         method: 'POST',
-        data: { email, password },
+        data: { login:email, password },
       });
 
       if (response.success) {
