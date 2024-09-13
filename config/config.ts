@@ -19,5 +19,5 @@ export default defineConfig({
     antd: true,
     baseNavigator: false,
   },
-  esbuildMinifyIIFE: false,
+  esbuildMinifyIIFE: true,
 });
