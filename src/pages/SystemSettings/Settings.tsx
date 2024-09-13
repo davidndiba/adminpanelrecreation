@@ -1,72 +1,4 @@
-// import React, { useState, useEffect } from 'react';
-// import { Form, Select, message, Row, Col, Typography } from 'antd';
-// import { request } from 'umi';
 
-// const { Title } = Typography;
-// const { Option } = Select;
-
-// const Settings = () => {
-//   const [form] = Form.useForm();
-//   const [serverOptions, setServerOptions] = useState([]);
-
-//   useEffect(() => {
-//     const fetchServerOptions = async () => {
-//       try {
-//         const response = await request('/mail-config');
-//         if (response.success) {
-//           setServerOptions([{ value: 'smtp', label: 'SMTP' }, { value: 'sendmail', label: 'Sendmail' }]);
-//         } else {
-//           message.error(response.message || 'Failed to fetch server options');
-//         }
-//       } catch (error) {
-//         message.error('Failed to fetch server options');
-//       }
-//     };
-
-//     fetchServerOptions();
-//   }, []);
-
-//   const handleUpdateConfig = async (values) => {
-//     try {
-//       await request('/mail-config/update', {
-//         method: 'POST',
-//         data: values,
-//       });
-//       message.success('Email configuration updated successfully');
-//     } catch (error) {
-//       message.error('Failed to update email configuration');
-//     }
-//   };
-
-//   return (
-//     <Row justify="center" align="middle" style={{ minHeight: '60vh' }}>
-//       <Col xs={24} sm={20} md={16} lg={12}>
-//         <Form
-//           form={form}
-//           layout="vertical"
-//           onFinish={handleUpdateConfig}
-//           style={{ padding: '16px', background: '#fff', borderRadius: '8px' }}
-//         >
-//           <Title level={4}>Email Configuration</Title>
-//           <Form.Item
-//             label="Mailer"
-//             name="mailer"
-//             rules={[{ required: true, message: 'Please select the mailer!' }]}
-//           >
-//             <Select style={{ width: '100%' }}>
-//               {serverOptions.map((option) => (
-//                 <Option key={option.value} value={option.value}>{option.label}</Option>
-//               ))}
-//             </Select>
-//           </Form.Item>
-//           {/* Add other form fields as needed */}
-//         </Form>
-//       </Col>
-//     </Row>
-//   );
-// };
-
-// export default Settings;
 import React, { useState, useEffect } from 'react';
 import { Form, Select, message, Row, Col, Typography, Input, Button, Modal } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -152,7 +84,7 @@ const Settings = () => {
 
   return (
     <PageContainer>
-      <Row justify="center" align="middle" style={{ minHeight: '60vh' }}>
+      <Row justify="center" align="middle" style={{ minHeight: '40vh' }}>
         <Col xs={24} sm={20} md={16} lg={12}>
           <Form
             form={form}

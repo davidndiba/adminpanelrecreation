@@ -83,7 +83,7 @@ const HeatMap: React.FC = () => {
   return (
     <ProCard
       title="World Heat Map"
-      style={{ marginBottom: 24, height: '500px' }} // Adjust the height of the card
+      style={{ marginBottom: 24, height: '500px' }} 
       bordered
       bodyStyle={{ padding: 0, height: '100%', overflow: 'hidden' }} // Prevent overflow
     >
