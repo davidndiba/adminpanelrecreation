@@ -438,7 +438,7 @@
 // export default Permissions;
 import React, { useState, useEffect } from 'react';
 import { Table, Checkbox, Button, message, Modal } from 'antd';
-import { request } from 'umi';
+import { request, useRequest } from 'umi';
 
 interface Role {
   id: string;
@@ -455,7 +455,8 @@ const PermissionsManagement: React.FC = () => {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [permissionsByRole, setPermissionsByRole] = useState<Record<string, Set<string>>>({});
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const {data} = useRequest(()=>request(`/permissions`))
+  console.log(data)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -469,7 +470,7 @@ const PermissionsManagement: React.FC = () => {
         setPermissions(fetchedPermissions);
 
         // Fetch role-permissions mapping
-        const rolePermissionsResponse = await request('/role-permissions', { method: 'GET' });
+        // const rolePermissionsResponse = await request('/role-permissions', { method: 'GET' });
         const rolePermissions = rolePermissionsResponse.data.reduce((acc: Record<string, Set<string>>, item: any) => {
           if (!acc[item.role_id]) acc[item.role_id] = new Set();
           acc[item.role_id].add(item.permission_id);
@@ -527,12 +528,13 @@ const PermissionsManagement: React.FC = () => {
     ...roles.map(role => ({
       title: role.name,
       key: role.id,
-      render: (permission: Permission) => (
-        <Checkbox
-          checked={permissionsByRole[role.id]?.has(permission.id) || false}
+      render: (permission: Permission) => {
+       console.log(role?.permissions?.filter((v)=>v?.id===permission?.id).length > 0)
+        return<Checkbox
+          checked={role?.permissions?.filter((v)=>v?.id===permission?.id).length > 0}
           onChange={(e) => handleCheckboxChange(role.id, permission.id, e.target.checked)}
         />
-      ),
+      },
     })),
   ];
 
@@ -541,7 +543,7 @@ const PermissionsManagement: React.FC = () => {
     key: permission.id,
     ...permission,
   }));
-
+console.log(permissions)
   return (
     <div>
       <Button
@@ -552,7 +554,7 @@ const PermissionsManagement: React.FC = () => {
       </Button>
 
       <Table
-        dataSource={dataSource}
+        dataSource={data?.data}
         columns={columns}
         pagination={false}
         scroll={{ x: 'max-content' }}
