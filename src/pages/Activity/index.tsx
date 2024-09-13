@@ -6,7 +6,7 @@ import ActivityLogs from './components/ActivityLogsTable';
 
 const Dashboard = () => (
   <PageContainer>
-    {/* Statistics at the top */}
+   
     <Statistics />
     
     {/* HeatMap below the statistics */}

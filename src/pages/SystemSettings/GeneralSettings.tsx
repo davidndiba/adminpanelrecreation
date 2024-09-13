@@ -474,511 +474,10 @@
 // };
 
 // export default GeneralSettings;
-// import React, { useState, useEffect } from 'react';
-// import { Form, Input, message, Button, Select, Typography, Switch } from 'antd';
-// import { request } from 'umi';
 
-// const { Title } = Typography;
-// const { Option } = Select;
-
-// const GeneralSettings = () => {
-//   const [systemStatus, setSystemStatus] = useState('Online');
-//   const [systemName, setSystemName] = useState('My System');
-//   const [contactEmail, setContactEmail] = useState('contact@example.com');
-//   const [contactPhone, setContactPhone] = useState('+1234567890');
-//   const [systemTimezone, setSystemTimezone] = useState('');
-//   const [languagePreference, setLanguagePreference] = useState('English');
-//   const [timezones, setTimezones] = useState<string[]>([]);
-
-//   useEffect(() => {
-//     // Fetch current system settings
-//     request(`/system-settings`, { method: 'GET' })
-//       .then((response: any) => {
-//         if (response) {
-//           const {
-//             system_status,
-//             system_name,
-//             contact_email,
-//             contact_phone,
-//             timezone,
-//             language_preference,
-//           } = response;
-//           setSystemStatus(system_status);
-//           setSystemName(system_name);
-//           setContactEmail(contact_email);
-//           setContactPhone(contact_phone);
-//           setSystemTimezone(timezone);
-//           setLanguagePreference(language_preference);
-//         } else {
-//           message.error('Failed to fetch system settings');
-//         }
-//       })
-//       .catch(() => message.error('Failed to fetch system settings'));
-
-//     // Fetch available timezones
-//     request(`/timezones`, { method: 'GET' })
-//       .then((response: any) => {
-//         if (Array.isArray(response)) {
-//           setTimezones(response);
-//         } else {
-//           message.error('Timezone data is not in the expected format');
-//         }
-//       })
-//       .catch(() => message.error('Failed to fetch timezones'));
-//   }, []);
-
-//   const handleUpdateSettings = (updatedData: any) => {
-//     request(`/system-settings`, {
-//       method: 'PUT',
-//       data: updatedData,
-//     })
-//       .then((response: any) => {
-//         if (response.message === 'Settings updated successfully') {
-//           message.success('Settings updated successfully');
-//         } else {
-//           message.error('Failed to update settings');
-//         }
-//       })
-//       .catch(() => message.error('Failed to update settings'));
-//   };
-
-//   return (
-//     <div style={{ padding: '24px' }}>
-//       <Title level={4} style={{ marginBottom: '16px' }}>General Settings</Title>
-//       <Form layout="vertical">
-//         {/* System Status */}
-//         <Form.Item label="System Status">
-//           <Switch
-//             checked={systemStatus === 'Online'}
-//             onChange={(checked) => {
-//               const newStatus = checked ? 'Online' : 'Offline';
-//               setSystemStatus(newStatus);
-//               handleUpdateSettings({ system_status: newStatus });
-//             }}
-//             checkedChildren="Online"
-//             unCheckedChildren="Offline"
-//           />
-//         </Form.Item>
-
-//         {/* System Name */}
-//         <Form.Item label="System Name">
-//           <Input
-//             value={systemName}
-//             onChange={(e) => {
-//               setSystemName(e.target.value);
-//               handleUpdateSettings({ system_name: e.target.value });
-//             }}
-//           />
-//         </Form.Item>
-
-//         {/* Contact Email */}
-//         <Form.Item label="Contact Email">
-//           <Input
-//             value={contactEmail}
-//             onChange={(e) => {
-//               setContactEmail(e.target.value);
-//               handleUpdateSettings({ contact_email: e.target.value });
-//             }}
-//           />
-//         </Form.Item>
-
-//         {/* Contact Phone Number */}
-//         <Form.Item label="Contact Phone Number">
-//           <Input
-//             value={contactPhone}
-//             onChange={(e) => {
-//               setContactPhone(e.target.value);
-//               handleUpdateSettings({ contact_phone: e.target.value });
-//             }}
-//           />
-//         </Form.Item>
-
-//         {/* System Timezone */}
-//         <Form.Item label="System Timezone">
-//           <Select
-//             value={systemTimezone}
-//             onChange={(value) => {
-//               setSystemTimezone(value);
-//               handleUpdateSettings({ timezone: value });
-//             }}
-//           >
-//             {timezones.map((timezone) => (
-//               <Option key={timezone} value={timezone}>
-//                 {timezone}
-//               </Option>
-//             ))}
-//           </Select>
-//         </Form.Item>
-
-//         {/* Language Preference */}
-//         <Form.Item label="Language Preference">
-//           <Select
-//             value={languagePreference}
-//             onChange={(value) => {
-//               setLanguagePreference(value);
-//               handleUpdateSettings({ language_preference: value });
-//             }}
-//           >
-//             <Option value="English">English</Option>
-//             <Option value="Spanish">Spanish</Option>
-//             <Option value="French">French</Option>
-//           </Select>
-//         </Form.Item>
-//       </Form>
-//     </div>
-//   );
-// };
-
-// export default GeneralSettings;
-// import React, { useState, useEffect } from 'react';
-// import { Form, Input, message, Switch, Select, Typography, Row, Col, Card } from 'antd';
-// import { request } from 'umi';
-
-// const { Title } = Typography;
-// const { Option } = Select;
-
-// const GeneralSettings = () => {
-//   const [systemStatus, setSystemStatus] = useState('Online');
-//   const [systemName, setSystemName] = useState('My System');
-//   const [contactEmail, setContactEmail] = useState('contact@example.com');
-//   const [contactPhone, setContactPhone] = useState('+1234567890');
-//   const [systemTimezone, setSystemTimezone] = useState('');
-//   const [languagePreference, setLanguagePreference] = useState('English');
-//   const [timezones, setTimezones] = useState<any[]>([]);
-
-//   useEffect(() => {
-//     // Fetch current system settings
-//     request(`/system-settings`, { method: 'GET' })
-//       .then((response: any) => {
-//         if (response) {
-//           const {
-//             system_status,
-//             system_name,
-//             contact_email,
-//             contact_phone,
-//             timezone,
-//             language_preference,
-//           } = response;
-//           setSystemStatus(system_status);
-//           setSystemName(system_name);
-//           setContactEmail(contact_email);
-//           setContactPhone(contact_phone);
-//           setSystemTimezone(timezone);
-//           setLanguagePreference(language_preference);
-//         } else {
-//           message.error('Failed to fetch system settings');
-//         }
-//       })
-//       .catch(() => message.error('Failed to fetch system settings'));
-
-//     // Fetch available timezones
-//     request('/time-zones', { method: 'GET' })
-//       .then((response: any) => {
-//         if (response.success === 'true' && Array.isArray(response.data)) {
-//           setTimezones(response.data);
-//         } else {
-//           message.error('Timezone data is not in the expected format');
-//         }
-//       })
-//       .catch(() => message.error('Failed to fetch timezones'));
-//   }, []);
-
-//   const handleUpdateSettings = (updatedData: any) => {
-//     request(`/system-settings`, {
-//       method: 'PUT',
-//       data: updatedData,
-//     })
-//       .then((response: any) => {
-//         if (response.message === 'Settings updated successfully') {
-//           message.success('Settings updated successfully');
-//         } else {
-//           message.error('Failed to update settings');
-//         }
-//       })
-//       .catch(() => message.error('Failed to update settings'));
-//   };
-
-//   return (
-//     <Row justify="center" align="middle" style={{ minHeight: '100vh' }}>
-//       <Col span={24} md={16} lg={12}>
-//         <Card style={{ padding: '24px' }}>
-//           <Title level={4} style={{ marginBottom: '16px' }}>General Settings</Title>
-//           <Form layout="vertical">
-//             {/* System Status */}
-//             <Form.Item label="System Status">
-//               <Switch
-//                 checked={systemStatus === 'Online'}
-//                 onChange={(checked) => {
-//                   const newStatus = checked ? 'Online' : 'Offline';
-//                   setSystemStatus(newStatus);
-//                   handleUpdateSettings({ system_status: newStatus });
-//                 }}
-//                 checkedChildren="Online"
-//                 unCheckedChildren="Offline"
-//               />
-//             </Form.Item>
-
-//             {/* System Name */}
-//             <Form.Item label="System Name">
-//               <Input
-//                 value={systemName}
-//                 onChange={(e) => {
-//                   setSystemName(e.target.value);
-//                   handleUpdateSettings({ system_name: e.target.value });
-//                 }}
-//               />
-//             </Form.Item>
-
-//             {/* Contact Email */}
-//             <Form.Item label="Contact Email">
-//               <Input
-//                 value={contactEmail}
-//                 onChange={(e) => {
-//                   setContactEmail(e.target.value);
-//                   handleUpdateSettings({ contact_email: e.target.value });
-//                 }}
-//               />
-//             </Form.Item>
-
-//             {/* Contact Phone Number */}
-//             <Form.Item label="Contact Phone Number">
-//               <Input
-//                 value={contactPhone}
-//                 onChange={(e) => {
-//                   setContactPhone(e.target.value);
-//                   handleUpdateSettings({ contact_phone: e.target.value });
-//                 }}
-//               />
-//             </Form.Item>
-
-//             {/* System Timezone */}
-//             <Form.Item label="System Timezone">
-//               <Select
-//                 value={systemTimezone}
-//                 onChange={(value) => {
-//                   setSystemTimezone(value);
-//                   handleUpdateSettings({ timezone: value });
-//                 }}
-//               >
-//                 {timezones.map((timezone) => (
-//                   <Option key={timezone.zone_name} value={timezone.zone_name}>
-//                     {timezone.zone_name}
-//                   </Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
-
-//             {/* Language Preference */}
-//             <Form.Item label="Language Preference">
-//               <Select
-//                 value={languagePreference}
-//                 onChange={(value) => {
-//                   setLanguagePreference(value);
-//                   handleUpdateSettings({ language_preference: value });
-//                 }}
-//               >
-//                 <Option value="English">English</Option>
-//                 <Option value="Spanish">Spanish</Option>
-//                 <Option value="French">French</Option>
-//               </Select>
-//             </Form.Item>
-//           </Form>
-//         </Card>
-//       </Col>
-//     </Row>
-//   );
-// };
-
-// export default GeneralSettings;
-// import React, { useState, useEffect } from 'react';
-// import { Form, Input, message, Button, Select, Typography, Switch, Card } from 'antd';
-// import { request } from 'umi';
-// import moment from 'moment-timezone';
-
-// const { Title } = Typography;
-// const { Option } = Select;
-
-// const GeneralSettings = () => {
-//   const [systemStatus, setSystemStatus] = useState('Online');
-//   const [systemName, setSystemName] = useState('My System');
-//   const [contactEmail, setContactEmail] = useState('contact@example.com');
-//   const [contactPhone, setContactPhone] = useState('+1234567890');
-//   const [systemTimezone, setSystemTimezone] = useState('');
-//   const [languagePreference, setLanguagePreference] = useState('English');
-//   const [timezones, setTimezones] = useState<string[]>([]);
-//   const [currentTime, setCurrentTime] = useState<string>('');
-
-//   useEffect(() => {
-//     // Fetch current system settings
-//     request(`/system-settings`, { method: 'GET' })
-//       .then((response: any) => {
-//         if (response) {
-//           const {
-//             system_status,
-//             system_name,
-//             contact_email,
-//             contact_phone,
-//             timezone,
-//             language_preference,
-//           } = response;
-//           setSystemStatus(system_status);
-//           setSystemName(system_name);
-//           setContactEmail(contact_email);
-//           setContactPhone(contact_phone);
-//           setSystemTimezone(timezone);
-//           setLanguagePreference(language_preference);
-//           updateClock(timezone);
-//         } else {
-//           message.error('Failed to fetch system settings');
-//         }
-//       })
-//       .catch(() => message.error('Failed to fetch system settings'));
-
-//     // Fetch available timezones
-//     request(`/time-zones`, { method: 'GET' })
-//       .then((response: any) => {
-//         if (response.success === 'true' && Array.isArray(response.data)) {
-//           // Extract zone_name from the response data
-//           setTimezones(response.data.map((tz: any) => tz.zone_name));
-//         } else {
-//           message.error('Timezone data is not in the expected format');
-//         }
-//       })
-//       .catch(() => message.error('Failed to fetch timezones'));
-//   }, []);
-
-//   const handleUpdateSettings = (updatedData: any) => {
-//     request(`/system-settings`, {
-//       method: 'PUT',
-//       data: updatedData,
-//     })
-//       .then((response: any) => {
-//         if (response.message === 'Settings updated successfully') {
-//           message.success('Settings updated successfully');
-//           if (updatedData.timezone) {
-//             updateClock(updatedData.timezone);
-//           }
-//         } else {
-//           message.error('Failed to update settings');
-//         }
-//       })
-//       .catch(() => message.error('Failed to update settings'));
-//   };
-
-//   const updateClock = (timezone: string) => {
-//     if (timezone) {
-//       const updateCurrentTime = () => {
-//         const now = moment().tz(timezone).format('YYYY-MM-DD HH:mm:ss');
-//         setCurrentTime(now);
-//       };
-
-//       updateCurrentTime(); // Set initial time
-//       setInterval(updateCurrentTime, 1000); // Update every second
-//     }
-//   };
-
-//   return (
-//     <div style={{ display: 'flex', flexDirection: 'row', height: '100vh', padding: '24px' }}>
-//       <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-//         <Card
-//           title={<Title level={4}>General Settings</Title>}
-//           style={{ width: 500, marginRight: '16px', borderRadius: '8px' }}
-//         >
-//           <Form layout="vertical">
-//             {/* System Status */}
-//             <Form.Item label="System Status">
-//               <Switch
-//                 checked={systemStatus === 'Online'}
-//                 onChange={(checked) => {
-//                   const newStatus = checked ? 'Online' : 'Offline';
-//                   setSystemStatus(newStatus);
-//                   handleUpdateSettings({ system_status: newStatus });
-//                 }}
-//                 checkedChildren="Online"
-//                 unCheckedChildren="Offline"
-//               />
-//             </Form.Item>
-
-//             {/* System Name */}
-//             <Form.Item label="System Name">
-//               <Input
-//                 value={systemName}
-//                 onChange={(e) => {
-//                   setSystemName(e.target.value);
-//                   handleUpdateSettings({ system_name: e.target.value });
-//                 }}
-//               />
-//             </Form.Item>
-
-//             {/* Contact Email */}
-//             <Form.Item label="Contact Email">
-//               <Input
-//                 value={contactEmail}
-//                 onChange={(e) => {
-//                   setContactEmail(e.target.value);
-//                   handleUpdateSettings({ contact_email: e.target.value });
-//                 }}
-//               />
-//             </Form.Item>
-
-//             {/* Contact Phone Number */}
-//             <Form.Item label="Contact Phone Number">
-//               <Input
-//                 value={contactPhone}
-//                 onChange={(e) => {
-//                   setContactPhone(e.target.value);
-//                   handleUpdateSettings({ contact_phone: e.target.value });
-//                 }}
-//               />
-//             </Form.Item>
-
-//             {/* System Timezone */}
-//             <Form.Item label="System Timezone">
-//               <Select
-//                 value={systemTimezone}
-//                 onChange={(value) => {
-//                   setSystemTimezone(value);
-//                   handleUpdateSettings({ timezone: value });
-//                 }}
-//               >
-//                 {timezones.map((timezone) => (
-//                   <Option key={timezone} value={timezone}>
-//                     {timezone}
-//                   </Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
-
-//             {/* Language Preference */}
-//             <Form.Item label="Language Preference">
-//               <Select
-//                 value={languagePreference}
-//                 onChange={(value) => {
-//                   setLanguagePreference(value);
-//                   handleUpdateSettings({ language_preference: value });
-//                 }}
-//               >
-//                 <Option value="English">English</Option>
-//                 <Option value="Spanish">Spanish</Option>
-//                 <Option value="French">French</Option>
-//               </Select>
-//             </Form.Item>
-//           </Form>
-//         </Card>
-//       </div>
-
-//       <div style={{ position: 'fixed', top: 0, right: 0, padding: '24px' }}>
-//         <Card title="Current Time" style={{ width: 250 }}>
-//           <div>{currentTime}</div>
-//         </Card>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default GeneralSettings;
 import React, { useState, useEffect } from 'react';
 import { Form, Input, message, Select, Typography, Switch, Card } from 'antd';
+import { PageContainer } from '@ant-design/pro-layout'; // Import PageContainer
 import { request } from 'umi';
 import moment from 'moment-timezone';
 
@@ -988,12 +487,14 @@ const { Option } = Select;
 const GeneralSettings = () => {
   const [form] = Form.useForm();
   const [timezones, setTimezones] = useState<string[]>([]);
-  const [currentTime, setCurrentTime] = useState<string>('');
-  const [timezone, setTimezone] = useState<string>('');
+  const [languages, setLanguages] = useState<any[]>([]); // State for languages
+  const [currentTime, setCurrentTime] = useState<string>(''); // System time
+  const [timezone, setTimezone] = useState<string>(''); // Timezone state
   const [clockInterval, setClockInterval] = useState<NodeJS.Timeout | null>(null);
 
+  // Fetch system settings, timezones, and languages
   useEffect(() => {
-    // Fetch current system settings
+    // Fetch system settings including current time and timezone
     request(`/system-settings`, { method: 'GET' })
       .then((response: any) => {
         if (response.settings) {
@@ -1006,9 +507,9 @@ const GeneralSettings = () => {
             timezone: settings.timezone,
             language_preference: settings.language_preference,
           });
-          setTimezone(settings.timezone); // Set timezone for clock
-          setCurrentTime(current_system_time);
-          updateClock(settings.timezone); // Update clock with initial timezone
+          setTimezone(settings.timezone); // Set the system timezone
+          setCurrentTime(current_system_time); // Set the system time from the endpoint
+          updateClock(settings.timezone); // Update clock based on the system timezone
         } else {
           message.error('Failed to fetch system settings');
         }
@@ -1026,13 +527,40 @@ const GeneralSettings = () => {
       })
       .catch(() => message.error('Failed to fetch timezones'));
 
-    // Cleanup interval on unmount
+    // Fetch available languages
+    request(`/languages`, { method: 'GET' })
+      .then((response: any) => {
+        if (Array.isArray(response)) {
+          setLanguages(response);
+        } else {
+          message.error('Failed to fetch languages');
+        }
+      })
+      .catch(() => message.error('Failed to fetch languages'));
+
+    // Cleanup clock interval on unmount
     return () => {
       if (clockInterval) {
         clearInterval(clockInterval);
       }
     };
   }, []);
+
+  // Update the clock based on timezone
+  const updateClock = (timezone: string) => {
+    if (clockInterval) {
+      clearInterval(clockInterval);
+    }
+
+    const updateCurrentTime = () => {
+      const now = moment().tz(timezone).format('YYYY-MM-DD HH:mm:ss');
+      setCurrentTime(now);
+    };
+
+    updateCurrentTime(); // Set initial time
+    const interval = setInterval(updateCurrentTime, 1000); // Update every second
+    setClockInterval(interval); // Store the interval ID for clearing
+  };
 
   const handleUpdateSettings = (updatedData: any) => {
     request(`/system-settings`, {
@@ -1049,21 +577,6 @@ const GeneralSettings = () => {
       .catch(() => message.error('Failed to update settings'));
   };
 
-  const updateClock = (timezone: string) => {
-    if (clockInterval) {
-      clearInterval(clockInterval);
-    }
-
-    const updateCurrentTime = () => {
-      const now = moment().tz(timezone).format('YYYY-MM-DD HH:mm:ss');
-      setCurrentTime(now);
-    };
-
-    updateCurrentTime(); // Set initial time
-    const interval = setInterval(updateCurrentTime, 1000); // Update every second
-    setClockInterval(interval); // Store the interval ID for clearing
-  };
-
   const onFieldChange = (changedValues: any) => {
     if (changedValues.timezone) {
       setTimezone(changedValues.timezone);
@@ -1074,72 +587,83 @@ const GeneralSettings = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', height: '100vh', padding: '24px' }}>
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-        <Card
-          title={<Title level={4}>General Settings</Title>}
-          style={{ width: 500, marginRight: '16px', borderRadius: '8px' }}
-        >
-          <Form form={form} layout="vertical" onValuesChange={onFieldChange}>
-            {/* System Status */}
-            <Form.Item name="system_status" label="System Status">
-              <Switch
-                checked={form.getFieldValue('system_status') === 'Online'}
-                onChange={(checked) => form.setFieldsValue({ system_status: checked ? 'Online' : 'Offline' })}
-                checkedChildren="Online"
-                unCheckedChildren="Offline"
-              />
-            </Form.Item>
+    <PageContainer
+      title="System Settings"
+      breadcrumb={{
+        routes: [
+          {
+            path: '/system-settings',
+            breadcrumbName: 'System Settings',
+          },
+          {
+            path: '/general-settings',
+            breadcrumbName: 'General Settings',
+          },
+        ],
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', padding: '24px' }}>
+        <div style={{ width: '700px' }}>
+          <Card title={<Title level={4}>System Settings</Title>} style={{ width: '100%', borderRadius: '8px' }}>
+            <Form form={form} layout="vertical" onValuesChange={onFieldChange}>
+              {/* System Status */}
+              <Form.Item name="system_status" label="System Status">
+                <Switch
+                  checked={form.getFieldValue('system_status') === 'Online'}
+                  onChange={(checked) => form.setFieldsValue({ system_status: checked ? 'Online' : 'Offline' })}
+                  checkedChildren="Online"
+                  unCheckedChildren="Offline"
+                />
+              </Form.Item>
 
-            {/* System Name */}
-            <Form.Item name="system_name" label="System Name">
-              <Input />
-            </Form.Item>
+              {/* System Name */}
+              <Form.Item name="system_name" label="System Name">
+                <Input />
+              </Form.Item>
 
-            {/* Contact Email */}
-            <Form.Item name="contact_email" label="Contact Email">
-              <Input />
-            </Form.Item>
+              {/* Contact Email */}
+              <Form.Item name="contact_email" label="Contact Email">
+                <Input />
+              </Form.Item>
 
-            {/* Contact Phone Number */}
-            <Form.Item name="contact_phone" label="Contact Phone Number">
-              <Input />
-            </Form.Item>
+              {/* Contact Phone Number */}
+              <Form.Item name="contact_phone" label="Contact Phone Number">
+                <Input />
+              </Form.Item>
 
-            {/* System Timezone */}
-            <Form.Item name="timezone" label="System Timezone">
-              <Select>
-                {timezones.map((timezone) => (
-                  <Option key={timezone} value={timezone}>
-                    {timezone}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+              {/* System Timezone */}
+              <Form.Item name="timezone" label="System Timezone">
+                <Select>
+                  {timezones.map((timezone) => (
+                    <Option key={timezone} value={timezone}>
+                      {timezone}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
 
-            {/* Language Preference */}
-            <Form.Item name="language_preference" label="Language Preference">
-              <Select>
-                <Option value="English">English</Option>
-                <Option value="Spanish">Spanish</Option>
-                <Option value="French">French</Option>
-              </Select>
-            </Form.Item>
-          </Form>
-        </Card>
+              {/* Language Preference */}
+              <Form.Item name="language_preference" label="Language Preference">
+                <Select>
+                  {languages.map((language) => (
+                    <Option key={language.id} value={language.code}>
+                      {language.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              {/* Display current time based on the system timezone */}
+              <Form.Item label="Current System Time">
+                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center' }}>
+                  {currentTime || 'Loading...'}
+                </div>
+              </Form.Item>
+            </Form>
+          </Card>
+        </div>
       </div>
-
-      <div style={{ position: 'fixed', top: 0, right: 0, padding: '24px', width: '250px' }}>
-        <Card title="Current Time" style={{ width: '100%', textAlign: 'center', borderRadius: '8px' }}>
-          <Title level={5} style={{ margin: 0, fontSize: '24px' }}>
-            {currentTime}
-          </Title>
-          <div style={{ marginTop: '8px', color: '#888' }}>
-            <small>Updated Every Second</small>
-          </div>
-        </Card>
-      </div>
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,75 +1,6 @@
-// import React, { useState, useEffect } from 'react';
-// import { Table, Button, Switch, message } from 'antd';
-// import { request } from 'umi';
 
-// const EmailTemplate = () => {
-//   const [templates, setTemplates] = useState([]);
-
-//   useEffect(() => {
-//     const fetchTemplates = async () => {
-//       try {
-//         const response = await request('/templates');
-//         setTemplates(response.data);
-//       } catch (error) {
-//         message.error('Failed to fetch templates');
-//       }
-//     };
-
-//     fetchTemplates();
-//   }, []);
-
-//   const handleDelete = async (templateId) => {
-//     try {
-//       await request(`/templates/${templateId}`, { method: 'DELETE' });
-//       message.success('Template deleted successfully');
-//       setTemplates(templates.filter(template => template.id !== templateId));
-//     } catch (error) {
-//       message.error('Failed to delete template');
-//     }
-//   };
-
-//   const handleStatusChange = async (templateId, checked) => {
-//     try {
-//       await request(`/templates/${templateId}/status`, {
-//         method: 'PATCH',
-//         data: { status: checked ? 'Active' : 'Inactive' },
-//       });
-//       message.success('Status updated successfully');
-//     } catch (error) {
-//       message.error('Failed to update status');
-//     }
-//   };
-
-//   const templateColumns = [
-//     { title: 'Name', dataIndex: 'name', key: 'name' },
-//     {
-//       title: 'Status',
-//       render: (text, record) => (
-//         <Switch
-//           checked={record.status === 'Active'}
-//           onChange={(checked) => handleStatusChange(record.id, checked)}
-//         />
-//       ),
-//     },
-//     {
-//       title: 'Option',
-//       render: (text, record) => (
-//         <>
-//           <Button>Edit</Button>
-//           <Button danger onClick={() => handleDelete(record.id)}>Delete</Button>
-//         </>
-//       ),
-//     },
-//   ];
-
-//   return (
-//     <Table columns={templateColumns} dataSource={templates} />
-//   );
-// };
-
-// export default EmailTemplate;
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Switch, message, Modal, Form, Input } from 'antd';
+import { Table, Button, Switch, message, Modal, Form, Input, Card } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { PlusOutlined, EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { request } from 'umi';
@@ -160,9 +91,15 @@ const EmailTemplate = () => {
       title: 'Actions',
       render: (text, record) => (
         <>
-          <Button icon={<EyeOutlined />} onClick={() => handleViewTemplate(record)}>View</Button>
-          <Button icon={<EditOutlined />} onClick={() => handleEditTemplate(record)}>Edit</Button>
-          <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>Delete</Button>
+          <Button icon={<EyeOutlined />} onClick={() => handleViewTemplate(record)} style={{ marginRight: 8 }}>
+            View
+          </Button>
+          <Button icon={<EditOutlined />} onClick={() => handleEditTemplate(record)} style={{ marginRight: 8 }}>
+            Edit
+          </Button>
+          <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>
+            Delete
+          </Button>
         </>
       ),
     },
@@ -170,86 +107,107 @@ const EmailTemplate = () => {
 
   return (
     <PageContainer
-      title="Email Template Management"
-      extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
-          Create Template
-        </Button>
-      }
+      title={null} // Remove the title
     >
-      <Table columns={templateColumns} dataSource={templates} rowKey="id" />
-
-      {/* Create Template Modal */}
-      <Modal
-        title="Create Email Template"
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        onOk={() => form.submit()}
-      >
-        <Form form={form} layout="vertical" onFinish={handleCreateTemplate}>
-          <Form.Item label="Template Name" name="name" rules={[{ required: true, message: 'Please enter the template name' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Subject" name="subject" rules={[{ required: true, message: 'Please enter the subject' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
-            <ReactQuill theme="snow" />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* View Template Modal */}
-      {selectedTemplate && (
-        <Modal
-          title="View Template"
-          visible={isViewModalVisible}
-          onCancel={() => setIsViewModalVisible(false)}
-          footer={null}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '40vh' }}>
+        <Card
+          style={{
+            width: '105%',
+            // maxWidth: '1200px',
+            // padding: '20px',
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+          }}
         >
-          <h3>{selectedTemplate.name}</h3>
-          <p><strong>Subject:</strong> {selectedTemplate.subject}</p>
-          <div dangerouslySetInnerHTML={{ __html: selectedTemplate.body }} />
-        </Modal>
-      )}
-
-      {/* Edit Template Modal */}
-      {selectedTemplate && (
-        <Modal
-          title="Edit Email Template"
-          visible={isEditModalVisible}
-          onCancel={() => setIsEditModalVisible(false)}
-          onOk={() => form.submit()}
-        >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={async (values) => {
-              try {
-                await request(`/templates/${selectedTemplate.id}`, {
-                  method: 'PUT',
-                  data: values,
-                });
-                message.success('Template updated successfully');
-                setIsEditModalVisible(false);
-                fetchTemplates();
-              } catch (error) {
-                message.error('Failed to update template');
-              }
-            }}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+              Create Template
+            </Button>
+          </div>
+          <Table
+            columns={templateColumns}
+            dataSource={templates}
+            rowKey="id"
+            bordered
+            pagination={{ pageSize: 10 }}
+            title={() => null} // Removes the default title
+          />
+          
+          {/* Create Template Modal */}
+          <Modal
+            title="Create Email Template"
+            visible={isModalVisible}
+            onCancel={() => setIsModalVisible(false)}
+            onOk={() => form.submit()}
+            centered
           >
-            <Form.Item label="Template Name" name="name" rules={[{ required: true, message: 'Please enter the template name' }]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="Subject" name="subject" rules={[{ required: true, message: 'Please enter the subject' }]}>
-              <Input />
-            </Form.Item>
-            <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
-              <ReactQuill theme="snow" />
-            </Form.Item>
-          </Form>
-        </Modal>
-      )}
+            <Form form={form} layout="vertical" onFinish={handleCreateTemplate}>
+              <Form.Item label="Template Name" name="name" rules={[{ required: true, message: 'Please enter the template name' }]}>
+                <Input />
+              </Form.Item>
+              <Form.Item label="Subject" name="subject" rules={[{ required: true, message: 'Please enter the subject' }]}>
+                <Input />
+              </Form.Item>
+              <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
+                <ReactQuill theme="snow" />
+              </Form.Item>
+            </Form>
+          </Modal>
+
+          {/* View Template Modal */}
+          {selectedTemplate && (
+            <Modal
+              title="View Template"
+              visible={isViewModalVisible}
+              onCancel={() => setIsViewModalVisible(false)}
+              footer={null}
+              centered
+            >
+              <h3>{selectedTemplate.name}</h3>
+              <p><strong>Subject:</strong> {selectedTemplate.subject}</p>
+              <div dangerouslySetInnerHTML={{ __html: selectedTemplate.body }} />
+            </Modal>
+          )}
+
+          {/* Edit Template Modal */}
+          {selectedTemplate && (
+            <Modal
+              title="Edit Email Template"
+              visible={isEditModalVisible}
+              onCancel={() => setIsEditModalVisible(false)}
+              onOk={() => form.submit()}
+              centered
+            >
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={async (values) => {
+                  try {
+                    await request(`/templates/${selectedTemplate.id}`, {
+                      method: 'PUT',
+                      data: values,
+                    });
+                    message.success('Template updated successfully');
+                    setIsEditModalVisible(false);
+                    fetchTemplates();
+                  } catch (error) {
+                    message.error('Failed to update template');
+                  }
+                }}
+              >
+                <Form.Item label="Template Name" name="name" rules={[{ required: true, message: 'Please enter the template name' }]}>
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Subject" name="subject" rules={[{ required: true, message: 'Please enter the subject' }]}>
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
+                  <ReactQuill theme="snow" />
+                </Form.Item>
+              </Form>
+            </Modal>
+          )}
+        </Card>
+      </div>
     </PageContainer>
   );
 };

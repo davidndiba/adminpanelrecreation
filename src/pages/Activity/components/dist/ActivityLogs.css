@@ -2,7 +2,7 @@
   padding: 8px;
 }
 .description-cell {
-  max-width: 150px;
+  max-width: 500px;
   /* Adjust the width as needed */
   overflow: hidden;
   white-space: nowrap;

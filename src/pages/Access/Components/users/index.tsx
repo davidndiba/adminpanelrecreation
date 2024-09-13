@@ -1249,7 +1249,7 @@ const Users: React.FC = () => {
         method: 'POST',
         data: {
           email: values.email,
-          display_name: values.display_name, // Changed to display_name
+          display_name: values.display_name, 
           username: values.username,
           password: values.password,
           password_confirmation: values.password_confirmation,

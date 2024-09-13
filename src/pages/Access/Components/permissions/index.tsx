@@ -564,7 +564,7 @@ const PermissionsManagement: React.FC = () => {
         onCancel={() => setIsModalVisible(false)}
         footer={null}
       >
-        {/* Optional modal content */}
+      
       </Modal>
     </div>
   );

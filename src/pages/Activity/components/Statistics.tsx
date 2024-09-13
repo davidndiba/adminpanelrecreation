@@ -104,7 +104,7 @@ const Statistics: React.FC = () => {
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                 // Ensure the card fits well within the column
                 width: '100%',
-                height: '100px', // Adjust the height as needed
+                height: '100px', 
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
