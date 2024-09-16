@@ -925,8 +925,8 @@ const ActivityLogs = () => {
       });
 
       if (response.data && response.data.data && Array.isArray(response.data.data)) {
-        const mappedData = response.data.data.map(log => ({
-          key: log.auditable_id,
+        const mappedData = response.data.data.map((log, index) => ({
+          key: index,
           user: log.user,
           description: log.description,
           module: log.module,
@@ -1045,7 +1045,7 @@ const ActivityLogs = () => {
             start_date: changedValues.dateRange?.[0]?.format('YYYY-MM-DD') || filters.start_date,
             end_date: changedValues.dateRange?.[1]?.format('YYYY-MM-DD') || filters.end_date,
           };
-          console.log('Filters updated:', newFilters); // Debugging
+          console.log('Filters updated:', newFilters); 
           setFilters(newFilters);
         }}
       >
@@ -1102,15 +1102,16 @@ const ActivityLogs = () => {
         <ProTable
           columns={columns}
           dataSource={data}
+          search={false}
           rowKey="key"
           rowSelection={{
             type: 'radio',
             onChange: (selectedRowKeys, selectedRows) => {
-              setSelectedRow(selectedRows[0] || null); // Handle single selection
+              setSelectedRow(selectedRows[0] || null); 
             },
             selectedRowKeys: selectedRow ? [selectedRow.key] : [],
           }}
-          pagination={false} // Disable built-in pagination; we're using external
+          pagination={false} 
           bordered
         />
       )}
