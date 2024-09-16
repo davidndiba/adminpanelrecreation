@@ -17,7 +17,7 @@ const LogoutPage: React.FC = () => {
       if (response.success) {
         message.success('Logout successful!');
         localStorage.removeItem('planner_t'); 
-        history.push('/auth/login'); 
+        history.push('/user/login'); 
       } else {
         message.error('Logout failed. Please try again.');
       }
