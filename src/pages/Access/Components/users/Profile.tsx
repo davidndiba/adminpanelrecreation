@@ -1,74 +1,6 @@
-// import React, { useEffect, useState } from 'react';
-// import { useParams } from 'umi'; 
-// import { Card, Descriptions, Spin, message } from 'antd';
-// import { request } from 'umi'; 
-
-// interface ProfileData {
-//   id: string;
-//   display_name: string;
-//   email: string;
-//   ip_address: string;
-//   status: { name: string };
-//   roles: string[]; // Ensure roles is always an array
-//   last_login: string;
-//   login_count: number;
-// }
-
-// const Profile: React.FC = () => {
-//   const { id } = useParams<{ id: string }>(); // Or 'useParams()' from 'react-router-dom'
-//   const [profile, setProfile] = useState<ProfileData | null>(null);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     const fetchProfile = async () => {
-//       try {
-//         const response = await request(`/users/${id}`);
-//         if (response.data) {
-//           setProfile(response.data);
-//         } else {
-//           message.error('No data found');
-//         }
-//       } catch (error) {
-//         message.error('Failed to fetch user profile');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchProfile();
-//   }, [id]);
-
-//   if (loading) {
-//     return <Spin />;
-//   }
-
-//   return (
-//     <Card title="User Profile">
-//       {profile ? (
-//         <Descriptions bordered>
-//           <Descriptions.Item label="ID">{profile.id}</Descriptions.Item>
-//           <Descriptions.Item label="Display Name">{profile.display_name}</Descriptions.Item>
-//           <Descriptions.Item label="Email">{profile.email}</Descriptions.Item>
-//           <Descriptions.Item label="IP Address">{profile.ip_address}</Descriptions.Item>
-//           <Descriptions.Item label="Status">{profile.status?.name || 'N/A'}</Descriptions.Item>
-//           <Descriptions.Item label="Roles">
-//             {profile.roles?.length ? profile.roles.join(', ') : 'N/A'}
-//           </Descriptions.Item>
-//           <Descriptions.Item label="Last Login">{profile.last_login || 'N/A'}</Descriptions.Item>
-//           <Descriptions.Item label="Login Count">{profile.login_count || 'N/A'}</Descriptions.Item>
-//         </Descriptions>
-//       ) : (
-//         <p>No profile data available</p>
-//       )}
-//     </Card>
-//   );
-// };
-
-// export default Profile;
+import { Button, Card, Descriptions, Form, Input, Spin, message } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'umi';
-import { Card, Descriptions, Spin, message, Input, Button, Form } from 'antd';
-import { request } from 'umi';
+import { request, useParams } from 'umi';
 
 interface ProfileData {
   id: string;
@@ -137,12 +69,15 @@ const Profile: React.FC = () => {
       {profile ? (
         <Form form={form} layout="vertical">
           <Descriptions bordered>
-            <Descriptions.Item label="ID">
-              {profile.id}
-            </Descriptions.Item>
+            <Descriptions.Item label="ID">{profile.id}</Descriptions.Item>
             <Descriptions.Item label="Display Name">
               {editing ? (
-                <Form.Item name="display_name" rules={[{ required: true, message: 'Display Name is required' }]}>
+                <Form.Item
+                  name="display_name"
+                  rules={[
+                    { required: true, message: 'Display Name is required' },
+                  ]}
+                >
                   <Input />
                 </Form.Item>
               ) : (
@@ -151,7 +86,15 @@ const Profile: React.FC = () => {
             </Descriptions.Item>
             <Descriptions.Item label="Email">
               {editing ? (
-                <Form.Item name="email" rules={[{ type: 'email', message: 'The input is not valid E-mail!' }]}>
+                <Form.Item
+                  name="email"
+                  rules={[
+                    {
+                      type: 'email',
+                      message: 'The input is not valid E-mail!',
+                    },
+                  ]}
+                >
                   <Input />
                 </Form.Item>
               ) : (
