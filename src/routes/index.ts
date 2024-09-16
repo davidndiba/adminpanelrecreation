@@ -9,6 +9,7 @@ const routes: any[] = [
     path: '/home',
     component: './Home',
   },
+  
   {
     name: 'User',
     layout: false,
@@ -23,7 +24,13 @@ const routes: any[] = [
         path: '/user/logout',
         component: './User/Login/Logout',
       },
+      
     ],
+  },
+  {
+    name: 'Profile',
+    path: '/users/:id',
+    component: './Access/Components/users/Profile', 
   },
   {
     name: 'Access Control',
