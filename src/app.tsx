@@ -129,8 +129,6 @@ const handleLogout = async () => {
     message.error('Logout failed, please try again.');
   }
 };
-
-// Layout configuration
 export const layout = ({ initialState }: any) => {
   return {
     layout: 'side',
@@ -139,14 +137,13 @@ export const layout = ({ initialState }: any) => {
     fixedHeader: true,
     fixSiderbar: true,
     siderWidth: 200,
-    // Logout button is rendered in actionsRender section
     actionsRender: () => [
       <Button
         key="logout"
         icon={<LogoutOutlined />}
         type="text"
         onClick={handleLogout}
-        style={{ color: '#f5222d', marginRight: 16 }} // Optional styling
+        style={{ color: '#f5222d', marginRight: 16 }} 
       >
         Logout
       </Button>,
