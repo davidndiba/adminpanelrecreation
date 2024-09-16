@@ -1520,8 +1520,8 @@ const Users: React.FC = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
+            {/* <Col span={12}>  */}
+              {/* <Form.Item
                 label="Password"
                 name="password"
                 rules={[{ required: true, message: 'Please input the password!' }]}
@@ -1536,8 +1536,8 @@ const Users: React.FC = () => {
                 rules={[{ required: true, message: 'Please confirm the password!' }]}
               >
                 <Input.Password />
-              </Form.Item>
-            </Col>
+              </Form.Item> */}
+            {/* </Col> */}
             <Col span={12}>
               <Form.Item
                 label="Email"

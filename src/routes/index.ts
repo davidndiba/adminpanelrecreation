@@ -18,6 +18,11 @@ const routes: any[] = [
         path: '/user/login',
         component: './User/Login',
       },
+      {
+        name: 'Logout',
+        path: '/user/logout',
+        component: './User/Login/Logout',
+      },
     ],
   },
   {
