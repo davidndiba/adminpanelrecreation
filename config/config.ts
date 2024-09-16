@@ -8,7 +8,7 @@ export default defineConfig({
   initialState: {},
   request: {},
   layout: {
-    title: 'Planner',
+    title: 'Admin Panel',
     locale: false,
   },
   // headScripts: [{ src: '/scripts/loading.js', async: true }],
