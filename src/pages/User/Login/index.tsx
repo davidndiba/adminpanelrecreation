@@ -889,7 +889,7 @@
   // export default LoginPage;
   
 
-  import { GoogleOutlined } from '@ant-design/icons';
+import { GoogleOutlined } from '@ant-design/icons';
 import {
   ProCard,
   ProForm,
@@ -963,7 +963,8 @@ const LoginPage: React.FC = () => {
 
       if (response.success) {
         message.success('Sign-up successful! Please log in.');
-        setIsSignUpVisible(false);
+        // setIsSignUpVisible(false);
+        setTimeout(() => setIsSignUpVisible(false), 300);
       } 
     } catch (error) {
       message.error('An error occurred. Please try again.');
