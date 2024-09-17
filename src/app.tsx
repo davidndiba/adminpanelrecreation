@@ -1,6 +1,5 @@
-
-import { history, request as umiRequest } from '@umijs/max';
 import { LogoutOutlined } from '@ant-design/icons';
+import { history, request as umiRequest } from '@umijs/max';
 import { Button, message } from 'antd';
 import { errorConfig } from './requestErrorConfig';
 
@@ -38,18 +37,17 @@ export async function getInitialState(): Promise<{
 // Handle logout function
 const handleLogout = async () => {
   try {
-   
     await umiRequest('/auth/logout', {
       method: 'POST',
     });
     message.success('Logged out successfully');
-    
+
     history.push('/user/login');
   } catch (error) {
     message.error('Logout failed, please try again.');
   }
 };
-export const layout = ({ initialState }: any) => {
+export const layout = ({}: any) => {
   return {
     layout: 'side',
     headerRender: false,
@@ -63,7 +61,7 @@ export const layout = ({ initialState }: any) => {
         icon={<LogoutOutlined />}
         type="text"
         onClick={handleLogout}
-        style={{ color: '#f5222d', marginRight: 16 }} 
+        style={{ color: '#f5222d', marginRight: 16 }}
       >
         Logout
       </Button>,
