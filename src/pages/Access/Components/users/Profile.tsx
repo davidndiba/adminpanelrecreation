@@ -26,7 +26,7 @@ const Profile: React.FC = () => {
         const response = await request(`/users/${id}`);
         if (response.data) {
           setProfile(response.data);
-          form.setFieldsValue(response.data); // Initialize form with profile data
+          form.setFieldsValue(response.data); 
         } else {
           message.error('No data found');
         }

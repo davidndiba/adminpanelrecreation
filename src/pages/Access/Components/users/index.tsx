@@ -18,7 +18,7 @@ import {
   Typography,
 } from 'antd';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { history, request, useRequest } from 'umi';
 
 const { Title } = Typography;
@@ -36,33 +36,19 @@ interface User {
 }
 
 const Users: React.FC = () => {
-  const addUserRef = React.useRef<any>(),
+  const addUserRef = useRef<any>(),
     { data: statuses } = useRequest(() => request('/statuses')),
-    tableActionRef = React.useRef<ActionType>(),
+    tableActionRef = useRef<ActionType>(),
     [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]),
     [searchTerm, setSearchTerm] = useState<string>(''),
     handleRowSelection = (selectedKeys: React.Key[]) => {
       setSelectedRowKeys(selectedKeys);
     },
+    handleSearch = () => {
+      // Trigger table reload on search
+      tableActionRef.current?.reload();
+    },
     columns: ProColumns<User>[] = [
-      // {
-      //   title: 'Select',
-      //   dataIndex: 'select',
-      //   key: 'select',
-      //   render: (_, record) => (
-      //     <input
-      //       type="checkbox"
-      //       checked={selectedRowKeys.includes(record.id)}
-      //       onChange={(e) => {
-      //         if (e.target.checked) {
-      //           setSelectedRowKeys([...selectedRowKeys, record.id]);
-      //         } else {
-      //           setSelectedRowKeys(selectedRowKeys.filter(id => id !== record.id));
-      //         }
-      //       }}
-      //     />
-      //   ),
-      // },
       {
         title: 'Display Name',
         dataIndex: 'display_name',
@@ -102,75 +88,88 @@ const Users: React.FC = () => {
         <Col span={6}>
           <Card bordered>
             <Title level={4}>Total Users</Title>
-            {/* <div style={{ fontSize: '24px' }}>{users?.length}</div> */}
           </Card>
         </Col>
       </Row>
+
+      {/* Search field above the table */}
       <Row gutter={16} style={{ marginBottom: '16px' }}>
         <Col span={24}>
           <Input
             placeholder="Search Users"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ marginBottom: '16px' }}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSearchTerm(value);
+
+              // If input is cleared, reload the table
+              if (value === '') {
+                handleSearch();
+              }
+            }}
+            onPressEnter={handleSearch} // Trigger search on Enter
+            style={{ width: 200, marginBottom: '16px' }} // Make search field smaller
+            allowClear // Add a clear button
           />
         </Col>
       </Row>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+        <ModalForm
+          formRef={addUserRef}
+          title="Add User"
+          onFinish={async (values) => {
+            await request('/auth/admin/register', {
+              method: 'POST',
+              data: values,
+            });
+            message.success('User added successfully');
+            addUserRef?.current?.resetFields?.();
+            return true;
+          }}
+          trigger={<Button type="primary">Add User</Button>}
+        >
+          <ProFormText
+            label="Display Name"
+            name="display_name"
+            rules={[{ required: true }]}
+          />
+          <ProFormText
+            label="Email"
+            name="email"
+            rules={[
+              { required: true },
+              { type: 'email', message: 'Invalid email address' },
+            ]}
+          />
+          <ProFormText label="Phone Number" name="phone" />
+          <ProFormText
+            label="Username"
+            name="username"
+            rules={[{ required: true }]}
+          />
+          <ProFormSelect
+            request={async () => {
+              const resp = await request('/roles');
+              return resp?.data ?? [];
+            }}
+            fieldProps={{
+              fieldNames: {
+                label: 'name',
+                value: 'id',
+              },
+            }}
+            label="Role"
+            name="role"
+            rules={[{ required: true }]}
+          />
+        </ModalForm>
+      </div>
+
       <ProTable<User>
         columns={columns}
         actionRef={tableActionRef}
         rowKey="id"
-        headerTitle={
-          <ModalForm
-            formRef={addUserRef}
-            title="Add User"
-            onFinish={async (values) => {
-              await request('/auth/admin/register', {
-                method: 'POST',
-                data: values,
-              });
-              message.success('User added successfully');
-              addUserRef?.current?.resetFields?.();
-              return true;
-            }}
-            trigger={<Button type="primary">Add User</Button>}
-          >
-            <ProFormText
-              label="Display Name"
-              name="display_name"
-              rules={[{ required: true }]}
-            />
-            <ProFormText
-              label="Email"
-              name="email"
-              rules={[
-                { required: true },
-                { type: 'email', message: 'Invalid email address' },
-              ]}
-            />
-            <ProFormText label="Phone Number" name="phone" />
-            <ProFormText
-              label="Username"
-              name="username"
-              rules={[{ required: true }]}
-            />
-            <ProFormSelect
-              request={async () => {
-                const resp = await request('/roles');
-                return resp?.data ?? [];
-              }}
-              fieldProps={{
-                fieldNames: {
-                  label: 'name',
-                  value: 'id',
-                },
-              }}
-              label="Role"
-              name="role"
-              rules={[{ required: true }]}
-            />
-          </ModalForm>
-        }
         pagination={{
           defaultCurrent: 1,
           defaultPageSize: 10,
@@ -179,8 +178,14 @@ const Users: React.FC = () => {
           hideOnSinglePage: true,
         }}
         search={false}
-        request={async () => {
-          const resp = await request('/users');
+        request={async (params) => {
+          // Include search term as a query parameter
+          const resp = await request('/users', {
+            params: {
+              ...params,
+              search: searchTerm, // Pass search term
+            },
+          });
           return {
             data: resp?.data?.data,
             total: resp?.data?.total,
@@ -188,30 +193,28 @@ const Users: React.FC = () => {
           };
         }}
         footer={() => (
-          <>
-            <Space split={<Divider type="vertical" />}>
-              {statuses?.map((status: any) => (
-                <Button
-                  size="small"
-                  key={status.id}
-                  onClick={async () => {
-                    console.log(selectedRowKeys);
-                    selectedRowKeys?.forEach(async (id) => {
-                      await request(`/users/${id}`, {
-                        method: 'PUT',
-                        data: { status: status.id },
-                      });
-                      tableActionRef?.current?.reload?.();
-                      message.success(`User status updated to ${status.name}`);
+          <Space split={<Divider type="vertical" />}>
+            {statuses?.map((status: any) => (
+              <Button
+                size="small"
+                key={status.id}
+                onClick={async () => {
+                  console.log(selectedRowKeys);
+                  selectedRowKeys?.forEach(async (id) => {
+                    await request(`/users/${id}`, {
+                      method: 'PUT',
+                      data: { status: status.id },
                     });
-                  }}
-                  disabled={selectedRowKeys.length === 0}
-                >
-                  {status.name}
-                </Button>
-              ))}
-            </Space>
-          </>
+                    tableActionRef?.current?.reload?.();
+                    message.success(`User status updated to ${status.name}`);
+                  });
+                }}
+                disabled={selectedRowKeys.length === 0}
+              >
+                {status.name}
+              </Button>
+            ))}
+          </Space>
         )}
         onRow={(record) => ({
           onClick: () => {
