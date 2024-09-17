@@ -133,7 +133,7 @@ const ActivityLogs = () => {
         },
       });
       message.success('Logs deleted successfully based on the filters');
-      fetchData(pagination.current); // Reload the table data
+      fetchData(pagination.current);
     } catch (error) {
       message.error('Failed to delete logs');
     }
@@ -154,7 +154,7 @@ const ActivityLogs = () => {
         },
       });
       message.success('Selected logs deleted successfully');
-      fetchData(pagination.current); // Reload the table data
+      fetchData(pagination.current);
       setSelectedRows([]);
     } catch (error) {
       message.error('Failed to delete selected logs');
