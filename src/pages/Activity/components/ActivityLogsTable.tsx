@@ -1,13 +1,24 @@
-
-import React, { useState, useEffect } from 'react';
-import { ProTable, ProFormSelect, ProFormDateRangePicker } from '@ant-design/pro-components';
-import { Button, message, Popconfirm, Form, Pagination, Tooltip, Spin } from 'antd';
-import { request } from 'umi';
+import {
+  ProFormDateRangePicker,
+  ProFormSelect,
+  ProTable,
+} from '@ant-design/pro-components';
+import {
+  Button,
+  Form,
+  message,
+  Pagination,
+  Popconfirm,
+  Spin,
+  Tooltip,
+} from 'antd';
 import { format } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { request } from 'umi';
 import './ActivityLogs.less';
 
 interface LogData {
-  key: number; 
+  key: number;
   user: string;
   description: string;
   module: string;
@@ -35,13 +46,12 @@ const ActivityLogs = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    // Fetch users for filtering
     const fetchUsers = async () => {
       try {
         const response = await request('/users');
-        const userOptions = response.data.data.map(user => ({
-          value: user.display_name || user.username, // Use display_name or username
-          label: user.display_name || user.username, // Display the user name
+        const userOptions = response.data.data.map((user) => ({
+          value: user.display_name || user.username,
+          label: user.display_name || user.username,
         }));
         setUsers(userOptions);
       } catch (error) {
@@ -53,11 +63,10 @@ const ActivityLogs = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch modules for filtering
     const fetchModules = async () => {
       try {
         const response = await request('/modules');
-        const moduleOptions = response.data.map(module => ({
+        const moduleOptions = response.data.map((module) => ({
           value: module,
           label: module,
         }));
@@ -74,22 +83,19 @@ const ActivityLogs = () => {
     setLoading(true);
     try {
       const { start_date, end_date, user, module } = filters;
-      console.log('Start Date:', start_date);
-      console.log('End Date:', end_date);
-      console.log('Filters for API request:', { start_date, end_date, user, module });
       const response = await request('/audits', {
         params: {
           page,
           per_page: pagination.pageSize,
           start_date: start_date || undefined,
           end_date: end_date || undefined,
-          user: user || undefined, 
+          user: user || undefined,
           module: module || undefined,
         },
       });
 
       if (response.data && response.data.data) {
-        const mappedData = response.data.data.map((log, id) => ({
+        const mappedData = response.data.data.map((log) => ({
           key: log.id,
           user: log.user,
           description: log.description,
@@ -119,49 +125,39 @@ const ActivityLogs = () => {
   }, [filters, pagination.current]);
 
   const handleBulkDelete = async () => {
+    try {
+      await request('/audits/bulk-delete', {
+        method: 'DELETE',
+        data: {
+          ...filters,
+        },
+      });
+      message.success('Logs deleted successfully based on the filters');
+      fetchData(pagination.current);
+    } catch (error) {
+      message.error('Failed to delete logs');
+    }
+  };
+  const handleDeleteSelected = async () => {
     if (selectedRows.length === 0) {
-      message.error('No logs selected for bulk deletion');
+      message.error('No logs selected for deletion');
       return;
     }
-  
+
+    const selectedIds = selectedRows.map((log) => log.key);
+
     try {
-      await request('/audits', {
+      await request('/audits/bulk-delete-selected', {
         method: 'DELETE',
-        params: {
-          start_date: filters.start_date,
-          end_date: filters.end_date,
-          user: filters.user,
-          module: filters.module,
-        },
         data: {
-          logs: selectedRows.map(row => row.key),
+          ids: selectedIds,
         },
       });
       message.success('Selected logs deleted successfully');
-      fetchData(pagination.current); // Reload the table data
+      fetchData(pagination.current);
       setSelectedRows([]);
     } catch (error) {
       message.error('Failed to delete selected logs');
-    }
-  };
-
-  const handleDeleteSelected = async () => {
-    if (selectedRows.length !== 1) {
-      message.error('Please select exactly one log to delete');
-      return;
-    }
-  
-    const logId = selectedRows[0].key;
-  
-    try {
-      await request(`/audits/${logId}`, {
-        method: 'DELETE',
-      });
-      message.success('Log deleted successfully');
-      fetchData(pagination.current); 
-      setSelectedRows([]);
-    } catch (error) {
-      message.error('Failed to delete the log');
     }
   };
 
@@ -177,9 +173,7 @@ const ActivityLogs = () => {
       key: 'description',
       render: (text: string) => (
         <Tooltip title={text} placement="topLeft">
-          <div className="description-cell">
-            {text}
-          </div>
+          <div className="description-cell">{text}</div>
         </Tooltip>
       ),
     },
@@ -198,23 +192,14 @@ const ActivityLogs = () => {
       dataIndex: 'updated_at',
       key: 'updated_at',
       render: (text: string) => (
-        <span className="date-cell">{format(new Date(text), 'yyyy-MM-dd HH:mm:ss')}</span>
+        <span className="date-cell">
+          {format(new Date(text), 'yyyy-MM-dd HH:mm:ss')}
+        </span>
       ),
     },
   ];
 
-  useEffect(() => {
-    console.log('Filters:', filters);
-    console.log('Users:', users);
-    console.log('Filters before fetching data:', filters);
-    console.log('Pagination:', pagination);
-    fetchData(pagination.current);
-  }, [filters, pagination.current]);
-
   const handleFormValuesChange = (changedValues: any, allValues: any) => {
-    console.log('Changed Values:', changedValues);
-    console.log('All Values:', allValues);
-
     const { dateRange } = allValues;
     let startDate = '';
     let endDate = '';
@@ -235,7 +220,6 @@ const ActivityLogs = () => {
       start_date: startDate,
       end_date: endDate,
     };
-    console.log('New Filters:', newFilters);
     setFilters(newFilters);
   };
 
@@ -253,12 +237,7 @@ const ActivityLogs = () => {
           />
         </Form.Item>
         <Form.Item name="dateRange" label="Date Range">
-          <ProFormDateRangePicker
-            format="YYYY-MM-DD"
-            onChange={(dates: any) => {
-              console.log('Date Range Changed:', dates);
-            }}
-          />
+          <ProFormDateRangePicker format="YYYY-MM-DD" />
         </Form.Item>
         <Form.Item name="module" label="Module">
           <ProFormSelect
@@ -269,19 +248,19 @@ const ActivityLogs = () => {
 
       <div style={{ marginBottom: 16 }}>
         <Popconfirm
-          title="Are you sure you want to delete the selected logs?"
+          title="Are you sure you want to delete logs based on the filters?"
           onConfirm={handleBulkDelete}
           okText="Yes"
           cancelText="No"
         >
-          <Button type="primary" disabled={selectedRows.length === 0}>
+          <Button type="primary" disabled={pagination.total === 0}>
             Bulk Delete
           </Button>
         </Popconfirm>
         <Button
           type="danger"
           style={{ marginLeft: 8 }}
-          disabled={selectedRows.length !== 1}
+          disabled={selectedRows.length === 0}
           onClick={handleDeleteSelected}
         >
           Delete Selected
