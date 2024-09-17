@@ -42,12 +42,11 @@ const routes: any[] = [
     path: '/activity',
     component: './Activity',
   },
-  // Main "System Settings" menu with submenus
+
   {
     name: 'System Settings',
     path: '/system-settings',
     icon: 'setting',
-    // component: './SystemSettings', // main component for System Settings
     routes: [
       {
         name: 'General Settings',
