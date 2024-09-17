@@ -2,7 +2,7 @@ import { LogoutOutlined } from '@ant-design/icons';
 import { Button, message, Modal } from 'antd';
 import React from 'react';
 import { history, request } from 'umi';
-// import './logout.less';
+
 
 const LogoutPage: React.FC = () => {
   const handleLogout = async () => {

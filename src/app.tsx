@@ -38,12 +38,12 @@ export async function getInitialState(): Promise<{
 // Handle logout function
 const handleLogout = async () => {
   try {
-    // Make a logout request to the server
+   
     await umiRequest('/auth/logout', {
       method: 'POST',
     });
     message.success('Logged out successfully');
-    // Redirect to the login page after successful logout
+    
     history.push('/user/login');
   } catch (error) {
     message.error('Logout failed, please try again.');

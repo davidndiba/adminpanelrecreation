@@ -51,24 +51,23 @@ const routes: any[] = [
       {
         name: 'General Settings',
         path: '/system-settings/generalsettings',
-        component: './SystemSettings/GeneralSettings', // Component for General Settings
+        component: './SystemSettings/GeneralSettings', 
       },
       {
         name: 'Email Settings',
         path: '/system-settings/emailsettings',
-        component: './SystemSettings/EmailSettings', // Component for Email Settings
+        component: './SystemSettings/EmailSettings', 
       },
       {
         name: 'Security Settings',
         path: '/system-settings/securitysettings',
-        component: './SystemSettings/SecuritySettings', // Component for Security Settings
+        component: './SystemSettings/SecuritySettings', 
       },
     ],
   },
   {
     name: 'Maintenance',
     path: '/maintenance',
-    // component: './Maintenance',
     routes:[
       {
         name: 'System Backup',
