@@ -202,7 +202,7 @@
         {/* Statistics Cards */}
         <Row gutter={16} style={{ marginBottom: '16px' }}>
           <Col span={6}>
-            <Card bordered>
+          <Card bordered style={{ backgroundColor: '#e6f7ff', color: '#1890ff' }}>
               <Title level={4}>Total Roles</Title>
               <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
                 {stats.totalRoles}
@@ -211,7 +211,7 @@
             </Card>
           </Col>
           <Col span={6}>
-            <Card bordered>
+          <Card bordered style={{ backgroundColor: '#f6ffed', color: '#52c41a' }}>
               <Title level={4}>Active Roles</Title>
               <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
                 {stats.activeRoles}
@@ -220,7 +220,7 @@
             </Card>
           </Col>
           <Col span={6}>
-            <Card bordered>
+          <Card bordered style={{ backgroundColor: '#fff7e6', color: '#fa8c16' }}>
               <Title level={4}>Pending Roles</Title>
               <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
                 {stats.pendingRoles}
@@ -229,7 +229,7 @@
             </Card>
           </Col>
           <Col span={6}>
-            <Card bordered>
+          <Card bordered style={{ backgroundColor: '#fffbe6', color: '#faad14' }}>
               <Title level={4}>Archived Roles</Title>
               <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
                 {stats.archivedRoles}
