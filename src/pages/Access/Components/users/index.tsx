@@ -18,7 +18,7 @@ import {
   Typography,
 } from 'antd';
 import moment from 'moment';
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { history, request, useRequest } from 'umi';
 
 const { Title } = Typography;
@@ -114,7 +114,13 @@ const Users: React.FC = () => {
         </Col>
       </Row>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginBottom: '16px',
+        }}
+      >
         <ModalForm
           formRef={addUserRef}
           title="Add User"
@@ -186,11 +192,34 @@ const Users: React.FC = () => {
               search: searchTerm, // Pass search term
             },
           });
+
           return {
             data: resp?.data?.data,
             total: resp?.data?.total,
             success: true,
           };
+        }}
+        components={{
+          header: {
+            cell: (props) => (
+              <th
+                {...props}
+                style={{
+                  borderBottom: '2px solid #d9d9d9', // Customize the column line color
+                }}
+              />
+            ),
+          },
+          body: {
+            cell: (props) => (
+              <td
+                {...props}
+                style={{
+                  borderBottom: '1px solid #d9d9d9', // Customize the row line color
+                }}
+              />
+            ),
+          },
         }}
         footer={() => (
           <Space split={<Divider type="vertical" />}>
