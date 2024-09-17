@@ -348,7 +348,7 @@ const Queue = () => {
             Delete Selected
           </Button>
           <Button danger onClick={handleBulkDelete}>
-            Bulk Delete
+            Clear All
           </Button>
         </div>
 
