@@ -1,55 +1,5 @@
 "use strict";
-// const routes: any[] = [
-//   {
-//     path: '/',
-//     redirect: '/access',
-//   },
-//   {
-//     name: '',
-//     path: '/home',
-//     component: './Home',
-//     // layout:false,
-//   },
-//   // {
-//   //   name: 'Login Page',
-//   //   path: '/loginPage',
-//   //   component: './LoginPage',
-//   //   // layout:false,
-//   // },
-//   {
-//     name: 'User',
-//     layout: false,
-//     routes: [
-//       {
-//         name: 'Login',
-//         path: '/user/login',
-//         component: './User/Login',
-//       },
-//     ],
-//   },
-//   {
-//     name: 'Access Control',
-//     path: '/access',
-//     component: './Access',
-//   },
-//   {
-//     name: 'Activity Logs',
-//     path: '/activity',
-//     component: './Activity',
-//   },
-//   {
-//     name: 'System Settings',
-//     path: '/systemSettings',
-//     component: './SystemSettings',
-//   },
-//   {
-//     name: 'Maintenance',
-//     path: '/maintenance',
-//     component: './Maintenance',
-//   },
-// ];
 exports.__esModule = true;
-// export default routes;
 var routes = [
     {
         path: '/',
@@ -69,7 +19,17 @@ var routes = [
                 path: '/user/login',
                 component: './User/Login'
             },
+            {
+                name: 'Logout',
+                path: '/user/logout',
+                component: './User/Login/Logout'
+            },
         ]
+    },
+    {
+        name: 'Profile',
+        path: '/users/:id',
+        component: './Access/Components/users/Profile'
     },
     {
         name: 'Access Control',
@@ -81,12 +41,10 @@ var routes = [
         path: '/activity',
         component: './Activity'
     },
-    // Main "System Settings" menu with submenus
     {
         name: 'System Settings',
         path: '/system-settings',
         icon: 'setting',
-        // component: './SystemSettings', // main component for System Settings
         routes: [
             {
                 name: 'General Settings',
@@ -108,7 +66,60 @@ var routes = [
     {
         name: 'Maintenance',
         path: '/maintenance',
-        component: './Maintenance'
+        routes: [
+            {
+                name: 'System Backup',
+                path: '/maintenance/systembackup',
+                component: './Maintenance/SystemBackup'
+            },
+            {
+                name: 'System Information',
+                path: '/maintenance/systeminformation',
+                component: './Maintenance/SystemInformation'
+            },
+        ]
+    },
+    // New Menu: Reports with Access Control
+    {
+        name: 'Dashboard',
+        path: '/dashboard',
+        component: './UserSide/Dashboard'
+    },
+    {
+        name: 'Planner',
+        path: '/planner',
+        component: './UserSide/Planner'
+    },
+    {
+        name: 'Data Sheet',
+        path: '/datasheet',
+        component: './UserSide/DataSheet'
+    },
+    {
+        name: 'Mapping',
+        path: '/mapping',
+        routes: [
+            {
+                name: 'Manage Job Types',
+                path: '/mapping/managejobtypes',
+                component: './UserSide/Mapping/ManageJobTypes'
+            },
+            {
+                name: 'Job Areas',
+                path: '/mapping/jobareas',
+                component: './UserSide/Mapping/JobAreas'
+            },
+            {
+                name: 'Lines & Tanks',
+                path: '/mapping/linesandtanks',
+                component: './UserSide/Mapping/LinesAndTanks'
+            },
+        ]
+    },
+    {
+        name: 'Users',
+        path: '/users',
+        component: './UserSide/Users'
     },
 ];
 exports["default"] = routes;

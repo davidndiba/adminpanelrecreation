@@ -1,7 +1,11 @@
 "use strict";
 // import React, { useState, useEffect } from 'react';
-// import { Table, Button, Switch, message } from 'antd';
+// import { Table, Button, Switch, message, Modal, Form, Input, Card } from 'antd';
+// import { PageContainer } from '@ant-design/pro-layout';
+// import { PlusOutlined, EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 // import { request } from 'umi';
+// import ReactQuill from 'react-quill';
+// import 'react-quill/dist/quill.snow.css';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -41,22 +45,40 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 // const EmailTemplate = () => {
 //   const [templates, setTemplates] = useState([]);
+//   const [isModalVisible, setIsModalVisible] = useState(false);
+//   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+//   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+//   const [selectedTemplate, setSelectedTemplate] = useState(null);
+//   const [form] = Form.useForm();
 //   useEffect(() => {
-//     const fetchTemplates = async () => {
-//       try {
-//         const response = await request('/templates');
-//         setTemplates(response.data);
-//       } catch (error) {
-//         message.error('Failed to fetch templates');
-//       }
-//     };
 //     fetchTemplates();
 //   }, []);
+//   const fetchTemplates = async () => {
+//     try {
+//       const response = await request('/templates');
+//       setTemplates(response.data);
+//     } catch (error) {
+//       message.error('Failed to fetch templates');
+//     }
+//   };
+//   const handleCreateTemplate = async (values) => {
+//     try {
+//       const response = await request('/templates', {
+//         method: 'POST',
+//         data: values,
+//       });
+//       message.success(response.message || 'Template created successfully');
+//       setIsModalVisible(false);
+//       fetchTemplates();
+//     } catch (error) {
+//       message.error('Failed to create template');
+//     }
+//   };
 //   const handleDelete = async (templateId) => {
 //     try {
 //       await request(`/templates/${templateId}`, { method: 'DELETE' });
 //       message.success('Template deleted successfully');
-//       setTemplates(templates.filter(template => template.id !== templateId));
+//       setTemplates(templates.filter((template) => template.id !== templateId));
 //     } catch (error) {
 //       message.error('Failed to delete template');
 //     }
@@ -68,9 +90,19 @@ exports.__esModule = true;
 //         data: { status: checked ? 'Active' : 'Inactive' },
 //       });
 //       message.success('Status updated successfully');
+//       fetchTemplates();
 //     } catch (error) {
 //       message.error('Failed to update status');
 //     }
+//   };
+//   const handleViewTemplate = (template) => {
+//     setSelectedTemplate(template);
+//     setIsViewModalVisible(true);
+//   };
+//   const handleEditTemplate = (template) => {
+//     setSelectedTemplate(template);
+//     setIsEditModalVisible(true);
+//     form.setFieldsValue(template);
 //   };
 //   const templateColumns = [
 //     { title: 'Name', dataIndex: 'name', key: 'name' },
@@ -84,17 +116,123 @@ exports.__esModule = true;
 //       ),
 //     },
 //     {
-//       title: 'Option',
+//       title: 'Actions',
 //       render: (text, record) => (
 //         <>
-//           <Button>Edit</Button>
-//           <Button danger onClick={() => handleDelete(record.id)}>Delete</Button>
+//           <Button icon={<EyeOutlined />} onClick={() => handleViewTemplate(record)} style={{ marginRight: 8 }}>
+//             View
+//           </Button>
+//           <Button icon={<EditOutlined />} onClick={() => handleEditTemplate(record)} style={{ marginRight: 8 }}>
+//             Edit
+//           </Button>
+//           <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record.id)}>
+//             Delete
+//           </Button>
 //         </>
 //       ),
 //     },
 //   ];
 //   return (
-//     <Table columns={templateColumns} dataSource={templates} />
+//     <PageContainer
+//       title={null} // Remove the title
+//     >
+//       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '40vh' }}>
+//         <Card
+//           style={{
+//             width: '105%',
+//             // maxWidth: '1200px',
+//             // padding: '20px',
+//             boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+//           }}
+//         >
+//           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+//             <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+//               Create Template
+//             </Button>
+//           </div>
+//           <Table
+//             columns={templateColumns}
+//             dataSource={templates}
+//             rowKey="id"
+//             bordered
+//             pagination={{ pageSize: 10 }}
+//             title={() => null} // Removes the default title
+//           />
+//           {/* Create Template Modal */}
+//           <Modal
+//             title="Create Email Template"
+//             visible={isModalVisible}
+//             onCancel={() => setIsModalVisible(false)}
+//             onOk={() => form.submit()}
+//             centered
+//           >
+//             <Form form={form} layout="vertical" onFinish={handleCreateTemplate}>
+//               <Form.Item label="Template Name" name="name" rules={[{ required: true, message: 'Please enter the template name' }]}>
+//                 <Input />
+//               </Form.Item>
+//               <Form.Item label="Subject" name="subject" rules={[{ required: true, message: 'Please enter the subject' }]}>
+//                 <Input />
+//               </Form.Item>
+//               <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
+//                 <ReactQuill theme="snow" />
+//               </Form.Item>
+//             </Form>
+//           </Modal>
+//           {/* View Template Modal */}
+//           {selectedTemplate && (
+//             <Modal
+//               title="View Template"
+//               visible={isViewModalVisible}
+//               onCancel={() => setIsViewModalVisible(false)}
+//               footer={null}
+//               centered
+//             >
+//               <h3>{selectedTemplate.name}</h3>
+//               <p><strong>Subject:</strong> {selectedTemplate.subject}</p>
+//               <div dangerouslySetInnerHTML={{ __html: selectedTemplate.body }} />
+//             </Modal>
+//           )}
+//           {/* Edit Template Modal */}
+//           {selectedTemplate && (
+//             <Modal
+//               title="Edit Email Template"
+//               visible={isEditModalVisible}
+//               onCancel={() => setIsEditModalVisible(false)}
+//               onOk={() => form.submit()}
+//               centered
+//             >
+//               <Form
+//                 form={form}
+//                 layout="vertical"
+//                 onFinish={async (values) => {
+//                   try {
+//                     await request(`/templates/${selectedTemplate.id}`, {
+//                       method: 'PUT',
+//                       data: values,
+//                     });
+//                     message.success('Template updated successfully');
+//                     setIsEditModalVisible(false);
+//                     fetchTemplates();
+//                   } catch (error) {
+//                     message.error('Failed to update template');
+//                   }
+//                 }}
+//               >
+//                 <Form.Item label="Template Name" name="name" rules={[{ required: true, message: 'Please enter the template name' }]}>
+//                   <Input />
+//                 </Form.Item>
+//                 <Form.Item label="Subject" name="subject" rules={[{ required: true, message: 'Please enter the subject' }]}>
+//                   <Input />
+//                 </Form.Item>
+//                 <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
+//                   <ReactQuill theme="snow" />
+//                 </Form.Item>
+//               </Form>
+//             </Modal>
+//           )}
+//         </Card>
+//       </div>
+//     </PageContainer>
 //   );
 // };
 // export default EmailTemplate;
@@ -105,6 +243,7 @@ var icons_1 = require("@ant-design/icons");
 var umi_1 = require("umi");
 var react_quill_1 = require("react-quill");
 require("react-quill/dist/quill.snow.css");
+require("./Email.less");
 var EmailTemplate = function () {
     var _a = react_1.useState([]), templates = _a[0], setTemplates = _a[1];
     var _b = react_1.useState(false), isModalVisible = _b[0], setIsModalVisible = _b[1];
@@ -218,59 +357,70 @@ var EmailTemplate = function () {
         },
         {
             title: 'Actions',
+            fixed: 'right',
             render: function (text, record) { return (react_1["default"].createElement(react_1["default"].Fragment, null,
-                react_1["default"].createElement(antd_1.Button, { icon: react_1["default"].createElement(icons_1.EyeOutlined, null), onClick: function () { return handleViewTemplate(record); } }, "View"),
-                react_1["default"].createElement(antd_1.Button, { icon: react_1["default"].createElement(icons_1.EditOutlined, null), onClick: function () { return handleEditTemplate(record); } }, "Edit"),
-                react_1["default"].createElement(antd_1.Button, { danger: true, icon: react_1["default"].createElement(icons_1.DeleteOutlined, null), onClick: function () { return handleDelete(record.id); } }, "Delete"))); }
+                react_1["default"].createElement(antd_1.Button, { icon: react_1["default"].createElement(icons_1.EyeOutlined, null), onClick: function () { return handleViewTemplate(record); }, style: { marginRight: 18, color: '#faad14', borderColor: '#faad14', borderRadius: '4px' } }, "View"),
+                react_1["default"].createElement(antd_1.Button, { icon: react_1["default"].createElement(icons_1.EditOutlined, null), onClick: function () { return handleEditTemplate(record); }, style: { marginRight: 18, color: '#1890ff', borderColor: '#1890ff', borderRadius: '4px' } }, "Edit"),
+                react_1["default"].createElement(antd_1.Button, { danger: true, icon: react_1["default"].createElement(icons_1.DeleteOutlined, null), onClick: function () { return handleDelete(record.id); }, style: { color: '#ff4d4f', borderColor: '#ff4d4f', borderRadius: '4px' } }, "Delete"))); },
+            className: 'column-actions'
         },
     ];
-    return (react_1["default"].createElement(pro_layout_1.PageContainer, { title: "Email Template Management", extra: react_1["default"].createElement(antd_1.Button, { type: "primary", icon: react_1["default"].createElement(icons_1.PlusOutlined, null), onClick: function () { return setIsModalVisible(true); } }, "Create Template") },
-        react_1["default"].createElement(antd_1.Table, { columns: templateColumns, dataSource: templates, rowKey: "id" }),
-        react_1["default"].createElement(antd_1.Modal, { title: "Create Email Template", visible: isModalVisible, onCancel: function () { return setIsModalVisible(false); }, onOk: function () { return form.submit(); } },
-            react_1["default"].createElement(antd_1.Form, { form: form, layout: "vertical", onFinish: handleCreateTemplate },
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Template Name", name: "name", rules: [{ required: true, message: 'Please enter the template name' }] },
-                    react_1["default"].createElement(antd_1.Input, null)),
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Subject", name: "subject", rules: [{ required: true, message: 'Please enter the subject' }] },
-                    react_1["default"].createElement(antd_1.Input, null)),
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Body", name: "body", rules: [{ required: true, message: 'Please enter the body' }] },
-                    react_1["default"].createElement(react_quill_1["default"], { theme: "snow" })))),
-        selectedTemplate && (react_1["default"].createElement(antd_1.Modal, { title: "View Template", visible: isViewModalVisible, onCancel: function () { return setIsViewModalVisible(false); }, footer: null },
-            react_1["default"].createElement("h3", null, selectedTemplate.name),
-            react_1["default"].createElement("p", null,
-                react_1["default"].createElement("strong", null, "Subject:"),
-                " ",
-                selectedTemplate.subject),
-            react_1["default"].createElement("div", { dangerouslySetInnerHTML: { __html: selectedTemplate.body } }))),
-        selectedTemplate && (react_1["default"].createElement(antd_1.Modal, { title: "Edit Email Template", visible: isEditModalVisible, onCancel: function () { return setIsEditModalVisible(false); }, onOk: function () { return form.submit(); } },
-            react_1["default"].createElement(antd_1.Form, { form: form, layout: "vertical", onFinish: function (values) { return __awaiter(void 0, void 0, void 0, function () {
-                    var error_5;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                _a.trys.push([0, 2, , 3]);
-                                return [4 /*yield*/, umi_1.request("/templates/" + selectedTemplate.id, {
-                                        method: 'PUT',
-                                        data: values
-                                    })];
-                            case 1:
-                                _a.sent();
-                                antd_1.message.success('Template updated successfully');
-                                setIsEditModalVisible(false);
-                                fetchTemplates();
-                                return [3 /*break*/, 3];
-                            case 2:
-                                error_5 = _a.sent();
-                                antd_1.message.error('Failed to update template');
-                                return [3 /*break*/, 3];
-                            case 3: return [2 /*return*/];
-                        }
-                    });
-                }); } },
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Template Name", name: "name", rules: [{ required: true, message: 'Please enter the template name' }] },
-                    react_1["default"].createElement(antd_1.Input, null)),
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Subject", name: "subject", rules: [{ required: true, message: 'Please enter the subject' }] },
-                    react_1["default"].createElement(antd_1.Input, null)),
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Body", name: "body", rules: [{ required: true, message: 'Please enter the body' }] },
-                    react_1["default"].createElement(react_quill_1["default"], { theme: "snow" })))))));
+    return (react_1["default"].createElement(pro_layout_1.PageContainer, { title: null },
+        react_1["default"].createElement("div", { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '40vh' } },
+            react_1["default"].createElement(antd_1.Card, { style: {
+                    width: '105%',
+                    // maxWidth: '1200px',
+                    // padding: '20px',
+                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'
+                } },
+                react_1["default"].createElement("div", { style: { display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' } },
+                    react_1["default"].createElement(antd_1.Button, { type: "primary", icon: react_1["default"].createElement(icons_1.PlusOutlined, null), onClick: function () { return setIsModalVisible(true); } }, "Create Template")),
+                react_1["default"].createElement(antd_1.Table, { columns: templateColumns, dataSource: templates, rowKey: "id", bordered: true, pagination: { pageSize: 10 }, title: function () { return null; } }),
+                react_1["default"].createElement(antd_1.Modal, { title: "Create Email Template", visible: isModalVisible, onCancel: function () { return setIsModalVisible(false); }, onOk: function () { return form.submit(); }, centered: true },
+                    react_1["default"].createElement(antd_1.Form, { form: form, layout: "vertical", onFinish: handleCreateTemplate },
+                        react_1["default"].createElement(antd_1.Form.Item, { label: "Template Name", name: "name", rules: [{ required: true, message: 'Please enter the template name' }] },
+                            react_1["default"].createElement(antd_1.Input, null)),
+                        react_1["default"].createElement(antd_1.Form.Item, { label: "Subject", name: "subject", rules: [{ required: true, message: 'Please enter the subject' }] },
+                            react_1["default"].createElement(antd_1.Input, null)),
+                        react_1["default"].createElement(antd_1.Form.Item, { label: "Body", name: "body", rules: [{ required: true, message: 'Please enter the body' }] },
+                            react_1["default"].createElement(react_quill_1["default"], { theme: "snow" })))),
+                selectedTemplate && (react_1["default"].createElement(antd_1.Modal, { title: "View Template", visible: isViewModalVisible, onCancel: function () { return setIsViewModalVisible(false); }, footer: null, centered: true },
+                    react_1["default"].createElement("h3", null, selectedTemplate.name),
+                    react_1["default"].createElement("p", null,
+                        react_1["default"].createElement("strong", null, "Subject:"),
+                        " ",
+                        selectedTemplate.subject),
+                    react_1["default"].createElement("div", { dangerouslySetInnerHTML: { __html: selectedTemplate.body } }))),
+                selectedTemplate && (react_1["default"].createElement(antd_1.Modal, { title: "Edit Email Template", visible: isEditModalVisible, onCancel: function () { return setIsEditModalVisible(false); }, onOk: function () { return form.submit(); }, centered: true },
+                    react_1["default"].createElement(antd_1.Form, { form: form, layout: "vertical", onFinish: function (values) { return __awaiter(void 0, void 0, void 0, function () {
+                            var error_5;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        _a.trys.push([0, 2, , 3]);
+                                        return [4 /*yield*/, umi_1.request("/templates/" + selectedTemplate.id, {
+                                                method: 'PUT',
+                                                data: values
+                                            })];
+                                    case 1:
+                                        _a.sent();
+                                        antd_1.message.success('Template updated successfully');
+                                        setIsEditModalVisible(false);
+                                        fetchTemplates();
+                                        return [3 /*break*/, 3];
+                                    case 2:
+                                        error_5 = _a.sent();
+                                        antd_1.message.error('Failed to update template');
+                                        return [3 /*break*/, 3];
+                                    case 3: return [2 /*return*/];
+                                }
+                            });
+                        }); } },
+                        react_1["default"].createElement(antd_1.Form.Item, { label: "Template Name", name: "name", rules: [{ required: true, message: 'Please enter the template name' }] },
+                            react_1["default"].createElement(antd_1.Input, null)),
+                        react_1["default"].createElement(antd_1.Form.Item, { label: "Subject", name: "subject", rules: [{ required: true, message: 'Please enter the subject' }] },
+                            react_1["default"].createElement(antd_1.Input, null)),
+                        react_1["default"].createElement(antd_1.Form.Item, { label: "Body", name: "body", rules: [{ required: true, message: 'Please enter the body' }] },
+                            react_1["default"].createElement(react_quill_1["default"], { theme: "snow" })))))))));
 };
 exports["default"] = EmailTemplate;

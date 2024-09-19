@@ -81,6 +81,48 @@ const routes: any[] = [
       },
     ]
   },
+  // New Menu: Reports with Access Control
+  {
+    name: 'Dashboard',
+    path: '/dashboard',
+    component: './UserSide/Dashboard',
+  },
+  {
+    name: 'Planner',
+    path: '/planner',
+    component: './UserSide/Planner',
+  },
+  {
+    name: 'Data Sheet',
+    path: '/datasheet',
+    component: './UserSide/DataSheet',
+  },
+  {
+    name: 'Mapping',
+    path: '/mapping',
+    routes:[
+      {
+        name: 'Manage Job Types',
+        path: '/mapping/managejobtypes',
+        component: './UserSide/Mapping/ManageJobTypes', // Corrected path
+      },
+      {
+        name: 'Job Areas',
+        path: '/mapping/jobareas',
+        component: './UserSide/Mapping/JobAreas', // Corrected path
+      },
+      {
+        name: 'Lines & Tanks',
+        path: '/mapping/linesandtanks',
+        component: './UserSide/Mapping/LinesAndTanks', // Corrected path
+      },
+    ]
+  },
+  {
+    name: 'Users',
+    path: '/users',
+    component: './UserSide/Users',
+  },
 ];
 
 export default routes;

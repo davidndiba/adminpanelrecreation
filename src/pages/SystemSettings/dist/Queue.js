@@ -1,7 +1,10 @@
 "use strict";
 // import React, { useEffect, useState } from 'react';
-// import { Table, Checkbox, Button, message } from 'antd';
+// import { Table, Checkbox, Button, message, DatePicker, Form, Modal, Select, Input, Spin, Card } from 'antd';
 // import { request } from 'umi';
+// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// import { CKEditor } from '@ckeditor/ckeditor5-react';
+// import moment from 'moment'; // Import moment
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -46,65 +49,6 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 exports.__esModule = true;
-// const Queue = () => {
-//   const [emails, setEmails] = useState([]);
-//   const [selectedEmails, setSelectedEmails] = useState([]);
-//   useEffect(() => {
-//     const fetchEmails = async () => {
-//       try {
-//         const response = await request('/emails');
-//         setEmails(response.data);
-//       } catch (error) {
-//         message.error('Failed to fetch emails');
-//       }
-//     };
-//     fetchEmails();
-//   }, []);
-//   const handleDeleteSelected = async () => {
-//     try {
-//       await Promise.all(selectedEmails.map(emailId => 
-//         request(`/emails/${emailId}`, { method: 'DELETE' })
-//       ));
-//       message.success('Selected emails deleted successfully');
-//       setEmails(emails.filter(email => !selectedEmails.includes(email.id)));
-//     } catch (error) {
-//       message.error('Failed to delete selected emails');
-//     }
-//   };
-//   const emailColumns = [
-//     {
-//       title: '',
-//       dataIndex: 'checkbox',
-//       render: (_, record) => (
-//         <Checkbox
-//           onChange={(e) => {
-//             const { checked } = e.target;
-//             setSelectedEmails(prevSelectedEmails => checked
-//               ? [...prevSelectedEmails, record.id]
-//               : prevSelectedEmails.filter(id => id !== record.id)
-//             );
-//           }}
-//         />
-//       ),
-//     },
-//     { title: 'Recipient', dataIndex: 'to', key: 'recipient' },
-//     { title: 'Subject', dataIndex: 'subject', key: 'subject' },
-//     { title: 'Date Sent', dataIndex: 'sent_at', key: 'dateSent' },
-//   ];
-//   return (
-//     <>
-//       <Table columns={emailColumns} dataSource={emails} rowKey="id" />
-//       <Button danger onClick={handleDeleteSelected}>Delete Selected</Button>
-//     </>
-//   );
-// };
-// export default Queue;
-// import React, { useEffect, useState } from 'react';
-// import { Table, Checkbox, Button, message, DatePicker, Form, Modal, Select, Input } from 'antd';
-// import { request } from 'umi';
-// import moment from 'moment';
-// import ReactQuill from 'react-quill';
-// import 'react-quill/dist/quill.snow.css';
 // const { RangePicker } = DatePicker;
 // const { Option } = Select;
 // const Queue = () => {
@@ -113,9 +57,14 @@ exports.__esModule = true;
 //   const [templates, setTemplates] = useState([]);
 //   const [emailFormVisible, setEmailFormVisible] = useState(false);
 //   const [selectedTemplate, setSelectedTemplate] = useState(null);
-//   const [composedEmail, setComposedEmail] = useState({ recipient: '', subject: '', body: '' });
 //   const [form] = Form.useForm();
-//   // Fetch email logs
+//   const [editorContent, setEditorContent] = useState('');
+//   const [composedEmail, setComposedEmail] = useState({ recipient: '', subject: '' });
+//   const [loading, setLoading] = useState(false); // Loading state
+//   useEffect(() => {
+//     fetchEmails();
+//     fetchTemplates();
+//   }, []);
 //   const fetchEmails = async (params = {}) => {
 //     try {
 //       const response = await request('/emails', { params });
@@ -124,11 +73,6 @@ exports.__esModule = true;
 //       message.error('Failed to fetch emails');
 //     }
 //   };
-//   useEffect(() => {
-//     fetchEmails();
-//     fetchTemplates();
-//   }, []);
-//   // Fetch email templates
 //   const fetchTemplates = async () => {
 //     try {
 //       const response = await request('/templates');
@@ -137,100 +81,56 @@ exports.__esModule = true;
 //       message.error('Failed to fetch templates');
 //     }
 //   };
-//   // Fetch single template by ID
-//   const fetchTemplateById = async (templateId) => {
-//     try {
-//       const response = await request(`/templates/${templateId}`);
-//       return response.data;
-//     } catch (error) {
-//       message.error('Failed to fetch template');
-//     }
-//   };
-//   // Handle date filter
-//   const handleDateFilter = async (dates) => {
-//     const start_date = dates ? dates[0].format('YYYY-MM-DD') : undefined;
-//     const end_date = dates ? dates[1].format('YYYY-MM-DD') : undefined;
-//     fetchEmails({ start_date, end_date });
-//   };
-//   // Handle bulk delete
-//   const handleBulkDelete = async () => {
-//     try {
-//       await request('/emails/bulk-delete', {
-//         method: 'DELETE',
-//         data: { ids: selectedEmails }
-//       });
-//       message.success('Bulk delete successful');
-//       fetchEmails();  // Refresh the list
-//     } catch (error) {
-//       message.error('Failed to delete selected emails');
-//     }
-//   };
-//   // Handle delete selected
-//   const handleDeleteSelected = async () => {
-//     try {
-//       await Promise.all(selectedEmails.map(emailId => 
-//         request(`/emails/${emailId}`, { method: 'DELETE' })
-//       ));
-//       message.success('Selected emails deleted successfully');
-//       fetchEmails();  // Refresh the list
-//     } catch (error) {
-//       message.error('Failed to delete selected emails');
-//     }
-//   };
-//   // Handle single delete
-//   const handleSingleDelete = async (emailId) => {
-//     try {
-//       await request(`/emails/${emailId}`, { method: 'DELETE' });
-//       message.success('Email deleted successfully');
-//       fetchEmails();  // Refresh the list
-//     } catch (error) {
-//       message.error('Failed to delete email');
-//     }
-//   };
-//   // Handle resend
-//   const handleResend = async (emailId) => {
-//     try {
-//       await request(`/emails/${emailId}/resend`, { method: 'POST' });
-//       message.success('Email resent successfully');
-//     } catch (error) {
-//       message.error('Failed to resend email');
-//     }
-//   };
-//   // Handle compose email
-//   const handleComposeEmail = async () => {
-//     // Ensure fields are populated
-//     const { recipient, subject, body } = composedEmail;
-//     if (!recipient || !body || (!subject && !selectedTemplate)) {
+//   const handleComposeEmail = async (values) => {
+//     const { recipient, subject } = values;
+//     if (!recipient || !editorContent || (!subject && !selectedTemplate)) {
 //       message.error('Recipient and body are required. Subject is required if no template is used.');
 //       return;
 //     }
+//     const payload = {
+//       to: recipient,
+//       subject: subject || '',
+//       template_id: selectedTemplate || null,
+//       body: editorContent,
+//     };
+//     setLoading(true); // Show loader
 //     try {
 //       await request('/compose-email', {
 //         method: 'POST',
-//         data: composedEmail
+//         data: payload,
 //       });
 //       message.success('Email sent successfully');
 //       setEmailFormVisible(false);
 //       form.resetFields();
-//       setComposedEmail({ recipient: '', subject: '', body: '' }); // Reset composedEmail
+//       setEditorContent('');
+//       setSelectedTemplate(null);
+//       fetchEmails();
 //     } catch (error) {
 //       message.error('Failed to send email');
+//     } finally {
+//       setLoading(false); // Hide loader
 //     }
 //   };
-//   // Handle template selection
-//   const handleTemplateChange = async (templateId) => {
-//     if (!templateId) return;
-//     const selected = await fetchTemplateById(templateId);
-//     if (selected) {
-//       setComposedEmail(prev => ({
-//         ...prev,
-//         body: selected.body
-//       }));
-//       setSelectedTemplate(templateId);
-//       form.setFieldsValue({
-//         body: selected.body // Update form body field
-//       });
+//   const handleDeleteSelected = async () => {
+//     if (selectedEmails.length === 0) {
+//       message.error('No emails selected');
+//       return;
 //     }
+//     try {
+//       await request('/delete-emails', {
+//         method: 'POST',
+//         data: { ids: selectedEmails },
+//       });
+//       message.success('Selected emails deleted successfully');
+//       setSelectedEmails([]); // Clear selected emails after deletion
+//       fetchEmails(); // Refresh email list after deletion
+//     } catch (error) {
+//       message.error('Failed to delete selected emails');
+//     }
+//   };
+//   const handleBulkDelete = async () => {
+//     // Implement bulk delete logic here
+//     message.info('Bulk delete functionality is not yet implemented.');
 //   };
 //   const emailColumns = [
 //     {
@@ -240,9 +140,8 @@ exports.__esModule = true;
 //         <Checkbox
 //           onChange={(e) => {
 //             const { checked } = e.target;
-//             setSelectedEmails(prevSelectedEmails => checked
-//               ? [...prevSelectedEmails, record.id]
-//               : prevSelectedEmails.filter(id => id !== record.id)
+//             setSelectedEmails((prevSelectedEmails) =>
+//               checked ? [...prevSelectedEmails, record.id] : prevSelectedEmails.filter((id) => id !== record.id)
 //             );
 //           }}
 //         />
@@ -250,84 +149,274 @@ exports.__esModule = true;
 //     },
 //     { title: 'Recipient', dataIndex: 'to', key: 'recipient' },
 //     { title: 'Subject', dataIndex: 'subject', key: 'subject' },
-//     { title: 'Date Sent', dataIndex: 'sent_at', key: 'dateSent', render: text => moment(text).format('YYYY-MM-DD') },
-//     {
-//       title: 'Actions',
-//       dataIndex: 'actions',
-//       render: (_, record) => (
-//         <Button onClick={() => handleSingleDelete(record.id)} danger>Delete</Button>
-//       ),
-//     }
+//     { title: 'Date Sent', dataIndex: 'sent_at', key: 'dateSent', render: (text) => moment(text).format('YYYY-MM-DD') },
 //   ];
 //   return (
-//     <>
-//       <div style={{ marginBottom: '16px' }}>
-//         <RangePicker onChange={handleDateFilter} />
-//       </div>
-//       <div style={{ marginBottom: '16px' }}>
-//         <Button type="primary" onClick={() => setEmailFormVisible(true)} style={{ marginRight: '8px' }}>
-//           Test Email
-//         </Button>
-//         <Button danger onClick={handleDeleteSelected} style={{ marginRight: '8px' }}>
-//           Delete Selected
-//         </Button>
-//         <Button danger onClick={handleBulkDelete}>
-//           Bulk Delete
-//         </Button>
-//       </div>
-//       <Table columns={emailColumns} dataSource={emails} rowKey="id" />
-//       <Modal
-//         title="Compose Email"
-//         visible={emailFormVisible}
-//         onCancel={() => setEmailFormVisible(false)}
-//         footer={null}
-//       >
-//         <Form
-//           form={form}
-//           layout="vertical"
-//           onFinish={handleComposeEmail}
-//           initialValues={composedEmail}
+//     <div
+//       style={{
+//         display: 'flex',
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         minHeight: '40vh',
+//         // backgroundColor: '#f0f2f5',
+//       }}
+//     >
+//       <Card style={{ width: '190%', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
+//         <div style={{ marginBottom: '16px' }}>
+//           <RangePicker onChange={(dates) => handleDateFilter(dates)} />
+//         </div>
+//         <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+//           <Button type="primary" onClick={() => setEmailFormVisible(true)} style={{ marginRight: '8px' }}>
+//             Compose Email
+//           </Button>
+//           <Button danger onClick={handleDeleteSelected} style={{ marginRight: '8px' }}>
+//             Delete Selected
+//           </Button>
+//           <Button danger onClick={handleBulkDelete}>
+//             Bulk Delete
+//           </Button>
+//         </div>
+//         <Table columns={emailColumns} dataSource={emails} rowKey="id" />
+//         <Modal
+//           title="Compose Email"
+//           visible={emailFormVisible}
+//           onCancel={() => setEmailFormVisible(false)}
+//           footer={null}
 //         >
-//           <Form.Item
-//             label="To"
-//             name="recipient"
-//             rules={[{ required: true, message: 'Please enter the recipient email!' }]}
-//           >
-//             <Input />
-//           </Form.Item>
-//           <Form.Item
-//             label="Subject"
-//             name="subject"
-//             rules={[{ required: !selectedTemplate, message: 'Please enter the subject!' }]}
-//           >
-//             <Input />
-//           </Form.Item>
-//           <Form.Item
-//             label="Select Template"
-//             name="template"
-//             rules={[{ required: false }]}
-//           >
-//             <Select onChange={handleTemplateChange} placeholder="Select a template">
-//               {templates.map(template => (
-//                 <Option key={template.id} value={template.id}>{template.name}</Option>
-//               ))}
-//             </Select>
-//           </Form.Item>
-//           <Form.Item
-//             label="Body"
-//             name="body"
-//             rules={[{ required: true, message: 'Please enter the email body!' }]}
-//           >
-//             <ReactQuill value={composedEmail.body} onChange={body => setComposedEmail(prev => ({ ...prev, body }))} />
-//           </Form.Item>
-//           <Form.Item>
-//             <Button type="primary" htmlType="submit">
-//               Send Email
-//             </Button>
-//           </Form.Item>
-//         </Form>
-//       </Modal>
-//     </>
+//           <Form form={form} layout="vertical" onFinish={handleComposeEmail}>
+//             <Form.Item
+//               label="To"
+//               name="recipient"
+//               rules={[{ required: true, message: 'Please enter the recipient email!' }]}
+//             >
+//               <Input />
+//             </Form.Item>
+//             <Form.Item
+//               label="Subject"
+//               name="subject"
+//               rules={[{ required: !selectedTemplate, message: 'Please enter the subject!' }]}
+//             >
+//               <Input />
+//             </Form.Item>
+//             <Form.Item label="Select Template" name="template">
+//               <Select onChange={(value) => setSelectedTemplate(value)} placeholder="Select a template">
+//                 {templates.map((template) => (
+//                   <Option key={template.id} value={template.id}>
+//                     {template.name}
+//                   </Option>
+//                 ))}
+//               </Select>
+//             </Form.Item>
+//             <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the email body!' }]}>
+//               <CKEditor
+//                 editor={ClassicEditor}
+//                 data={editorContent}
+//                 onChange={(event, editor) => {
+//                   const data = editor.getData();
+//                   setEditorContent(data);
+//                 }}
+//               />
+//             </Form.Item>
+//             <Form.Item>
+//               <Button type="primary" htmlType="submit" loading={loading}>
+//                 Send Email
+//               </Button>
+//             </Form.Item>
+//           </Form>
+//         </Modal>
+//       </Card>
+//     </div>
+//   );
+// };
+// export default Queue;
+// import React, { useEffect, useState } from 'react';
+// import { Table, Checkbox, Button, message, DatePicker, Form, Modal, Select, Input, Spin, Card } from 'antd';
+// import { request } from 'umi';
+// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// import { CKEditor } from '@ckeditor/ckeditor5-react';
+// import moment from 'moment'; // Import moment
+// const { RangePicker } = DatePicker;
+// const { Option } = Select;
+// const Queue = () => {
+//   const [emails, setEmails] = useState([]);
+//   const [selectedEmails, setSelectedEmails] = useState([]);
+//   const [templates, setTemplates] = useState([]);
+//   const [emailFormVisible, setEmailFormVisible] = useState(false);
+//   const [selectedTemplate, setSelectedTemplate] = useState(null);
+//   const [form] = Form.useForm();
+//   const [editorContent, setEditorContent] = useState('');
+//   const [composedEmail, setComposedEmail] = useState({ recipient: '', subject: '' });
+//   const [loading, setLoading] = useState(false); // Loading state
+//   useEffect(() => {
+//     fetchEmails();
+//     fetchTemplates();
+//   }, []);
+//   const fetchEmails = async (params = {}) => {
+//     try {
+//       const response = await request('/emails', { params });
+//       setEmails(response.data);
+//     } catch (error) {
+//       message.error('Failed to fetch emails');
+//     }
+//   };
+//   const fetchTemplates = async () => {
+//     try {
+//       const response = await request('/templates');
+//       setTemplates(response.data);
+//     } catch (error) {
+//       message.error('Failed to fetch templates');
+//     }
+//   };
+//   const handleComposeEmail = async (values) => {
+//     const { recipient, subject } = values;
+//     if (!recipient || !editorContent || (!subject && !selectedTemplate)) {
+//       message.error('Recipient and body are required. Subject is required if no template is used.');
+//       return;
+//     }
+//     const payload = {
+//       to: recipient,
+//       subject: subject || '',
+//       template_id: selectedTemplate || null,
+//       body: editorContent,
+//     };
+//     setLoading(true); // Show loader
+//     try {
+//       await request('/compose-email', {
+//         method: 'POST',
+//         data: payload,
+//       });
+//       message.success('Email sent successfully');
+//       setEmailFormVisible(false);
+//       form.resetFields();
+//       setEditorContent('');
+//       setSelectedTemplate(null);
+//       fetchEmails();
+//     } catch (error) {
+//       message.error('Failed to send email');
+//     } finally {
+//       setLoading(false); // Hide loader
+//     }
+//   };
+//   const handleDeleteSelected = async () => {
+//     if (selectedEmails.length === 0) {
+//       message.error('No emails selected');
+//       return;
+//     }
+//     try {
+//       await request('/delete-emails', {
+//         method: 'POST',
+//         data: { ids: selectedEmails },
+//       });
+//       message.success('Selected emails deleted successfully');
+//       setSelectedEmails([]); // Clear selected emails after deletion
+//       fetchEmails(); // Refresh email list after deletion
+//     } catch (error) {
+//       message.error('Failed to delete selected emails');
+//     }
+//   };
+//   const handleBulkDelete = async () => {
+//     // Implement bulk delete logic here
+//     message.info('Bulk delete functionality is not yet implemented.');
+//   };
+//   const emailColumns = [
+//     {
+//       title: '',
+//       dataIndex: 'checkbox',
+//       render: (_, record) => (
+//         <Checkbox
+//           onChange={(e) => {
+//             const { checked } = e.target;
+//             setSelectedEmails((prevSelectedEmails) =>
+//               checked ? [...prevSelectedEmails, record.id] : prevSelectedEmails.filter((id) => id !== record.id)
+//             );
+//           }}
+//         />
+//       ),
+//     },
+//     { title: 'Recipient', dataIndex: 'to', key: 'recipient' },
+//     { title: 'Subject', dataIndex: 'subject', key: 'subject' },
+//     { title: 'Date Sent', dataIndex: 'sent_at', key: 'dateSent', render: (text) => moment(text).format('YYYY-MM-DD') },
+//   ];
+//   return (
+//     <div
+//       style={{
+//         display: 'flex',
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         minHeight: '40vh',
+//         // backgroundColor: '#f0f2f5',
+//       }}
+//     >
+//       <Card style={{ width: '100%', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
+//         <div style={{ marginBottom: '16px' }}>
+//           <RangePicker onChange={(dates) => handleDateFilter(dates)} />
+//         </div>
+//         <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+//           <Button type="primary" onClick={() => setEmailFormVisible(true)} style={{ marginRight: '8px' }}>
+//             Compose Email
+//           </Button>
+//           <Button danger onClick={handleDeleteSelected} style={{ marginRight: '8px' }}>
+//             Delete Selected
+//           </Button>
+//           <Button danger onClick={handleBulkDelete}>
+//             Clear All
+//           </Button>
+//         </div>
+//         <Table
+//           columns={emailColumns}
+//           dataSource={emails}
+//           rowKey="id"
+//           bordered // Add this line to include borders
+//         />
+//         <Modal
+//           title="Compose Email"
+//           visible={emailFormVisible}
+//           onCancel={() => setEmailFormVisible(false)}
+//           footer={null}
+//         >
+//           <Form form={form} layout="vertical" onFinish={handleComposeEmail}>
+//             <Form.Item
+//               label="To"
+//               name="recipient"
+//               rules={[{ required: true, message: 'Please enter the recipient email!' }]}
+//             >
+//               <Input />
+//             </Form.Item>
+//             <Form.Item
+//               label="Subject"
+//               name="subject"
+//               rules={[{ required: !selectedTemplate, message: 'Please enter the subject!' }]}
+//             >
+//               <Input />
+//             </Form.Item>
+//             <Form.Item label="Select Template" name="template">
+//               <Select onChange={(value) => setSelectedTemplate(value)} placeholder="Select a template">
+//                 {templates.map((template) => (
+//                   <Option key={template.id} value={template.id}>
+//                     {template.name}
+//                   </Option>
+//                 ))}
+//               </Select>
+//             </Form.Item>
+//             <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the email body!' }]}>
+//               <CKEditor
+//                 editor={ClassicEditor}
+//                 data={editorContent}
+//                 onChange={(event, editor) => {
+//                   const data = editor.getData();
+//                   setEditorContent(data);
+//                 }}
+//               />
+//             </Form.Item>
+//             <Form.Item>
+//               <Button type="primary" htmlType="submit" loading={loading}>
+//                 Send Email
+//               </Button>
+//             </Form.Item>
+//           </Form>
+//         </Modal>
+//       </Card>
+//     </div>
 //   );
 // };
 // export default Queue;
@@ -353,7 +442,6 @@ var Queue = function () {
         fetchEmails();
         fetchTemplates();
     }, []);
-    // Fetch email logs
     var fetchEmails = function (params) {
         if (params === void 0) { params = {}; }
         return __awaiter(void 0, void 0, void 0, function () {
@@ -376,7 +464,6 @@ var Queue = function () {
             });
         });
     };
-    // Fetch email templates
     var fetchTemplates = function () { return __awaiter(void 0, void 0, void 0, function () {
         var response, error_2;
         return __generator(this, function (_a) {
@@ -396,126 +483,8 @@ var Queue = function () {
             }
         });
     }); };
-    // Fetch single template by ID
-    var fetchTemplateById = function (templateId) { return __awaiter(void 0, void 0, void 0, function () {
-        var response, error_3;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, umi_1.request("/templates/" + templateId)];
-                case 1:
-                    response = _a.sent();
-                    return [2 /*return*/, response.data];
-                case 2:
-                    error_3 = _a.sent();
-                    antd_1.message.error('Failed to fetch template');
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    }); };
-    // Handle date filter
-    var handleDateFilter = function (dates) { return __awaiter(void 0, void 0, void 0, function () {
-        var start_date, end_date;
-        return __generator(this, function (_a) {
-            start_date = dates ? dates[0].format('YYYY-MM-DD') : undefined;
-            end_date = dates ? dates[1].format('YYYY-MM-DD') : undefined;
-            fetchEmails({ start_date: start_date, end_date: end_date });
-            return [2 /*return*/];
-        });
-    }); };
-    // Handle bulk delete
-    var handleBulkDelete = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var error_4;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, umi_1.request('/emails/bulk-delete', {
-                            method: 'DELETE',
-                            data: { ids: selectedEmails }
-                        })];
-                case 1:
-                    _a.sent();
-                    antd_1.message.success('Bulk delete successful');
-                    fetchEmails(); // Refresh the list
-                    return [3 /*break*/, 3];
-                case 2:
-                    error_4 = _a.sent();
-                    antd_1.message.error('Failed to delete selected emails');
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    }); };
-    // Handle delete selected
-    var handleDeleteSelected = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var error_5;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, Promise.all(selectedEmails.map(function (emailId) {
-                            return umi_1.request("/emails/" + emailId, { method: 'DELETE' });
-                        }))];
-                case 1:
-                    _a.sent();
-                    antd_1.message.success('Selected emails deleted successfully');
-                    fetchEmails(); // Refresh the list
-                    return [3 /*break*/, 3];
-                case 2:
-                    error_5 = _a.sent();
-                    antd_1.message.error('Failed to delete selected emails');
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    }); };
-    // Handle single delete
-    var handleSingleDelete = function (emailId) { return __awaiter(void 0, void 0, void 0, function () {
-        var error_6;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, umi_1.request("/emails/" + emailId, { method: 'DELETE' })];
-                case 1:
-                    _a.sent();
-                    antd_1.message.success('Email deleted successfully');
-                    fetchEmails(); // Refresh the list
-                    return [3 /*break*/, 3];
-                case 2:
-                    error_6 = _a.sent();
-                    antd_1.message.error('Failed to delete email');
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    }); };
-    // Handle resend
-    var handleResend = function (emailId) { return __awaiter(void 0, void 0, void 0, function () {
-        var error_7;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, umi_1.request("/emails/" + emailId + "/resend", { method: 'POST' })];
-                case 1:
-                    _a.sent();
-                    antd_1.message.success('Email resent successfully');
-                    return [3 /*break*/, 3];
-                case 2:
-                    error_7 = _a.sent();
-                    antd_1.message.error('Failed to resend email');
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
-            }
-        });
-    }); };
-    // Handle compose email
     var handleComposeEmail = function (values) { return __awaiter(void 0, void 0, void 0, function () {
-        var recipient, subject, payload, error_8;
+        var recipient, subject, payload, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -544,11 +513,11 @@ var Queue = function () {
                     setEmailFormVisible(false);
                     form.resetFields();
                     setEditorContent('');
-                    setSelectedTemplate(null); // Reset template selection
-                    fetchEmails(); // Refresh the list
+                    setSelectedTemplate(null);
+                    fetchEmails();
                     return [3 /*break*/, 5];
                 case 3:
-                    error_8 = _a.sent();
+                    error_3 = _a.sent();
                     antd_1.message.error('Failed to send email');
                     return [3 /*break*/, 5];
                 case 4:
@@ -558,25 +527,53 @@ var Queue = function () {
             }
         });
     }); };
-    // Handle template selection
-    var handleTemplateChange = function (templateId) { return __awaiter(void 0, void 0, void 0, function () {
-        var selected;
+    var handleDeleteSelected = function () { return __awaiter(void 0, void 0, void 0, function () {
+        var error_4;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!templateId)
+                    if (selectedEmails.length === 0) {
+                        antd_1.message.error('No emails selected');
                         return [2 /*return*/];
-                    return [4 /*yield*/, fetchTemplateById(templateId)];
-                case 1:
-                    selected = _a.sent();
-                    if (selected) {
-                        setEditorContent(selected.body);
-                        setSelectedTemplate(templateId);
-                        form.setFieldsValue({
-                            subject: selected.subject || '' // Update form subject field
-                        });
                     }
-                    return [2 /*return*/];
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, umi_1.request('/delete-emails', {
+                            method: 'POST',
+                            data: { ids: selectedEmails }
+                        })];
+                case 2:
+                    _a.sent();
+                    antd_1.message.success('Selected emails deleted successfully');
+                    setSelectedEmails([]); // Clear selected emails after deletion
+                    fetchEmails(); // Refresh email list after deletion
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_4 = _a.sent();
+                    antd_1.message.error('Failed to delete selected emails');
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var handleRetryEmail = function (emailId) { return __awaiter(void 0, void 0, void 0, function () {
+        var error_5;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, umi_1.request("/emails/retry/" + emailId, { method: 'POST' })];
+                case 1:
+                    _a.sent();
+                    antd_1.message.success('Retrying email sending');
+                    fetchEmails(); // Refresh email list after retry
+                    return [3 /*break*/, 3];
+                case 2:
+                    error_5 = _a.sent();
+                    antd_1.message.error('Failed to retry sending email');
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
             }
         });
     }); };
@@ -586,36 +583,50 @@ var Queue = function () {
             dataIndex: 'checkbox',
             render: function (_, record) { return (react_1["default"].createElement(antd_1.Checkbox, { onChange: function (e) {
                     var checked = e.target.checked;
-                    setSelectedEmails(function (prevSelectedEmails) { return checked
-                        ? __spreadArrays(prevSelectedEmails, [record.id]) : prevSelectedEmails.filter(function (id) { return id !== record.id; }); });
+                    setSelectedEmails(function (prevSelectedEmails) {
+                        return checked ? __spreadArrays(prevSelectedEmails, [record.id]) : prevSelectedEmails.filter(function (id) { return id !== record.id; });
+                    });
                 } })); }
         },
         { title: 'Recipient', dataIndex: 'to', key: 'recipient' },
         { title: 'Subject', dataIndex: 'subject', key: 'subject' },
         { title: 'Date Sent', dataIndex: 'sent_at', key: 'dateSent', render: function (text) { return moment_1["default"](text).format('YYYY-MM-DD'); } },
+        { title: 'Retry Count', dataIndex: 'retry_count', key: 'retryCount' },
+        { title: 'Sent', dataIndex: 'sent', key: 'sent', render: function (text) { return (text === 'Yes' ? 'Yes' : 'No'); } },
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: function (_, record) { return (react_1["default"].createElement(antd_1.Button, { onClick: function () { return handleRetryEmail(record.id); }, type: "link" }, "Retry")); }
+        },
     ];
-    return (react_1["default"].createElement(react_1["default"].Fragment, null,
-        react_1["default"].createElement("div", { style: { marginBottom: '16px' } },
-            react_1["default"].createElement(RangePicker, { onChange: handleDateFilter })),
-        react_1["default"].createElement("div", { style: { marginBottom: '16px' } },
-            react_1["default"].createElement(antd_1.Button, { type: "primary", onClick: function () { return setEmailFormVisible(true); }, style: { marginRight: '8px' } }, "Compose Email"),
-            react_1["default"].createElement(antd_1.Button, { danger: true, onClick: handleDeleteSelected, style: { marginRight: '8px' } }, "Delete Selected"),
-            react_1["default"].createElement(antd_1.Button, { danger: true, onClick: handleBulkDelete }, "Bulk Delete")),
-        react_1["default"].createElement(antd_1.Table, { columns: emailColumns, dataSource: emails, rowKey: "id" }),
-        react_1["default"].createElement(antd_1.Modal, { title: "Compose Email", visible: emailFormVisible, onCancel: function () { return setEmailFormVisible(false); }, footer: null },
-            react_1["default"].createElement(antd_1.Form, { form: form, layout: "vertical", onFinish: handleComposeEmail },
-                react_1["default"].createElement(antd_1.Form.Item, { label: "To", name: "recipient", rules: [{ required: true, message: 'Please enter the recipient email!' }] },
-                    react_1["default"].createElement(antd_1.Input, null)),
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Subject", name: "subject", rules: [{ required: !selectedTemplate, message: 'Please enter the subject!' }] },
-                    react_1["default"].createElement(antd_1.Input, null)),
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Select Template", name: "template", rules: [{ required: false }] },
-                    react_1["default"].createElement(antd_1.Select, { onChange: handleTemplateChange, placeholder: "Select a template" }, templates.map(function (template) { return (react_1["default"].createElement(Option, { key: template.id, value: template.id }, template.name)); }))),
-                react_1["default"].createElement(antd_1.Form.Item, { label: "Body", name: "body", rules: [{ required: true, message: 'Please enter the email body!' }] },
-                    react_1["default"].createElement(ckeditor5_react_1.CKEditor, { editor: ckeditor5_build_classic_1["default"], data: editorContent, onChange: function (event, editor) {
-                            var data = editor.getData();
-                            setEditorContent(data);
-                        } })),
-                react_1["default"].createElement(antd_1.Form.Item, null,
-                    react_1["default"].createElement(antd_1.Button, { type: "primary", htmlType: "submit", loading: loading }, "Send Email"))))));
+    return (react_1["default"].createElement("div", { style: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '40vh'
+        } },
+        react_1["default"].createElement(antd_1.Card, { style: { width: '100%', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' } },
+            react_1["default"].createElement("div", { style: { marginBottom: '16px' } },
+                react_1["default"].createElement(RangePicker, { onChange: function (dates) { return handleDateFilter(dates); } })),
+            react_1["default"].createElement("div", { style: { marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' } },
+                react_1["default"].createElement(antd_1.Button, { type: "primary", onClick: function () { return setEmailFormVisible(true); }, style: { marginRight: '8px' } }, "Compose Email"),
+                react_1["default"].createElement(antd_1.Button, { danger: true, onClick: handleDeleteSelected, style: { marginRight: '8px', border: 'none', boxShadow: 'none' } }, "Delete Selected"),
+                react_1["default"].createElement(antd_1.Button, { danger: true, onClick: function () { return antd_1.message.info('Bulk delete functionality is not yet implemented.'); } }, "Clear All")),
+            react_1["default"].createElement(antd_1.Table, { columns: emailColumns, dataSource: emails, rowKey: "id", bordered: true }),
+            react_1["default"].createElement(antd_1.Modal, { title: "Compose Email", visible: emailFormVisible, onCancel: function () { return setEmailFormVisible(false); }, footer: null },
+                react_1["default"].createElement(antd_1.Form, { form: form, layout: "vertical", onFinish: handleComposeEmail },
+                    react_1["default"].createElement(antd_1.Form.Item, { label: "To", name: "recipient", rules: [{ required: true, message: 'Please enter the recipient email!' }] },
+                        react_1["default"].createElement(antd_1.Input, null)),
+                    react_1["default"].createElement(antd_1.Form.Item, { label: "Subject", name: "subject", rules: [{ required: !selectedTemplate, message: 'Please enter the subject!' }] },
+                        react_1["default"].createElement(antd_1.Input, null)),
+                    react_1["default"].createElement(antd_1.Form.Item, { label: "Select Template", name: "template" },
+                        react_1["default"].createElement(antd_1.Select, { onChange: function (value) { return setSelectedTemplate(value); }, placeholder: "Select a template" }, templates.map(function (template) { return (react_1["default"].createElement(Option, { key: template.id, value: template.id }, template.name)); }))),
+                    react_1["default"].createElement(antd_1.Form.Item, { label: "Body", name: "body", rules: [{ required: true, message: 'Please enter the email body!' }] },
+                        react_1["default"].createElement(ckeditor5_react_1.CKEditor, { editor: ckeditor5_build_classic_1["default"], data: editorContent, onChange: function (event, editor) {
+                                var data = editor.getData();
+                                setEditorContent(data);
+                            } })),
+                    react_1["default"].createElement(antd_1.Form.Item, null,
+                        react_1["default"].createElement(antd_1.Button, { type: "primary", htmlType: "submit", loading: loading }, "Send Email")))))));
 };
 exports["default"] = Queue;

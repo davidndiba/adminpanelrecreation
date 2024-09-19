@@ -531,7 +531,7 @@ const ActivityLogs = () => {
   const deleteSelectedButtonStyle = {
     marginRight: '16px',
     // backgroundColor: '#ff4d4f',  // Red background color  
-    borderColor: '#ff4d4f',      // Red border color
+    // borderColor: '#ff4d4f',      // Red border color 
     color: '#ff4d4f',               // White text color
   };
   
@@ -550,7 +550,7 @@ const ActivityLogs = () => {
   
   return (
     <div className="activity-logs-container">
-      <Form
+      {/* <Form
         form={form}
         layout="inline"
         style={{ marginBottom: 16 }}
@@ -569,27 +569,80 @@ const ActivityLogs = () => {
             options={[{ value: '', label: 'All Modules' }, ...modules]}
           />
         </Form.Item>
-      </Form>
+      </Form> */}
+      <Form
+  form={form}
+  layout="inline"
+  style={{ marginBottom: 16 }}
+  onValuesChange={handleFormValuesChange}
+>
+  <Form.Item 
+    name="user" 
+    label="User"
+    style={{ width: '30%', marginRight: '16px' }}
+  >
+    <ProFormSelect
+      options={[{ value: '', label: 'All Users' }, ...users]}
+      fieldProps={{
+        showSearch: true,  // Enable search functionality
+        filterOption: (input, option) =>
+          option?.label.toLowerCase().includes(input.toLowerCase()),
+        // Detect when the search input is cleared
+        onSearch: (value) => {
+          if (value === '') {
+            form.setFieldsValue({ user: '' });
+            setFilters({ ...filters, user: '' });
+            fetchData(); // Re-fetch data with empty user filter
+          }
+        },
+        // Detect when a selection is made from the dropdown
+        onSelect: (value) => {
+          setFilters({ ...filters, user: value });
+          fetchData(); // Re-fetch data with the selected user
+        },
+      }}
+    />
+  </Form.Item>
+  
+  <Form.Item 
+    name="dateRange" 
+    label="Date Range"
+    style={{ width: '30%', marginRight: '16px' }}
+  >
+    <ProFormDateRangePicker 
+      fieldProps={{
+        format: "YYYY-MM-DD",
+      }} 
+    />
+  </Form.Item>
+  
+  <Form.Item 
+    name="module" 
+    label="Module"
+    style={{ width: '30%' }}
+  >
+    <ProFormSelect
+      options={[{ value: '', label: 'All Modules' }, ...modules]}
+      fieldProps={{
+        showSearch: true,
+        filterOption: (input, option) =>
+          option?.label.toLowerCase().includes(input.toLowerCase()),
+        onSearch: (value) => {
+          if (value === '') {
+            form.setFieldsValue({ module: '' });
+            setFilters({ ...filters, module: '' });
+            fetchData(); // Re-fetch data with empty module filter
+          }
+        },
+        onSelect: (value) => {
+          setFilters({ ...filters, module: value });
+          fetchData(); // Re-fetch data with the selected module
+        },
+      }}
+    />
+  </Form.Item>
+</Form>
 
-      {/* <div className="button-container">
-        <Button
-          type="danger"
-          onClick={handleDeleteSelected}
-          style={{ marginRight: 16 }}
-        >
-          Delete Selected
-        </Button>
-        <Popconfirm
-          title="Are you sure you want to clear all logs based on the filters?"
-          onConfirm={handleBulkDelete}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button type="default" danger>
-            Clear All
-          </Button>
-        </Popconfirm>
-      </div> */}
 <div style={buttonContainerStyle}>
   <Button
     type="danger"

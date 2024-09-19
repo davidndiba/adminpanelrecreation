@@ -1,12 +1,8 @@
 "use strict";
-// import {
-//   GridContent,
-//   ProCard,
-//   ProForm,
-//   ProFormText,
-// } from '@ant-design/pro-components';
-// import { message } from 'antd';
-// import React from 'react';
+// import { GoogleOutlined } from '@ant-design/icons';
+// import { ProCard, ProForm, ProFormText } from '@ant-design/pro-components';
+// import { Button, Divider, message, Modal } from 'antd';
+// import React, { useState } from 'react';
 // import { history, request } from 'umi';
 // import './login.less';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -47,71 +43,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 // const LoginPage: React.FC = () => {
+//   const [isSignUpVisible, setIsSignUpVisible] = useState(false);
+//   const [isResetPasswordVisible, setIsResetPasswordVisible] = useState(false);
 //   const handleFinish = async (values: any) => {
 //     const { email, password } = values;
 //     try {
 //       const response = await request(`/auth/login`, {
 //         method: 'POST',
-//         data: { email, password },
-//       });
-//       if (response.success) {
-//         message.success('Login successful!');
-//         // Store token or user info in localStorage or state
-//         localStorage.setItem('planner_t', response.token);
-//         // Redirect to the settings or home page
-//         history.push('/');
-//       } else {
-//         message.error('Login failed. Please try again.');
-//       }
-//     } catch (error) {
-//       message.error('An error occurred. Please try again.');
-//     }
-//   };
-//   return (
-//     <GridContent className="login-container">
-//       <ProCard bordered>
-//         <ProForm title="Login" onFinish={handleFinish} layout="vertical">
-//           <ProFormText
-//             name="email"
-//             label="Email"
-//             placeholder="Enter your username"
-//             rules={[{ required: true, message: 'Username is required' }]}
-//           />
-//           <ProFormText.Password
-//             name="password"
-//             label="Password"
-//             placeholder="Enter your password"
-//             rules={[{ required: true, message: 'Password is required' }]}
-//           />
-//           <ProForm.Item>
-//             <button type="submit" className="login-button">
-//               Login
-//             </button>
-//           </ProForm.Item>
-//         </ProForm>
-//       </ProCard>
-//     </GridContent>
-//   );
-// };
-// export default LoginPage;
-// import {
-//   GridContent,
-//   ProCard,
-//   ProForm,
-//   ProFormText,
-//   ProFormItem,
-// } from '@ant-design/pro-components';
-// import { message, Button, Divider } from 'antd';
-// import React from 'react';
-// import { history, request } from 'umi';
-// import './login.less'; // Assuming your custom styles are in this file
-// const LoginPage: React.FC = () => {
-//   const handleFinish = async (values: any) => {
-//     const { email, password } = values;
-//     try {
-//       const response = await request(`/auth/login`, {
-//         method: 'POST',
-//         data: { email, password },
+//         data: { login: email, password },
 //       });
 //       if (response.success) {
 //         message.success('Login successful!');
@@ -127,14 +66,15 @@ exports.__esModule = true;
 //   const handleGoogleSignIn = () => {
 //     // Implement Google Sign-In logic here
 //   };
-//   const handleForgotPassword = async () => {
+//   const handleForgotPassword = async (email: string) => {
 //     try {
-//       const response = await request('/forgot-password', {
+//       const response = await request('/auth/forgot-password', {
 //         method: 'POST',
-//         data: { email: '' }, // You can capture the email from a modal or input field
+//         data: { email },
 //       });
 //       if (response.success) {
 //         message.success('Password reset link sent to your email!');
+//         setIsResetPasswordVisible(false); // Close the reset password modal
 //       } else {
 //         message.error('Failed to send password reset link.');
 //       }
@@ -142,145 +82,30 @@ exports.__esModule = true;
 //       message.error('An error occurred. Please try again.');
 //     }
 //   };
-//   const handleResetPassword = async () => {
+//   const handleSignUp = async (values: any) => {
 //     try {
-//       const response = await request('/reset-password', {
+//       const response = await request('/auth/register', {
 //         method: 'POST',
-//         data: { email: '' }, // Capture the email or token from user input
+//         data: {
+//           email: values.email,
+//           display_name: values.displayName,
+//           username: values.username,
+//           password: values.password,
+//           password_confirmation: values.passwordConfirmation,
+//           timezone: 'UTC',
+//           role: '9cffe655-dc69-4d80-b4b3-2dde5f0cfb85',
+//         },
 //       });
 //       if (response.success) {
-//         message.success('Password has been reset successfully!');
-//       } else {
-//         message.error('Failed to reset password.');
+//         message.success('Sign-up successful! Please log in.');
+//         setTimeout(() => setIsSignUpVisible(false), 300);
 //       }
 //     } catch (error) {
 //       message.error('An error occurred. Please try again.');
 //     }
 //   };
 //   return (
-//     <GridContent className="login-container">
-//       <ProCard bordered className="login-card">
-//         <div className="login-content">
-//           <div className="login-left">
-//             <img src="/logo.png" alt="Company Logo" className="login-logo" />
-//             <h2>Planner Admin Dashboard</h2>
-//           </div>
-//           <div className="login-right">
-//             <Button
-//               type="primary"
-//               className="google-signin-button"
-//               onClick={handleGoogleSignIn}
-//             >
-//               Sign in with Google
-//             </Button>
-//             <Divider plain>or</Divider>
-//             <ProForm title="Login" onFinish={handleFinish} layout="vertical">
-//               <ProFormText
-//                 name="email"
-//                 label="Email"
-//                 placeholder="Enter your email"
-//                 rules={[{ required: true, message: 'Email is required' }]}
-//               />
-//               <ProFormText.Password
-//                 name="password"
-//                 label="Password"
-//                 placeholder="Enter your password"
-//                 rules={[{ required: true, message: 'Password is required' }]}
-//               />
-//               <ProFormItem>
-//                 <Button
-//                   type="link"
-//                   className="forgot-password-link"
-//                   onClick={handleForgotPassword}
-//                 >
-//                   Forgot Password?
-//                 </Button>
-//                 <Button
-//                   type="link"
-//                   className="reset-password-link"
-//                   onClick={handleResetPassword}
-//                 >
-//                   Reset Password
-//                 </Button>
-//               </ProFormItem>
-//               <ProForm.Item>
-//                 <button type="submit" className="login-button">
-//                   Login
-//                 </button>
-//               </ProForm.Item>
-//             </ProForm>
-//           </div>
-//         </div>
-//       </ProCard>
-//     </GridContent>
-//   );
-// };
-// export default LoginPage;
-// import {
-//   GridContent,
-//   ProCard,
-//   ProForm,
-//   ProFormText,
-//   ProFormItem,
-// } from '@ant-design/pro-components';
-// import { message, Button, Divider } from 'antd';
-// import React from 'react';
-// import { history, request } from 'umi';
-// import './login.less';
-// const LoginPage: React.FC = () => {
-//   const handleFinish = async (values: any) => {
-//     const { email, password } = values;
-//     try {
-//       const response = await request(`/auth/login`, {
-//         method: 'POST',
-//         data: { email, password },
-//       });
-//       if (response.success) {
-//         message.success('Login successful!');
-//         localStorage.setItem('planner_t', response.token);
-//         history.push('/');
-//       } else {
-//         message.error('Login failed. Please try again.');
-//       }
-//     } catch (error) {
-//       message.error('An error occurred. Please try again.');
-//     }
-//   };
-//   const handleGoogleSignIn = () => {
-//     // Implement Google Sign-In logic here
-//   };
-//   const handleForgotPassword = async () => {
-//     try {
-//       const response = await request('/forgot-password', {
-//         method: 'POST',
-//         data: { email: '' }, // You can capture the email from a modal or input field
-//       });
-//       if (response.success) {
-//         message.success('Password reset link sent to your email!');
-//       } else {
-//         message.error('Failed to send password reset link.');
-//       }
-//     } catch (error) {
-//       message.error('An error occurred. Please try again.');
-//     }
-//   };
-//   const handleResetPassword = async () => {
-//     try {
-//       const response = await request('/reset-password', {
-//         method: 'POST',
-//         data: { email: '' }, // Capture the email or token from user input
-//       });
-//       if (response.success) {
-//         message.success('Password has been reset successfully!');
-//       } else {
-//         message.error('Failed to reset password.');
-//       }
-//     } catch (error) {
-//       message.error('An error occurred. Please try again.');
-//     }
-//   };
-//   return (
-//     <GridContent className="login-container">
+//     <div className="login-container">
 //       <ProCard bordered className="login-card">
 //         <div className="login-content">
 //           <div className="login-left">
@@ -290,6 +115,7 @@ exports.__esModule = true;
 //           <div className="login-right">
 //             <Button
 //               type="primary"
+//               icon={<GoogleOutlined />}
 //               className="google-signin-button"
 //               onClick={handleGoogleSignIn}
 //             >
@@ -297,11 +123,10 @@ exports.__esModule = true;
 //             </Button>
 //             <Divider plain>or</Divider>
 //             <ProForm
-//               title="Login"
 //               onFinish={handleFinish}
 //               layout="vertical"
 //               submitter={{
-//                 render: (_, dom) => null, // Remove default submit and reset buttons
+//                 render: () => null, // Remove default submit and reset buttons
 //               }}
 //             >
 //               <ProFormText
@@ -316,42 +141,156 @@ exports.__esModule = true;
 //                 placeholder="Enter your password"
 //                 rules={[{ required: true, message: 'Password is required' }]}
 //               />
-//               <ProFormItem>
+//               <ProForm.Item>
 //                 <Button
 //                   type="link"
 //                   className="forgot-password-link"
-//                   onClick={handleForgotPassword}
+//                   onClick={() => setIsResetPasswordVisible(true)}
 //                 >
 //                   Forgot Password?
 //                 </Button>
 //                 <Button
 //                   type="link"
-//                   className="reset-password-link"
-//                   onClick={handleResetPassword}
+//                   className="signup-link"
+//                   onClick={() => setIsSignUpVisible(true)}
 //                 >
-//                   Reset Password
+//                   Sign Up
 //                 </Button>
-//               </ProFormItem>
+//               </ProForm.Item>
 //               <ProForm.Item>
-//                 <button type="submit" className="login-button">
+//                 <Button
+//                   type="primary"
+//                   htmlType="submit"
+//                   className="login-button"
+//                 >
 //                   Login
-//                 </button>
+//                 </Button>
 //               </ProForm.Item>
 //             </ProForm>
 //           </div>
 //         </div>
 //       </ProCard>
-//     </GridContent>
+//       {/* Sign-Up Modal */}
+//       <Modal
+//         title="Sign Up"
+//         visible={isSignUpVisible}
+//         onCancel={() => setIsSignUpVisible(false)}
+//         footer={null}
+//         className="signup-modal"
+//       >
+//         <ProForm
+//           onFinish={handleSignUp}
+//           layout="vertical"
+//           submitter={{
+//             render: (props) => (
+//               <div
+//                 style={{
+//                   display: 'flex',
+//                   justifyContent: 'flex-end',
+//                   gap: '10px',
+//                 }}
+//               >
+//                 <Button
+//                   type="default"
+//                   onClick={() => props?.reset?.()} // Reset fields on button click
+//                 >
+//                   Reset
+//                 </Button>
+//                 <Button type="primary" htmlType="submit">
+//                   Sign Up
+//                 </Button>
+//               </div>
+//             ),
+//           }}
+//         >
+//           <ProFormText
+//             name="email"
+//             label="Email"
+//             placeholder="Enter your email"
+//             rules={[{ required: true, message: 'Email is required' }]}
+//           />
+//           <ProFormText
+//             name="displayName"
+//             label="Display Name"
+//             placeholder="Enter your display name"
+//             rules={[{ required: true, message: 'Display Name is required' }]}
+//           />
+//           <ProFormText
+//             name="username"
+//             label="Username"
+//             placeholder="Enter your username"
+//             rules={[{ required: true, message: 'Username is required' }]}
+//           />
+//           <ProFormText.Password
+//             name="password"
+//             label="Password"
+//             placeholder="Enter your password"
+//             rules={[{ required: true, message: 'Password is required' }]}
+//           />
+//           <ProFormText.Password
+//             name="passwordConfirmation"
+//             label="Confirm Password"
+//             placeholder="Confirm your password"
+//             rules={[
+//               { required: true, message: 'Password confirmation is required' },
+//             ]}
+//           />
+//         </ProForm>
+//       </Modal>
+//       {/* Reset Password Modal */}
+//       <Modal
+//         title="Reset Password"
+//         visible={isResetPasswordVisible}
+//         onCancel={() => setIsResetPasswordVisible(false)}
+//         footer={null}
+//         className="reset-password-modal"
+//       >
+//         <ProForm
+//           onFinish={(values) => handleForgotPassword(values.email)}
+//           layout="vertical"
+//           submitter={{
+//             render: (props) => (
+//               <div
+//                 style={{
+//                   display: 'flex',
+//                   justifyContent: 'flex-end',
+//                   gap: '10px',
+//                 }}
+//               >
+//                 <Button
+//                   type="default"
+//                   onClick={() => props?.reset?.()} // Reset fields on button click
+//                 >
+//                   Reset
+//                 </Button>
+//                 <Button type="primary" htmlType="submit">
+//                   Send Reset Link
+//                 </Button>
+//               </div>
+//             ),
+//           }}
+//         >
+//           <ProFormText
+//             name="email"
+//             label="Email"
+//             placeholder="Enter your email"
+//             rules={[{ required: true, message: 'Email is required' }]}
+//           />
+//         </ProForm>
+//       </Modal>
+//     </div>
 //   );
 // };
 // export default LoginPage;
+var icons_1 = require("@ant-design/icons");
 var pro_components_1 = require("@ant-design/pro-components");
 var antd_1 = require("antd");
 var react_1 = require("react");
 var umi_1 = require("umi");
 require("./login.less");
-var icons_1 = require("@ant-design/icons");
 var LoginPage = function () {
+    var _a = react_1.useState(false), isSignUpVisible = _a[0], setIsSignUpVisible = _a[1];
+    var _b = react_1.useState(false), isResetPasswordVisible = _b[0], setIsResetPasswordVisible = _b[1];
     var handleFinish = function (values) { return __awaiter(void 0, void 0, void 0, function () {
         var email, password, response, error_1;
         return __generator(this, function (_a) {
@@ -363,7 +302,7 @@ var LoginPage = function () {
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, umi_1.request("/auth/login", {
                             method: 'POST',
-                            data: { email: email, password: password }
+                            data: { login: email, password: password }
                         })];
                 case 2:
                     response = _a.sent();
@@ -387,20 +326,21 @@ var LoginPage = function () {
     var handleGoogleSignIn = function () {
         // Implement Google Sign-In logic here
     };
-    var handleForgotPassword = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var handleForgotPassword = function (email) { return __awaiter(void 0, void 0, void 0, function () {
         var response, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, umi_1.request('/forgot-password', {
+                    return [4 /*yield*/, umi_1.request('/auth/forgot-password', {
                             method: 'POST',
-                            data: { email: '' }
+                            data: { email: email }
                         })];
                 case 1:
                     response = _a.sent();
                     if (response.success) {
                         antd_1.message.success('Password reset link sent to your email!');
+                        setIsResetPasswordVisible(false); // Close the reset password modal
                     }
                     else {
                         antd_1.message.error('Failed to send password reset link.');
@@ -414,23 +354,35 @@ var LoginPage = function () {
             }
         });
     }); };
-    var handleResetPassword = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var handleSignUp = function (values) { return __awaiter(void 0, void 0, void 0, function () {
         var response, error_3;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, umi_1.request('/reset-password', {
+                    return [4 /*yield*/, umi_1.request('/auth/register', {
                             method: 'POST',
-                            data: { email: '' }
+                            data: {
+                                email: values.email,
+                                display_name: values.displayName,
+                                username: values.username,
+                                password: values.password,
+                                password_confirmation: values.passwordConfirmation,
+                                timezone: 'UTC',
+                                role: '9cffe655-dc69-4d80-b4b3-2dde5f0cfb85'
+                            }
                         })];
                 case 1:
                     response = _a.sent();
                     if (response.success) {
-                        antd_1.message.success('Password has been reset successfully!');
-                    }
-                    else {
-                        antd_1.message.error('Failed to reset password.');
+                        antd_1.message.success('Sign-up successful! Please log in.');
+                        setIsSignUpVisible(false); // Close the sign-up modal
+                        setTimeout(function () {
+                            // Reset form fields
+                            var form = document.querySelector('.signup-modal .ant-form');
+                            if (form)
+                                form.reset();
+                        }, 300);
                     }
                     return [3 /*break*/, 3];
                 case 2:
@@ -441,7 +393,7 @@ var LoginPage = function () {
             }
         });
     }); };
-    return (react_1["default"].createElement(pro_components_1.GridContent, { className: "login-container" },
+    return (react_1["default"].createElement("div", { className: "login-container" },
         react_1["default"].createElement(pro_components_1.ProCard, { bordered: true, className: "login-card" },
             react_1["default"].createElement("div", { className: "login-content" },
                 react_1["default"].createElement("div", { className: "login-left" },
@@ -450,15 +402,43 @@ var LoginPage = function () {
                 react_1["default"].createElement("div", { className: "login-right" },
                     react_1["default"].createElement(antd_1.Button, { type: "primary", icon: react_1["default"].createElement(icons_1.GoogleOutlined, null), className: "google-signin-button", onClick: handleGoogleSignIn }, "Sign in with Google"),
                     react_1["default"].createElement(antd_1.Divider, { plain: true }, "or"),
-                    react_1["default"].createElement(pro_components_1.ProForm, { title: "Login", onFinish: handleFinish, layout: "vertical", submitter: {
+                    react_1["default"].createElement(pro_components_1.ProForm, { onFinish: handleFinish, layout: "vertical", submitter: {
                             render: function () { return null; }
                         } },
                         react_1["default"].createElement(pro_components_1.ProFormText, { name: "email", label: "Email", placeholder: "Enter your email", rules: [{ required: true, message: 'Email is required' }] }),
                         react_1["default"].createElement(pro_components_1.ProFormText.Password, { name: "password", label: "Password", placeholder: "Enter your password", rules: [{ required: true, message: 'Password is required' }] }),
-                        react_1["default"].createElement(pro_components_1.ProFormItem, null,
-                            react_1["default"].createElement(antd_1.Button, { type: "link", className: "forgot-password-link", onClick: handleForgotPassword }, "Forgot Password?"),
-                            react_1["default"].createElement(antd_1.Button, { type: "link", className: "reset-password-link", onClick: handleResetPassword }, "Reset Password")),
                         react_1["default"].createElement(pro_components_1.ProForm.Item, null,
-                            react_1["default"].createElement("button", { type: "submit", className: "login-button" }, "Login"))))))));
+                            react_1["default"].createElement(antd_1.Button, { type: "link", className: "forgot-password-link", onClick: function () { return setIsResetPasswordVisible(true); } }, "Forgot Password?"),
+                            react_1["default"].createElement(antd_1.Button, { type: "link", className: "signup-link", onClick: function () { return setIsSignUpVisible(true); } }, "Sign Up")),
+                        react_1["default"].createElement(pro_components_1.ProForm.Item, null,
+                            react_1["default"].createElement(antd_1.Button, { type: "primary", htmlType: "submit", className: "login-button" }, "Login")))))),
+        react_1["default"].createElement(antd_1.Modal, { title: "Sign Up", visible: isSignUpVisible, onCancel: function () { return setIsSignUpVisible(false); }, footer: null, className: "signup-modal" },
+            react_1["default"].createElement(pro_components_1.ProForm, { onFinish: handleSignUp, layout: "vertical", submitter: {
+                    render: function (props) { return (react_1["default"].createElement("div", { style: {
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            gap: '10px'
+                        } },
+                        react_1["default"].createElement(antd_1.Button, { type: "default", onClick: function () { var _a; return (_a = props === null || props === void 0 ? void 0 : props.reset) === null || _a === void 0 ? void 0 : _a.call(props); } }, "Reset"),
+                        react_1["default"].createElement(antd_1.Button, { type: "primary", htmlType: "submit" }, "Sign Up"))); }
+                } },
+                react_1["default"].createElement(pro_components_1.ProFormText, { name: "email", label: "Email", placeholder: "Enter your email", rules: [{ required: true, message: 'Email is required' }] }),
+                react_1["default"].createElement(pro_components_1.ProFormText, { name: "displayName", label: "Display Name", placeholder: "Enter your display name", rules: [{ required: true, message: 'Display Name is required' }] }),
+                react_1["default"].createElement(pro_components_1.ProFormText, { name: "username", label: "Username", placeholder: "Enter your username", rules: [{ required: true, message: 'Username is required' }] }),
+                react_1["default"].createElement(pro_components_1.ProFormText.Password, { name: "password", label: "Password", placeholder: "Enter your password", rules: [{ required: true, message: 'Password is required' }] }),
+                react_1["default"].createElement(pro_components_1.ProFormText.Password, { name: "passwordConfirmation", label: "Confirm Password", placeholder: "Confirm your password", rules: [
+                        { required: true, message: 'Password confirmation is required' },
+                    ] }))),
+        react_1["default"].createElement(antd_1.Modal, { title: "Reset Password", visible: isResetPasswordVisible, onCancel: function () { return setIsResetPasswordVisible(false); }, footer: null, className: "reset-password-modal" },
+            react_1["default"].createElement(pro_components_1.ProForm, { onFinish: function (values) { return handleForgotPassword(values.email); }, layout: "vertical", submitter: {
+                    render: function (props) { return (react_1["default"].createElement("div", { style: {
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            gap: '10px'
+                        } },
+                        react_1["default"].createElement(antd_1.Button, { type: "default", onClick: function () { var _a; return (_a = props === null || props === void 0 ? void 0 : props.reset) === null || _a === void 0 ? void 0 : _a.call(props); } }, "Reset"),
+                        react_1["default"].createElement(antd_1.Button, { type: "primary", htmlType: "submit" }, "Send Reset Link"))); }
+                } },
+                react_1["default"].createElement(pro_components_1.ProFormText, { name: "email", label: "Email", placeholder: "Enter your email", rules: [{ required: true, message: 'Email is required' }] })))));
 };
 exports["default"] = LoginPage;

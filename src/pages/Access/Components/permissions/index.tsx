@@ -923,13 +923,6 @@ const PermissionsManagement: React.FC = () => {
 
   return (
     <div>
-      <Button
-        type="primary"
-        onClick={() => setIsModalVisible(true)}
-      >
-        Manage Permissions
-      </Button>
-
       <Table
         dataSource={dataSource}
         columns={columns}

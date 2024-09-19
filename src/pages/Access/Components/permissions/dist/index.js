@@ -464,6 +464,309 @@ exports.__esModule = true;
 //   );
 // };
 // export default Permissions;
+// import React, { useState, useEffect } from 'react';
+// import { Table, Checkbox, Button, message, Modal } from 'antd';
+// import { request, useRequest } from 'umi';
+// interface Role {
+//   id: string;
+//   name: string;
+// }
+// interface Permission {
+//   id: string;
+//   name: string;
+// }
+// const PermissionsManagement: React.FC = () => {
+//   const [roles, setRoles] = useState<Role[]>([]);
+//   const [permissions, setPermissions] = useState<Permission[]>([]);
+//   const [permissionsByRole, setPermissionsByRole] = useState<Record<string, Set<string>>>({});
+//   const [isModalVisible, setIsModalVisible] = useState(false);
+//   const {data} = useRequest(()=>request(`/permissions`))
+//   console.log(data)
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         // Fetch roles
+//         const rolesResponse = await request('/roles', { method: 'GET' });
+//         setRoles(rolesResponse.data || []);
+//         // Fetch permissions
+//         const permissionsResponse = await request('/permissions', { method: 'GET' });
+//         const fetchedPermissions = Array.isArray(permissionsResponse.data) ? permissionsResponse.data : [];
+//         setPermissions(fetchedPermissions);
+//         // Fetch role-permissions mapping
+//         // const rolePermissionsResponse = await request('/role-permissions', { method: 'GET' });
+//         const rolePermissions = rolePermissionsResponse.data.reduce((acc: Record<string, Set<string>>, item: any) => {
+//           if (!acc[item.role_id]) acc[item.role_id] = new Set();
+//           acc[item.role_id].add(item.permission_id);
+//           return acc;
+//         }, {});
+//         setPermissionsByRole(rolePermissions);
+//       } catch (error) {
+//         message.error('Failed to fetch data');
+//       }
+//     };
+//     fetchData();
+//   }, []);
+//   const handleCheckboxChange = async (roleId: string, permissionId: string, checked: boolean) => {
+//     try {
+//       // Fetch current permissions for the role
+//       const rolePermissions = permissionsByRole[roleId] || new Set<string>();
+//       // Update permissions based on checkbox state
+//       const updatedPermissions = new Set(rolePermissions);
+//       if (checked) {
+//         updatedPermissions.add(permissionId);
+//       } else {
+//         updatedPermissions.delete(permissionId);
+//       }
+//       // Send the updated permissions to the server
+//       await request(`/roles/${roleId}`, {
+//         method: 'PUT',
+//         data: {
+//           permissions: Array.from(updatedPermissions),
+//         },
+//       });
+//       // Update state with the new permissions
+//       setPermissionsByRole(prev => ({
+//         ...prev,
+//         [roleId]: updatedPermissions,
+//       }));
+//       message.success('Permissions updated successfully');
+//     } catch (error) {
+//       message.error('Failed to update permissions');
+//     }
+//   };
+// const rowStyle = {
+//   borderBottom: '1px solid #e8e8e8'
+// }
+//   // Table columns
+//   // const columns = [
+//   //   {
+//   //     title: 'Permission',
+//   //     dataIndex: 'name',
+//   //     key: 'name',
+//   //     render: (text: string) => <span>{text}</span>,
+//   //   },
+//   //   ...roles.map(role => ({
+//   //     title: role.name,
+//   //     key: role.id,
+//   //     render: (permission: Permission) => {
+//   //      console.log(role?.permissions?.filter((v)=>v?.id===permission?.id).length > 0)
+//   //       return<Checkbox
+//   //           checked={role?.permissions?.filter((v)=>v?.id===permission?.id).length > 0}
+//   //         // checked={permissionsByRole[role.id]?.has(permission.id) || false}
+//   //         onChange={(e) => handleCheckboxChange(role.id, permission.id, e.target.checked)}
+//   //       />
+//   //     },
+//   //   })),
+//   // ];
+//   const columns = [
+//     {
+//       title: 'Permission',
+//       dataIndex: 'name',
+//       key: 'name',
+//       render: (text: string) => <span>{text}</span>,
+//     },
+//     ...roles.map(role => ({
+//       title: role.name,
+//       key: role.id,
+//       render: (permission: Permission) => {
+//         return (
+//           <Checkbox
+//             checked={permissionsByRole[role.id]?.has(permission.id) || false}
+//             onChange={(e) => handleCheckboxChange(role.id, permission.id, e.target.checked)}
+//           />
+//         );
+//       },
+//     })),
+//   ];
+//   // Data source for table
+//   const dataSource = permissions.map(permission => ({
+//     key: permission.id,
+//     ...permission,
+//   }));
+// console.log(permissions)
+//   return (
+//     <div>
+//       <Button
+//         type="primary"
+//         onClick={() => setIsModalVisible(true)}
+//       >
+//         Manage Permissions
+//       </Button>
+//       <Table
+//         dataSource={data?.data}
+//         columns={columns}
+//         pagination={false}
+//         scroll={{ x: 'max-content' }}
+//         rowClassName={(record, index) => index % 2 === 0 ? 'even-row' : 'odd-row'}
+//         style={{ border: '1px solid #f0f0f0', borderRadius: '4px' }} // Table border and rounded corners
+//       />
+//       <Modal
+//         title="Manage Permissions"
+//         visible={isModalVisible}
+//         onCancel={() => setIsModalVisible(false)}
+//         footer={null}
+//       >
+//       </Modal>
+//     </div>
+//   );
+// };
+// export default PermissionsManagement;
+// import React, { useState, useEffect } from 'react';
+// import { Table, Checkbox, Button, message, Modal } from 'antd';
+// import { request } from 'umi';
+// interface Role {
+//   id: string;
+//   name: string;
+// }
+// interface Permission {
+//   id: string;
+//   name: string;
+// }
+// const PermissionsManagement: React.FC = () => {
+//   const [roles, setRoles] = useState<Role[]>([]);
+//   const [permissions, setPermissions] = useState<Permission[]>([]);
+//   const [permissionsByRole, setPermissionsByRole] = useState<Record<string, Set<string>>>({});
+//   const [isModalVisible, setIsModalVisible] = useState(false);
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         // Fetch roles
+//         const rolesResponse = await request('/roles', { method: 'GET' });
+//         if (!rolesResponse.data) {
+//           throw new Error('No roles data');
+//         }
+//         setRoles(rolesResponse.data);
+//         // Fetch permissions
+//         const permissionsResponse = await request('/permissions', { method: 'GET' });
+//         if (!permissionsResponse.data || !permissionsResponse.data.data || !Array.isArray(permissionsResponse.data.data)) {
+//           throw new Error('Invalid permissions data');
+//         }
+//         setPermissions(permissionsResponse.data.data);
+//         // Initialize permissionsByRole with default values
+//         const initialPermissionsByRole = rolesResponse.data.reduce((acc: Record<string, Set<string>>, role: Role) => {
+//           acc[role.id] = new Set(); // Initialize with empty Set
+//           return acc;
+//         }, {});
+//         setPermissionsByRole(initialPermissionsByRole);
+//       } catch (error) {
+//         message.error(`Failed to fetch data: ${error.message}`);
+//       }
+//     };
+//     fetchData();
+//   }, []);
+//   // const handleCheckboxChange = async (roleId: string, permissionId: string, checked: boolean) => {
+//   //   try {
+//   //     // Fetch current permissions for the role
+//   //     const rolePermissions = permissionsByRole[roleId] || new Set<string>();
+//   //     // Update permissions based on checkbox state
+//   //     const updatedPermissions = new Set(rolePermissions);
+//   //     if (checked) {
+//   //       updatedPermissions.add(permissionId);
+//   //     } else {
+//   //       updatedPermissions.delete(permissionId);
+//   //     }
+//   //     // Send the updated permissions to the server
+//   //     await request(`/roles/${roleId}`, {
+//   //       method: 'PUT',
+//   //       data: {
+//   //         permissions: Array.from(updatedPermissions),
+//   //       },
+//   //     });
+//   //     // Update state with the new permissions
+//   //     setPermissionsByRole(prev => ({
+//   //       ...prev,
+//   //       [roleId]: updatedPermissions,
+//   //     }));
+//   //     message.success('Permissions updated successfully');
+//   //   } catch (error) {
+//   //     message.error(`Failed to update permissions: ${error.message}`);
+//   //   }
+//   // };
+//   const handleCheckboxChange = async (roleId: string, permissionId: string, checked: boolean) => {
+//     try {
+//       // Fetch current permissions for the role
+//       const rolePermissions = permissionsByRole[roleId] || new Set<string>();
+//       // Update permissions based on checkbox state
+//       const updatedPermissions = new Set(rolePermissions);
+//       if (checked) {
+//         updatedPermissions.add(permissionId);
+//       } else {
+//         updatedPermissions.delete(permissionId);
+//       }
+//       // Send the updated permissions to the server
+//       const response = await request(`/roles/${roleId}`, {
+//         method: 'PUT',
+//         data: {
+//           permissions: Array.from(updatedPermissions),
+//         },
+//       });
+//       // Check if the response is successful and contains updated data
+//       if (response.success) {
+//         // Update state with the new permissions
+//         setPermissionsByRole(prev => ({
+//           ...prev,
+//           [roleId]: updatedPermissions,
+//         }));
+//         message.success('Permissions updated successfully');
+//         // Refetch data to ensure frontend reflects updates
+//         await fetchData(); // Make sure fetchData() is implemented to refetch the roles and permissions
+//       } else {
+//         throw new Error(response.message || 'Failed to update permissions');
+//       }
+//     } catch (error) {
+//       message.error(`Failed to update permissions: ${error.message}`);
+//     }
+//   };
+//   const columns = [
+//     {
+//       title: 'Permission',
+//       dataIndex: 'name',
+//       key: 'name',
+//       render: (text: string) => <span>{text}</span>,
+//     },
+//     ...roles.map(role => ({
+//       title: role.name,
+//       key: role.id,
+//       render: (permission: Permission) => (
+//         <Checkbox
+//           checked={permissionsByRole[role.id]?.has(permission.id) || false}
+//           onChange={(e) => handleCheckboxChange(role.id, permission.id, e.target.checked)}
+//         />
+//       ),
+//     })),
+//   ];
+//   const dataSource = permissions.map(permission => ({
+//     key: permission.id,
+//     ...permission,
+//   }));
+//   return (
+//     <div>
+//       <Button
+//         type="primary"
+//         onClick={() => setIsModalVisible(true)}
+//       >
+//         Manage Permissions
+//       </Button>
+//       <Table
+//         dataSource={dataSource}
+//         columns={columns}
+//         pagination={false}
+//         scroll={{ x: 'max-content' }}
+//         rowClassName={(record, index) => index % 2 === 0 ? 'even-row' : 'odd-row'}
+//         style={{ border: '1px solid #f0f0f0', borderRadius: '4px' }} // Table border and rounded corners
+//       />
+//       <Modal
+//         title="Manage Permissions"
+//         visible={isModalVisible}
+//         onCancel={() => setIsModalVisible(false)}
+//         footer={null}
+//       >
+//         {/* Modal content here */}
+//       </Modal>
+//     </div>
+//   );
+// };
+// export default PermissionsManagement;
 var react_1 = require("react");
 var antd_1 = require("antd");
 var umi_1 = require("umi");
@@ -474,47 +777,81 @@ var PermissionsManagement = function () {
     var _d = react_1.useState(false), isModalVisible = _d[0], setIsModalVisible = _d[1];
     react_1.useEffect(function () {
         var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
-            var rolesResponse, permissionsResponse, fetchedPermissions, rolePermissionsResponse, rolePermissions, error_1;
+            var rolesResponse, permissionsResponse, initialPermissionsByRole, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 4, , 5]);
+                        _a.trys.push([0, 3, , 4]);
                         return [4 /*yield*/, umi_1.request('/roles', { method: 'GET' })];
                     case 1:
                         rolesResponse = _a.sent();
-                        setRoles(rolesResponse.data || []);
+                        if (!rolesResponse.data) {
+                            throw new Error('No roles data');
+                        }
+                        setRoles(rolesResponse.data);
                         return [4 /*yield*/, umi_1.request('/permissions', { method: 'GET' })];
                     case 2:
                         permissionsResponse = _a.sent();
-                        fetchedPermissions = Array.isArray(permissionsResponse.data) ? permissionsResponse.data : [];
-                        setPermissions(fetchedPermissions);
-                        return [4 /*yield*/, umi_1.request('/role-permissions', { method: 'GET' })];
-                    case 3:
-                        rolePermissionsResponse = _a.sent();
-                        rolePermissions = rolePermissionsResponse.data.reduce(function (acc, item) {
-                            if (!acc[item.role_id])
-                                acc[item.role_id] = new Set();
-                            acc[item.role_id].add(item.permission_id);
+                        if (!permissionsResponse.data || !permissionsResponse.data.data || !Array.isArray(permissionsResponse.data.data)) {
+                            throw new Error('Invalid permissions data');
+                        }
+                        setPermissions(permissionsResponse.data.data);
+                        initialPermissionsByRole = rolesResponse.data.reduce(function (acc, role) {
+                            acc[role.id] = new Set(); // Initialize with empty Set
                             return acc;
                         }, {});
-                        setPermissionsByRole(rolePermissions);
-                        return [3 /*break*/, 5];
-                    case 4:
+                        setPermissionsByRole(initialPermissionsByRole);
+                        return [3 /*break*/, 4];
+                    case 3:
                         error_1 = _a.sent();
-                        antd_1.message.error('Failed to fetch data');
-                        return [3 /*break*/, 5];
-                    case 5: return [2 /*return*/];
+                        antd_1.message.error("Failed to fetch data: " + error_1.message);
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         }); };
         fetchData();
     }, []);
-    var handleCheckboxChange = function (roleId, permissionId, checked) { return __awaiter(void 0, void 0, void 0, function () {
-        var rolePermissions, updatedPermissions_1, error_2;
+    var fetchData = function () { return __awaiter(void 0, void 0, void 0, function () {
+        var rolesResponse, permissionsResponse, updatedPermissionsByRole, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
+                    _a.trys.push([0, 3, , 4]);
+                    return [4 /*yield*/, umi_1.request('/roles', { method: 'GET' })];
+                case 1:
+                    rolesResponse = _a.sent();
+                    if (!rolesResponse.data) {
+                        throw new Error('No roles data');
+                    }
+                    setRoles(rolesResponse.data);
+                    return [4 /*yield*/, umi_1.request('/permissions', { method: 'GET' })];
+                case 2:
+                    permissionsResponse = _a.sent();
+                    if (!permissionsResponse.data || !permissionsResponse.data.data || !Array.isArray(permissionsResponse.data.data)) {
+                        throw new Error('Invalid permissions data');
+                    }
+                    setPermissions(permissionsResponse.data.data);
+                    updatedPermissionsByRole = rolesResponse.data.reduce(function (acc, role) {
+                        acc[role.id] = new Set(); // Initialize with empty Set
+                        return acc;
+                    }, {});
+                    setPermissionsByRole(updatedPermissionsByRole);
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_2 = _a.sent();
+                    antd_1.message.error("Failed to fetch data: " + error_2.message);
+                    return [3 /*break*/, 4];
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); };
+    var handleCheckboxChange = function (roleId, permissionId, checked) { return __awaiter(void 0, void 0, void 0, function () {
+        var rolePermissions, updatedPermissions_1, response, error_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 5, , 6]);
                     rolePermissions = permissionsByRole[roleId] || new Set();
                     updatedPermissions_1 = new Set(rolePermissions);
                     if (checked) {
@@ -523,7 +860,6 @@ var PermissionsManagement = function () {
                     else {
                         updatedPermissions_1["delete"](permissionId);
                     }
-                    // Send the updated permissions to the server
                     return [4 /*yield*/, umi_1.request("/roles/" + roleId, {
                             method: 'PUT',
                             data: {
@@ -531,24 +867,31 @@ var PermissionsManagement = function () {
                             }
                         })];
                 case 1:
-                    // Send the updated permissions to the server
-                    _a.sent();
+                    response = _a.sent();
+                    console.log('Server response:', response); // Log the server response for debugging
+                    if (!response.success) return [3 /*break*/, 3];
                     // Update state with the new permissions
                     setPermissionsByRole(function (prev) {
                         var _a;
                         return (__assign(__assign({}, prev), (_a = {}, _a[roleId] = updatedPermissions_1, _a)));
                     });
                     antd_1.message.success('Permissions updated successfully');
-                    return [3 /*break*/, 3];
+                    // Refetch data to ensure frontend reflects updates
+                    return [4 /*yield*/, fetchData()];
                 case 2:
-                    error_2 = _a.sent();
-                    antd_1.message.error('Failed to update permissions');
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
+                    // Refetch data to ensure frontend reflects updates
+                    _a.sent(); // Make sure fetchData() is implemented to refetch the roles and permissions
+                    return [3 /*break*/, 4];
+                case 3: throw new Error(response.message || 'Failed to update permissions');
+                case 4: return [3 /*break*/, 6];
+                case 5:
+                    error_3 = _a.sent();
+                    antd_1.message.error("Failed to update permissions: " + error_3.message);
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
             }
         });
     }); };
-    // Table columns
     var columns = __spreadArrays([
         {
             title: 'Permission',
@@ -564,11 +907,9 @@ var PermissionsManagement = function () {
             return (react_1["default"].createElement(antd_1.Checkbox, { checked: ((_a = permissionsByRole[role.id]) === null || _a === void 0 ? void 0 : _a.has(permission.id)) || false, onChange: function (e) { return handleCheckboxChange(role.id, permission.id, e.target.checked); } }));
         }
     }); }));
-    // Data source for table
     var dataSource = permissions.map(function (permission) { return (__assign({ key: permission.id }, permission)); });
     return (react_1["default"].createElement("div", null,
-        react_1["default"].createElement(antd_1.Button, { type: "primary", onClick: function () { return setIsModalVisible(true); } }, "Manage Permissions"),
-        react_1["default"].createElement(antd_1.Table, { dataSource: dataSource, columns: columns, pagination: false, scroll: { x: 'max-content' } }),
+        react_1["default"].createElement(antd_1.Table, { dataSource: dataSource, columns: columns, pagination: false, scroll: { x: 'max-content' }, rowClassName: function (record, index) { return index % 2 === 0 ? 'even-row' : 'odd-row'; }, style: { border: '1px solid #f0f0f0', borderRadius: '4px' } }),
         react_1["default"].createElement(antd_1.Modal, { title: "Manage Permissions", visible: isModalVisible, onCancel: function () { return setIsModalVisible(false); }, footer: null })));
 };
 exports["default"] = PermissionsManagement;
