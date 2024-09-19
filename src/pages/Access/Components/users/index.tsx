@@ -45,7 +45,7 @@
     const [totalUsers, setTotalUsers] = useState<number>(0);
     const [activeUsers, setActiveUsers] = useState<number>(0);
     const [inactiveUsers, setInactiveUsers] = useState<number>(0);
-    const [totalLogins, setTotalLogins] = useState<number>(0);
+    const [pendingActivation, setPendingActivation] = useState<number>(0);
     const [visible, setVisible] = useState<boolean>(false); // Corrected visible state
     const [formValues, setFormValues] = useState<User | undefined>(undefined); // Corrected formValues state
     const { data: statuses } = useRequest(() => request('/statuses'));  
@@ -69,7 +69,7 @@
                 (statistics?.user_counts_by_status?.Deactivated ?? 0) + 
                 (statistics?.user_counts_by_status?.Deleted ?? 0)
               );
-              setTotalLogins(response.data?.data?.reduce((acc, user) => acc + (user.login_count || 0), 0));
+              setPendingActivation(response.data?.data?.reduce((acc, user) => acc + (user.login_count || 0), 0));
             } else {
               message.error('Failed to retrieve users statistics.');
             }
@@ -210,10 +210,10 @@
           </Col>
           <Col span={6}>
             <Card bordered style={{ backgroundColor: '#fffbe6', color: '#faad14' }}>
-              <Title level={4}>Total Logins</Title>
+              <Title level={4}>Pending Activation</Title>
               <Statistic
-                title="Total Logins"
-                value={totalLogins}
+                title="Pending Activation"
+                value={pendingActivation}
                 prefix={<LoginOutlined style={{ color: '#faad14', fontSize: '24px' }} />}
               />
             </Card>
@@ -241,96 +241,6 @@
             />
           </Col>
         </Row>
-
-        {/* <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            marginBottom: '16px',
-          }}
-        >
-          <ModalForm
-            formRef={addUserRef}
-            title="Add New User"
-            onFinish={async (values) => {
-            try {
-              if (values.id) {
-                // Update existing user
-                await request(`/users/${values.id}`, {
-                  method: 'PUT',
-                  data: values,
-                });
-                message.success('User updated successfully');
-              } else {
-                // Create new user
-                await request('/auth/admin/register', {
-                  method: 'POST',
-                  data: values,
-                });
-                message.success('User added successfully');
-              }
-        
-              addUserRef.current?.resetFields();
-              addUserRef.current?.close(); // Close the modal
-              tableActionRef.current?.reload(); // Refresh the table data
-              // return true;
-            } catch (error) {
-              message.error('Failed to save user');
-              // return false;
-            }
-          }}
-            trigger={<Button type="primary" 
-              icon={<PlusOutlined />}
-              style={{
-                backgroundColor: '#6c5ce7',
-                color: '#ffffff',
-                borderColor: '#6c5ce7',// Lighter blue version
-              }}
-            >Add New User</Button>}
-          >
-            <ProFormText
-              label="Display Name"
-              name="display_name"
-              rules={[{ required: true }]}
-            />
-            <ProFormText
-              label="Email"
-              name="email"
-              rules={[
-                { required: true },
-                { type: 'email', message: 'Invalid email address' },
-              ]}
-            />
-            <ProFormText label="Phone Number" name="phone" />
-            <ProFormText
-              label="Username"
-              name="username"
-              rules={[{ required: true }]}
-            />
-            <ProFormSelect
-              label="Status"
-              name={['status', 'name']}
-              options={statuses?.map((status) => ({ label: status.name, value: status.name })) || []}
-              rules={[{ required: true }]}
-            />
-            <ProFormSelect
-              request={async () => {
-                const resp = await request('/roles');
-                return resp?.data ?? [];
-              }}
-              fieldProps={{
-                fieldNames: {
-                  label: 'name',
-                  value: 'id',
-                },
-              }}
-              label="Role"
-              name="role"
-              rules={[{ required: true }]}
-            />
-          </ModalForm>
-        </div> */}
-
 <div
         style={{
           display: 'flex',
