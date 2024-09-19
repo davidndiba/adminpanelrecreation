@@ -1316,14 +1316,20 @@
             <Button
               key="add"
               type="primary"
+              // icon={<PlusOutlined />}
               icon={<PlusOutlined />}
+              style={{
+                backgroundColor: '#6c5ce7',
+                color: '#ffffff',
+                borderColor: '#6c5ce7',
+              }}
               onClick={() => {
                 setIsEditing(false);
                 form.resetFields();
                 setIsModalVisible(true);
               }}
             >
-              Add Role
+              Add New Role
             </Button>,
           ]}
         />
