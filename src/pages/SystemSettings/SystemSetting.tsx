@@ -202,7 +202,7 @@ const SystemSetting = () => {
             </div>
           </ProCard>
 
-          {/* API Settings */}
+          {/* API Settings HERE  */}
           <ProCard bordered>
             <div
               style={{
@@ -241,14 +241,14 @@ const SystemSetting = () => {
                 <Option value="en">English</Option>
                 <Option value="es">Spanish</Option>
                 <Option value="fr">French</Option>
-                {/* Add more languages as needed */}
+                {/* Add more languages as needed aND DONE HERE  */}
               </Select>
             </div>
           </ProCard>
         </div>
       </div>
 
-      {/* Modal for Additional Setting */}
+      {/* Modal for Additional Setting done here */}
       <Modal
         title="Change Setting"
         visible={isModalVisible}

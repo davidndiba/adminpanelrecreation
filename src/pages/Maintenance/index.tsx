@@ -16,6 +16,7 @@ const DataBackupAndSystemInfo = () => {
           selectedKeys={[location.pathname]}
           style={{ width: 200 }}
         >
+          {/* maintenance */}
           <Menu.Item key="/maintenance/systembackup">
             <Link to="/maintenance/systembackup">System Backup</Link>
           </Menu.Item>
@@ -24,7 +25,7 @@ const DataBackupAndSystemInfo = () => {
           </Menu.Item>
         </Menu>
         <div style={{ flex: 1, marginLeft: 24 }}>
-          <Outlet /> {/* This renders the nested route components */}
+          <Outlet /> 
         </div>
       </div>
     </PageContainer>

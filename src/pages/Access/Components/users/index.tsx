@@ -96,14 +96,12 @@
       const userData = response?.data;
     
       // Set the form values
-      // addUserRef.current?.setFieldsValue(userData);
       addUserRef.current?.setFieldsValue({
         ...user,
-        status: { key: user.status }, // Adjust if your statuses use different format
+        status: { key: user.status }, 
       });
     
       // Open the modal form
-      // addUserRef.current?.open();
       setFormValues(user);
       setVisible(true);
     };

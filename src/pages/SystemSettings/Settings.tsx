@@ -166,7 +166,7 @@ const Settings = () => {
         </Col>
       </Row>
 
-      {/* Test email modal */}
+      {/* Test email modal inside  here */}
       <Modal
         title="Test Email Configuration"
         visible={isModalVisible}
