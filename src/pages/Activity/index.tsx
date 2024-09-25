@@ -9,12 +9,12 @@ const Dashboard = () => (
    
     <Statistics />
     
-    {/* HeatMap below the statistics */}
+    
     <div style={{ marginTop: 24 }}>
       <HeatMap />
     </div>
     
-    {/* Activity Logs below the HeatMap */}
+    
     <div style={{ marginTop: 24 }}>
       <ActivityLogs />
     </div>

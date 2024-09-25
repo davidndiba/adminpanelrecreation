@@ -31,38 +31,3 @@ const EmailManagement = () => {
 };
 
 export default EmailManagement;
-
-  {/* <Modal
-        title={selectedTemplate ? 'Edit Template' : 'Create Template'}
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        onOk={handleSave}
-        width={800}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item name="name" label="Template Name" rules={[{ required: true, message: 'Please input the template name!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="subject" label="Subject" rules={[{ required: true, message: 'Please input the subject!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="provider" label="Select Provider">
-            <Select onChange={(value) => setEditor(value)}>
-              <Option value="ckeditor">CKEditor</Option>
-              <Option value="beefree">BeeFree</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="body" label="Template Body">
-            {editor === 'ckeditor' && (
-              <CKEditor
-                editor={ClassicEditor}
-                data={form.getFieldValue('body')}
-                onChange={(event, editor) => form.setFieldsValue({ body: editor.getData() })}
-              />
-            )}
-            {editor === 'beefree' && (
-              <Input.TextArea rows={10} />
-            )}
-          </Form.Item>
-        </Form>
-      </Modal> */}

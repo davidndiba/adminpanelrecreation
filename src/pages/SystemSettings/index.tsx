@@ -16,12 +16,14 @@ const SystemSettingsLayout = () => {
           selectedKeys={[location.pathname]}
           style={{ width: 200 }}
         >
+          {/* systems settings  */}
           <Menu.Item key="/system-settings/generalsettings">
             <Link to="/system-settings/generalsettings">General Settings</Link>
           </Menu.Item>
           <Menu.Item key="/system-settings/emailsettings">
             <Link to="/system-settings/emailsettings">Email Settings</Link>
           </Menu.Item>
+          {/* systems settings */}
           <Menu.Item key="/system-settings/securitysettings">
             <Link to="/system-settings/securitysettings">Security Settings</Link>
           </Menu.Item>

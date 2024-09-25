@@ -36,6 +36,7 @@ const SystemInformation = () => {
               size="small"
               bordered
               dataSource={[
+                // columns of tables 
                 `Document Root Folder: ${systemInfo.document_root_folder}`,
                 `Laravel Version: ${systemInfo.laravel_version}`,
                 `PHP Version: ${systemInfo.php_version}`,

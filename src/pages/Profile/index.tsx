@@ -29,7 +29,7 @@ const Users: React.FC = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    // Fetch statuses from the API
+    // Fetch statuses from the API from the api 
     request('/statuses')
       .then((response) => {
         setStatuses(response.data);
@@ -38,7 +38,7 @@ const Users: React.FC = () => {
         console.error('Failed to fetch statuses:', error);
       });
 
-    // Fetch users from the API
+    // Fetch users from the API in the profile page 
     request('/users')
       .then((response) => {
         setUsers(response.data);
@@ -86,7 +86,7 @@ const Users: React.FC = () => {
           })
           .catch((error) => console.error('Failed to update user:', error));
       } else {
-        // Handle add new user
+        // Handle add new user input in the rpofile 
         request('/api/users', {
           method: 'POST',
           data: values,
