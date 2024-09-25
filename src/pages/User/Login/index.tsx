@@ -1,6 +1,7 @@
+import logo from '@/assets/Microvision LOgo.png';
 import { GoogleOutlined } from '@ant-design/icons';
 import { ProCard, ProForm, ProFormText } from '@ant-design/pro-components';
-import { Button, Divider, message, Modal } from 'antd';
+import { Button, Divider, Image, message, Modal } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import { history, request, useModel } from 'umi';
@@ -89,7 +90,8 @@ const LoginPage: React.FC = () => {
       <ProCard bordered className="login-card">
         <div className="login-content">
           <div className="login-left">
-            <img src="/logo.png" alt="Company Logo" className="login-logo" />
+            {/* <img src="/logo.png" alt="Company Logo" className="login-logo" /> */}
+            <Image width={140} src={logo} />
             <h2 className="login-title">Planner Admin Dashboard</h2>
           </div>
           <div className="login-right">
