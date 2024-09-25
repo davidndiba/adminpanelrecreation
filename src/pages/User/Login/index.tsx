@@ -2,13 +2,14 @@ import { GoogleOutlined } from '@ant-design/icons';
 import { ProCard, ProForm, ProFormText } from '@ant-design/pro-components';
 import { Button, Divider, message, Modal } from 'antd';
 import React, { useState } from 'react';
-import { history, request } from 'umi';
+import { flushSync } from 'react-dom';
+import { history, request, useModel } from 'umi';
 import './login.less';
 
 const LoginPage: React.FC = () => {
   const [isSignUpVisible, setIsSignUpVisible] = useState(false);
   const [isResetPasswordVisible, setIsResetPasswordVisible] = useState(false);
-
+  const { setInitialState } = useModel('@@initialState');
   const handleFinish = async (values: any) => {
     const { email, password } = values;
     try {
@@ -20,6 +21,14 @@ const LoginPage: React.FC = () => {
       if (response.success) {
         message.success('Login successful!');
         localStorage.setItem('planner_t', response.token);
+        const resp = await request('/user/profile', {});
+        flushSync(() => {
+          setInitialState((s: any) => ({
+            ...s,
+            currentUser: { ...resp?.data },
+          }));
+        });
+
         history.push('/');
       } else {
         message.error('Login failed. Please try again.');
