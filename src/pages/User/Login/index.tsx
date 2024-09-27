@@ -30,6 +30,19 @@ const LoginPage: React.FC = () => {
           }));
         });
 
+        // TODO: Redirect based on user role
+        // if (user === "ADMIN") {
+        //   history.push('/dashboard');
+        // }
+
+        // if (user === "EDITOR") {
+        //   history.push('/planner');
+        // }
+
+        // if (user === "USER") {
+        //   history.push('/planner');
+        // }
+
         history.push('/');
       } else {
         message.error('Login failed. Please try again.');
