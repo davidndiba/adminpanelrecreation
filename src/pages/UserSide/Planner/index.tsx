@@ -21,7 +21,13 @@ import AddJobModal from './AddJobModal';
 
 const { RangePicker } = DatePicker;
 
+
 const ManufacturingPlanner = () => {
+  const [scheduledJobs, setScheduledJobs] = useState([]);
+  const handleAddJob = (newJob) => {
+    setScheduledJobs((prevJobs) => [...prevJobs, newJob]);
+  };
+
   const [isModalVisible, setModalVisible] = useState(false);
 
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
@@ -42,53 +48,86 @@ const ManufacturingPlanner = () => {
     }
     return days;
   };
-
-  const handleSlotClick = (r: any, hour: any) => {
-    setSelectedSlot({ r, hour });
+  const handleSlotClick = (record: any, hour: any, lineId: string, shiftId: string) => {
+    setSelectedSlot({
+        schedule_date: record.date, // Store the selected day (date)
+        hour, // Store the time (hour)
+        job_line_id: lineId, // Store the job line ID
+        shift_id: shiftId, // Store the shift ID
+    });
     setModalVisible(true);
-  };
+    
+    // Move the console logs here
+    console.log("Job Line ID:", lineId);
+    console.log("Shift ID:", shiftId);
+    console.log("Selected Slot:", {
+        schedule_date: record.date, 
+        hour
+    });
+};
 
-  // Render cards inside the job slot, allow up to 4 tasks per slot
-  const renderJobSlot = (record: any, hour: any) => {
+  const renderJobSlot = (record: any, hour: any, lineId: string, shiftId: string) => {
     const slotJobs = record[hour] || [];
-    return (
-      <Droppable droppableId={`${record.day}-${hour}`}>
-        {(provided) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            style={{
-              padding: '10px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              backgroundColor: slotJobs.length === 0 ? '#F8F4FE' : '#FFFFFF',
-            }}
-          >
-            {slotJobs.length === 0 ? (
-              <Card onClick={() => handleSlotClick(record, hour)}>FREE</Card>
-            ) : (
-              slotJobs.map((job: any, index: any) => (
-                <Draggable key={job.id} draggableId={job.id} index={index}>
-                  {(provided) => (
-                    <Card
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      ref={provided.innerRef}
-                      style={{ marginBottom: '10px' }}
-                    >
-                      {job.name} ({job.status})
-                    </Card>
-                  )}
-                </Draggable>
-              ))
-            )}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+    const scheduledJobsForHour = scheduledJobs.filter(job => 
+      job.job_line_id === lineId && job.schedule_time === hour 
     );
-  };
+    return (
+        <Droppable droppableId={`${record.day}-${hour}`}>
+            {(provided) => (
+                <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    style={{
+                        padding: '10px',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                //         backgroundColor: slotJobs.length === 0 ? '#F8F4FE' : '#FFFFFF',
+                //     }}
+                // >
+                //     {slotJobs.length === 0 ? (
+                //         <Card onClick={() => {
+                //             console.log("Rendering Job Slot Clicked:");
+                //             console.log("Line ID:", lineId);
+                //             console.log("Shift ID:", shiftId);
+                //             handleSlotClick(record, hour, lineId, shiftId);
+                //         }}>
+                //             FREE
+                //         </Card>
+                backgroundColor: scheduledJobsForHour.length === 0 ? '#F8F4FE' : '#FFFFFF',
+              }}
+          >
+              {scheduledJobsForHour.length === 0 ? (
+                  <Card onClick={() => {
+                      console.log("Rendering Job Slot Clicked:");
+                      console.log("Line ID:", lineId);
+                      console.log("Shift ID:", shiftId);
+                      handleSlotClick(record, hour, lineId, shiftId);
+                  }}>
+                      FREE
+                  </Card>
+                    ) : (
+                      scheduledJobsForHour.map((job: any, index: any) => (
+                            <Draggable key={job.id} draggableId={job.id} index={index}>
+                                {(provided) => (
+                                    <Card
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        ref={provided.innerRef}
+                                        style={{ marginBottom: '10px' }}
+                                    >
+                                        {job.name} ({job.status})
+                                    </Card>
+                                )}
+                            </Draggable>
+                        ))
+                    )}
+                    {provided.placeholder}
+                </div>
+            )}
+        </Droppable>
+    );
+};
 
   // Define the columns for the table (days + job lines + shifts)
   const daysOfWeek = getDaysOfWeek();
@@ -139,10 +178,9 @@ const ManufacturingPlanner = () => {
           /* Handle drag and drop functionality */
         }}
       >
-        {renderJobSlot(record, `h${index + 1}`)} {/* Day Shift */}
-        <Divider style={{ margin: '10px 0' }} />{' '}
-        {/* Divider for day and night shifts */}
-        {renderJobSlot(record, `h${index + 1}-night`)} {/* Night Shift */}
+        {renderJobSlot(record, `h${index + 1}`, line.id, shifts?.[0]?.id)} {/* Day Shift */}
+      <Divider style={{ margin: '10px 0' }} />{' '}
+      {renderJobSlot(record, `h${index + 1}-night`, line.id, shifts?.[1]?.id)} {/* Night Shift */}
       </DragDropContext>
     ),
   }));
@@ -257,6 +295,10 @@ const ManufacturingPlanner = () => {
       <AddJobModal
         visible={isModalVisible}
         onCancel={() => setModalVisible(false)}
+        onOk={() => setModalVisible(false)}
+        selectedSlot={selectedSlot}  
+        onAddJob={handleAddJob} 
+        // onAddJob={(newJob) => setScheduledJobs((prevJobs) => [...prevJobs, newJob])}
       />
     </ProCard>
   );
