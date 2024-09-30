@@ -1,473 +1,211 @@
-// import React, { useState } from 'react';
-// import { Modal, Input, Form, Select, Table, Row, Col, Typography } from 'antd';
-// import moment from 'moment';
-
-// const { Option } = Select;
-// const { Title } = Typography;
-
-// const AddJobModal = ({ isModalVisible, handleOk, handleCancel, jobAreas }) => {
-//   const [form] = Form.useForm();
-//   const [searchQuery, setSearchQuery] = useState('');
-
-//   const jobData = [
-//     { key: '1', jobNumber: 'UL2409144', size: '6,000', itemDetails: 'Lifebuoy BW Total 5x750ml' },
-//     { key: '2', jobNumber: 'UL2409145', size: '4,000', itemDetails: 'Lux Botan Skin Rebalance 5x750ml' },
-//     { key: '3', jobNumber: 'UL2409139', size: '7,344', itemDetails: 'Organics Kids STBY 2 in 1 6x400ml' },
-//     { key: '4', jobNumber: 'UL2409140', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-//     { key: '5', jobNumber: 'UL2409141', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-//     { key: '6', jobNumber: 'UL2409142', size: '6,600', itemDetails: 'Tresemme STYL Heat Def Spray 6x300ml' },
-//     { key: '7', jobNumber: 'UL2409143', size: '6,000', itemDetails: 'Lifebuoy BW Total 5x750ml' },
-//   ];
-
-//   const filteredJobs = jobData.filter(job => job.jobNumber.toLowerCase().includes(searchQuery.toLowerCase()));
-
-//   const columns = [
-//     { title: 'Job Number', dataIndex: 'jobNumber', key: 'jobNumber' },
-//     { title: 'Size', dataIndex: 'size', key: 'size' },
-//     { title: 'Item Details', dataIndex: 'itemDetails', key: 'itemDetails' },
-//   ];
-
-//   return (
-//     <Modal
-//       title={<Title level={4} style={{ color: '#1890ff' }}>Add New Job</Title>}
-//       visible={isModalVisible}
-//       onOk={() => {
-//         form.validateFields()
-//           .then(values => {
-//             handleOk(values); // Pass form values back to handleOk
-//             form.resetFields(); // Reset the form fields after submission
-//           })
-//           .catch(info => {
-//             console.error('Validate Failed:', info);
-//           });
-//       }}
-//       onCancel={handleCancel}
-//       width={800}
-//       okText="Add Job"
-//       cancelText="Cancel"
-//       footer={null}
-//     >
-//       <Form form={form} layout="vertical">
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Date" name="date" initialValue={moment().format('YYYY-MM-DD')}>
-//               <Input disabled />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Time" name="time" initialValue="Day Shift">
-//               <Input disabled />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Job Type" name="jobType" rules={[{ required: true, message: 'Please select a job type!' }]}>
-//               <Select placeholder="Select Job Type">
-//                 <Option value="Pack">Production (Pack)</Option>
-//                 <Option value="Bulk">Production (Bulk)</Option>
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Job Area" name="jobArea" rules={[{ required: true, message: 'Please select a job area!' }]}>
-//               <Select placeholder="Select Job Area">
-//                 {jobAreas.map(area => (
-//                   <Option key={area.id} value={area.id}>{area.name}</Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-//         <Row gutter={16}>
-//           <Col span={24}>
-//             <Form.Item label="Job Number" name="jobNumber" rules={[{ required: true, message: 'Please select a job number!' }]}>
-//               <Input.Search
-//                 placeholder="Search Job Number"
-//                 onSearch={(value) => setSearchQuery(value)}
-//                 enterButton
-//               />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-//         <Table
-//           columns={columns}
-//           dataSource={filteredJobs}
-//           pagination={false}
-//           style={{ marginTop: 16 }}
-//           onRow={(record) => ({
-//             onClick: () => {
-//               form.setFieldsValue({ jobNumber: record.jobNumber });
-//               handleOk(record.jobNumber); // Pass selected job number
-//             },
-//           })}
-//         />
-//       </Form>
-//     </Modal>
-//   );
-// };
-
-// export default AddJobModal;
-// import React, { useState } from 'react';
-// import { Modal, Input, Form, Select, Table, Row, Col, Typography } from 'antd';
-
-// const { Option } = Select;
-// const { Title } = Typography;
-
-// const AddJobModal = ({ isModalVisible, handleOk, handleCancel, jobAreas }) => {
-//   const [form] = Form.useForm();
-//   const [searchQuery, setSearchQuery] = useState('');
-//   const [selectedJob, setSelectedJob] = useState(null);
-
-//   const jobData = [
-//     // Your job data here...
-//     { key: '1', jobNumber: 'UL2409144', size: '6,000', itemDetails: 'Lifebuoy BW Total 5x750ml' },
-//      { key: '2', jobNumber: 'UL2409145', size: '4,000', itemDetails: 'Lux Botan Skin Rebalance 5x750ml' },
-//      { key: '3', jobNumber: 'UL2409139', size: '7,344', itemDetails: 'Organics Kids STBY 2 in 1 6x400ml' },
-//      { key: '4', jobNumber: 'UL2409140', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-//      { key: '5', jobNumber: 'UL2409141', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-//      { key: '6', jobNumber: 'UL2409142', size: '6,600', itemDetails: 'Tresemme STYL Heat Def Spray 6x300ml' },
-//      { key: '7', jobNumber: 'UL2409143', size: '6,000', itemDetails: 'Lifebuoy BW Total 5x750ml' },
-//   ];
-
-//   const filteredJobs = jobData.filter(job => job.jobNumber.toLowerCase().includes(searchQuery.toLowerCase()));
-
-//   const handleJobNumberChange = (value) => {
-//     const selected = jobData.find(job => job.jobNumber === value);
-//     setSelectedJob(selected);
-//     form.setFieldsValue({ bookedQuantity: '', size: selected ? selected.size : '' });
-//   };
-
-//   const columns = [
-//     { title: 'Job Number', dataIndex: 'jobNumber', key: 'jobNumber' },
-//     { title: 'Size', dataIndex: 'size', key: 'size' },
-//     { title: 'Item Details', dataIndex: 'itemDetails', key: 'itemDetails' },
-//   ];
-
-//   return (
-//     <Modal
-//       title={<Title level={4} style={{ color: '#1890ff' }}>Add New Job</Title>}
-//       visible={isModalVisible}
-//       onOk={() => {
-//         form.validateFields()
-//           .then(values => {
-//             handleOk(values);
-//             form.resetFields();
-//             setSelectedJob(null);
-//           })
-//           .catch(info => console.error('Validate Failed:', info));
-//       }}
-//       onCancel={handleCancel}
-//       width={800}
-//       okText="Add Job"
-//       cancelText="Cancel"
-//     >
-//       <Form form={form} layout="vertical">
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Job Number" name="jobNumber" rules={[{ required: true, message: 'Please select a job number!' }]}>
-//               <Select placeholder="Select Job Number" onChange={handleJobNumberChange} showSearch>
-//                 {filteredJobs.map(job => (
-//                   <Option key={job.key} value={job.jobNumber}>{job.jobNumber}</Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Booked Quantity" name="bookedQuantity" rules={[{ required: true, message: 'Please enter the booked quantity!' }]}>
-//               <Input placeholder="Booked Quantity" />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Size" name="size">
-//               <Input disabled placeholder="Size" value={selectedJob ? selectedJob.size : ''} />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Status" name="status" rules={[{ required: true, message: 'Please select the status!' }]}>
-//               <Select placeholder="Select Status">
-//                 <Option value="Booked">Booked</Option>
-//                 <Option value="Pending">Pending</Option>
-//                 <Option value="Completed">Completed</Option>
-//                 <Option value="Canceled">Canceled</Option>
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//         </Row>
-//         <Form.Item label="Job Details" name="details">
-//           <Input.TextArea rows={4} placeholder="Enter Job Details" />
-//         </Form.Item>
-//         <Form.Item>
-//           <Input placeholder="Search Job Number" onChange={e => setSearchQuery(e.target.value)} />
-//         </Form.Item>
-//         <Table columns={columns} dataSource={filteredJobs} pagination={false} rowKey="key" scroll={{ y: 240 }} />
-//       </Form>
-//     </Modal>
-//   );
-// };
-
-// export default AddJobModal;
-// import React, { useState } from 'react';
-// import { Modal, Input, Form, Select, Table, Row, Col, Typography, DatePicker } from 'antd';
-
-// const { Option } = Select;
-// const { Title } = Typography;
-
-// const AddJobModal = ({ isModalVisible, handleOk, handleCancel, existingJobs = [] }) => {
-//   const [form] = Form.useForm();
-//   const [selectedJob, setSelectedJob] = useState(null);
-  
-//   const jobData = [
-//     { key: '1', jobNumber: 'UL2409145', size: '4,000', itemDetails: 'Lux Botan Skin Rebalance 5x750ml' },
-//     { key: '2', jobNumber: 'UL2409140', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-//     { key: '3', jobNumber: 'UL2409141', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-//     { key: '4', jobNumber: 'UL2409142', size: '6,600', itemDetails: 'Tresemme STYL Heat Def Spray 6x300ml' },
-//     { key: '5', jobNumber: 'UL2409143', size: '6,000', itemDetails: 'Lifebuoy BW Total 5x750ml' },
-//     { key: '6', jobNumber: 'UL2409138', size: '4,986', itemDetails: 'Dove Men BCRM Hydrating 6x400ml' },
-//     { key: '7', jobNumber: 'UL2409130', size: '7,843', itemDetails: 'Lifebuoy BW Lemon 5x750ml' },
-//   ];
-
-//   const handleJobNumberChange = (value) => {
-//     const selected = jobData.find(job => job.jobNumber === value);
-//     setSelectedJob(selected);
-//     form.setFieldsValue({
-//       bookedQuantity: '',
-//       size: selected ? selected.size : '',
-//       itemDetails: selected ? selected.itemDetails : '',
-//     });
-//   };
-
-//   return (
-//     <Modal
-//       title={<Title level={4} style={{ color: '#1890ff' }}>Add New Job</Title>}
-//       visible={isModalVisible}
-//       onOk={() => {
-//         form.validateFields()
-//           .then(values => {
-//             handleOk({
-//               date: values.date,
-//               time: values.time,
-//               jobType: values.jobType,
-//               jobArea: values.jobArea,
-//               line: values.line,
-//               jobNumber: values.jobNumber,
-//               bookedQuantity: values.bookedQuantity,
-//               comments: values.comments,
-//               jobValidation: values.jobValidation,
-//               jobStatus: values.jobStatus,
-//               size: selectedJob.size,
-//               itemDetails: selectedJob.itemDetails,
-//             });
-//             form.resetFields();
-//             setSelectedJob(null);
-//           })
-//           .catch(info => console.error('Validate Failed:', info));
-//       }}
-//       onCancel={handleCancel}
-//       width={800}
-//       okText="Add Job"
-//       cancelText="Cancel"
-//     >
-//       <Form form={form} layout="vertical">
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Date" name="date" rules={[{ required: true, message: 'Please select a date!' }]}>
-//               <DatePicker style={{ width: '100%' }} />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Time" name="time" rules={[{ required: true, message: 'Please select a time!' }]}>
-//               <Select placeholder="Select Time">
-//                 <Option value="Day Shift">Day Shift</Option>
-//                 <Option value="Night Shift">Night Shift</Option>
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//         </Row>
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Job Type" name="jobType" rules={[{ required: true, message: 'Please select a job type!' }]}>
-//               <Select placeholder="Select Job Type">
-//                 <Option value="Production (Pack)">Production (Pack)</Option>
-//                 {/* Add other job types as needed */}
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Job Area" name="jobArea" rules={[{ required: true, message: 'Please select a job area!' }]}>
-//               <Select placeholder="Select Job Area">
-//                 <Option value="Home Care (Area 1)">Home Care (Area 1)</Option>
-//                 {/* Add other job areas as needed */}
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//         </Row>
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Line" name="line" rules={[{ required: true, message: 'Please enter the line!' }]}>
-//               <Input placeholder="Line" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Job Number" name="jobNumber" rules={[{ required: true, message: 'Please select a job number!' }]}>
-//               <Select placeholder="Select Job Number" onChange={handleJobNumberChange}>
-//                 {jobData.map(job => (
-//                   <Option key={job.key} value={job.jobNumber}>{job.jobNumber}</Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//         </Row>
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Booked Quantity" name="bookedQuantity" rules={[{ required: true, message: 'Please enter the booked quantity!' }]}>
-//               <Input placeholder="Booked Quantity" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Comments" name="comments">
-//               <Input.TextArea placeholder="Comments" />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item label="Job Validation" name="jobValidation" rules={[{ required: true, message: 'Please select job validation!' }]}>
-//               <Select placeholder="Job Validation">
-//                 <Option value="Needs Validation">Needs Validation</Option>
-//                 <Option value="Validated">Validated</Option>
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item label="Job Status" name="jobStatus" rules={[{ required: true, message: 'Please select job status!' }]}>
-//               <Select placeholder="Job Status">
-//                 <Option value="Picked">Picked</Option>
-//                 <Option value="Online">Online</Option>
-//                 <Option value="Complete">Complete</Option>
-//                 <Option value="On Hold">On Hold</Option>
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//         </Row>
-//         {/* Display existing jobs summary */}
-//         {existingJobs && existingJobs.length > 0 && (
-//           <div>
-//             <Title level={5}>Existing Jobs:</Title>
-//             <Table
-//               dataSource={existingJobs.map((job, index) => ({ key: index, ...job }))}
-//               columns={[
-//                 { title: 'Job Number', dataIndex: 'jobNumber', key: 'jobNumber' },
-//                 { title: 'Booked Quantity', dataIndex: 'bookedQuantity', key: 'bookedQuantity' },
-//                 { title: 'Size', dataIndex: 'size', key: 'size' },
-//                 { title: 'Item Details', dataIndex: 'itemDetails', key: 'itemDetails' },
-//               ]}
-//               pagination={false}
-//             />
-//           </div>
-//         )}
-//       </Form>
-//     </Modal>
-//   );
-// };
-
-// export default AddJobModal;
-import React, { useState } from 'react';
-import { Modal, Input, Form, Select, Table, Row, Col, Typography, DatePicker, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Form, Select, Input, Button, Checkbox, message } from 'antd';
+import { request } from 'umi';
 
 const { Option } = Select;
-const { Title } = Typography;
 
-const AddJobModal = ({ isModalVisible, handleOk, handleCancel }) => {
+const AddJobModal = ({ visible, onCancel, onOk, selectedSlot, onAddJob }) => {
   const [form] = Form.useForm();
+  const [jobData, setJobData] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
-  
-  const jobData = [
-    { key: '1', jobNumber: 'UL2409145', size: '4,000', itemDetails: 'Lux Botan Skin Rebalance 5x750ml' },
-    { key: '2', jobNumber: 'UL2409140', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-    { key: '3', jobNumber: 'UL2409141', size: '6,000', itemDetails: 'Lux BWash Sheer Twilight 5x750ml' },
-    { key: '4', jobNumber: 'UL2409142', size: '6,600', itemDetails: 'Tresemme STYL Heat Def Spray 6x300ml' },
-    { key: '5', jobNumber: 'UL2409143', size: '4,800', itemDetails: 'Dove Body Wash 5x750ml' },
-    { key: '6', jobNumber: 'UL2409144', size: '7,000', itemDetails: 'Tresemme RPL Shampoo 5x900ml' },
-  ];
+  const [schedules, setSchedules] = useState([]); // State for schedules
+  const [jobStatuses] = useState(['Picked', 'Online', 'Complete', 'On Hold']); // Static job statuses
 
-  const handleJobSelect = (job) => {
-    setSelectedJob(job);
-    form.setFieldsValue({
-      jobNumber: job.jobNumber,
-      size: job.size,
-    });
+  useEffect(() => {
+    // Fetch job numbers from the API when the modal is opened
+    if (visible) {
+      fetchJobData();
+      
+      fetchSchedules(); // Fetch schedules when the modal opens
+    }
+
+    return () => {
+      form.resetFields(); // Reset form fields on unmount
+      setSelectedJob(null); // Reset selected job
+    };
+  }, [visible, form]);
+
+  const fetchJobData = async () => {
+    try {
+      const response = await request('/schedule-jobs?paginate=false');
+      if (response.success) {
+        const jobs = response.data.data.map(job => ({
+          key: job.id,
+          jobNumber: job.job_number,
+          itemDetails: job.description,
+          capacity: job.capacity,
+          jobType: job.job_type_id,
+          jobArea: job.job_area,
+        }));
+        setJobData(jobs);
+      } else {
+        message.error('Failed to fetch job data');
+      }
+    } catch (error) {
+      console.error('Error fetching job data:', error);
+      message.error('Error fetching job data');
+    }
   };
 
-  const onFinish = (values) => {
-    handleOk({
-      jobNumber: values.jobNumber,
-      bookedQuantity: values.bookedQuantity,
-      size: values.size,
-      comments: values.comments,
-      jobStatus: values.jobStatus,
-    });
+  const fetchSchedules = async () => {
+    try {
+      const response = await request('/schedules'); // Adjust endpoint as needed
+      if (response.success) {
+        setSchedules(response.data.data); // Update state with the schedules data
+      } else {
+        message.error('Failed to fetch schedules');
+      }
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      message.error('Error fetching schedules');
+    }
+  };
+
+  useEffect(() => {
+    if (visible && selectedSlot) {
+      form.setFieldsValue({
+        date: selectedSlot?.r?.scheduleDate || '', // Pre-fill date from slot
+        time: selectedSlot?.hour || '',            // Pre-fill time from slot
+        bookedQuantity: selectedSlot?.bookedQuantity || '', // Pre-fill booked quantity
+        jobType: selectedSlot?.r?.jobType || '',   // Pre-fill job type
+        jobArea: selectedSlot?.r?.jobArea || '',   // Pre-fill job area
+      });
+    }
+  }, [selectedSlot, visible, form]);
+
+  const handleFinish = async (values:any) => {
+    const selectedSlotData = selectedSlot;
+
+    // Ensure values for job_line_id, shift_id, schedule_date, schedule_status_id, capacity, and booked_qty
+    const payload = {
+      schedule_job_id: selectedJob?.key || '', // From selected slot
+      job_line_id: selectedSlotData?.job_line_id, // From selected slot
+      shift_id: selectedSlotData?.shift_id, // From selected slot
+      schedule_date: selectedSlotData.schedule_date || new Date().toISOString(), // Ensure valid date format
+      schedule_status_id: selectedSlotData.schedule_status_id, // From selected slot
+      booked_qty: values.bookedQuantity || selectedSlotData.bookedQuantity, // Get from form or slot
+      capacity: values.capacity, // Get from form or slot
+      comments: values.comments, // From form
+      schedule_time: selectedSlotData.schedule_time || values.schedule_time // From slot or form
+    };
+
+    try {
+      const response = await request('/schedules', {
+        method: 'POST',
+        data: payload,
+      });
+      // if (response.success) {
+        onAddJob({
+          ...payload,
+          id: response?.data?.id, 
+        });
+        console.log(response?.data?.id)
+        message.success('Job added successfully');
+        onOk(values);
+        form.resetFields();
+        setSelectedJob(null);
+        fetchSchedules(); // Fetch the updated schedules after adding the job
+      // } else {
+      //   message.error('Failed to submit job: ' + response.message);
+      // }
+      return true
+    } catch (error) {
+      console.error('Error submitting job:', error);
+      message.error('Failed to submit job');
+    }
+  };
+
+  const handleJobNumberChange = (value) => {
+    const job = jobData.find(job => job.jobNumber === value);
+    setSelectedJob(job); // Set the selected job
+    if (job) {
+      form.setFieldsValue({
+        bookedQuantity: job.capacity,  // Pre-fill the booked quantity to match job capacity
+        jobType: job.jobType,          // Set job type from the selected job
+        jobArea: job.jobArea,          // Set job area from the selected job
+      });
+    }
   };
 
   return (
     <Modal
+      visible={visible}
       title="Add Job"
-      visible={isModalVisible}
-      onCancel={handleCancel}
+      onCancel={onCancel}
       footer={null}
+      width={800}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-      >
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Job Number" name="jobNumber" required>
-              <Select onChange={handleJobSelect} placeholder="Select Job">
-                {jobData.map(job => (
-                  <Option key={job.key} value={job.jobNumber}>{job.jobNumber}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Booked Quantity" name="bookedQuantity" required>
-              <Input type="number" placeholder="Enter booked quantity" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Size" name="size" required>
-              <Input disabled />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Comments" name="comments">
-              <Input.TextArea rows={3} placeholder="Add comments" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item label="Status" name="jobStatus" required>
-              <Select placeholder="Select Job Status">
-                <Option value="Completed">Completed</Option>
-                <Option value="In Progress">In Progress</Option>
-                <Option value="Pending">Pending</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Form.Item>
-          <Button type="primary" htmlType="submit">Submit</Button>
+      <Form form={form} onFinish={handleFinish}>
+        <Form.Item
+          name="jobNumber"
+          label="Job Number"
+          rules={[{ required: true, message: 'Please select a job number!' }]}
+        >
+          <Select
+            placeholder="Search for a job"
+            onChange={handleJobNumberChange}
+            showSearch
+            filterOption={(input, option) =>
+              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
+            style={{ width: '100%' }}
+          >
+            {jobData.map((job) => (
+              <Option key={job.key} value={job.jobNumber}>
+                {job.jobNumber} - {job.itemDetails}
+              </Option>
+            ))}
+          </Select>
         </Form.Item>
+
+        <Form.Item
+          name="jobStatus"
+          label="Job Status"
+          rules={[{ required: true, message: 'Please select a job status!' }]}
+        >
+          <Checkbox.Group>
+            {jobStatuses.map((status) => (
+              <Checkbox key={status} value={status}>
+                {status}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
+        </Form.Item>
+
+        <Form.Item
+          name="bookedQuantity"
+          label="Booked Quantity"
+          rules={[{ required: true, message: 'Please enter booked quantity!' }]}
+        >
+          <Input placeholder="Enter booked quantity" />
+        </Form.Item>
+
+        <Form.Item
+          name="capacity"
+          label="Capacity"
+          rules={[
+            { required: true, message: 'Please enter capacity!' },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const bookedQuantity = getFieldValue('bookedQuantity');
+                if (value && Number(value) > Number(bookedQuantity)) {
+                  return Promise.reject(new Error('Capacity cannot exceed booked quantity!'));
+                }
+                return Promise.resolve();
+              },
+            }),
+          ]}
+        >
+          <Input placeholder="Enter set capacity" />
+        </Form.Item>
+        
+        <Form.Item name="comments" label="Comments">
+          <Input.TextArea rows={4} placeholder="Additional comments (optional)" />
+        </Form.Item>
+
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
       </Form>
     </Modal>
   );

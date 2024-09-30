@@ -70,7 +70,7 @@
       setLoadingPermissions(true);
       try {
         const response = await request('/permissions');
-        const permissionsData = response.data.data;
+        const permissionsData = response.data;
         const permissions = permissionsData.map((perm: any) => ({
           id: perm.id,
           name: perm.name,
@@ -93,7 +93,7 @@
       try {
         const payload = {
           ...values,
-          permissions: values?.permissions || [],
+          permission: values?.permissions || [],
         };
   
         await request('/roles', {
@@ -114,7 +114,7 @@
       try {
         const payload = {
           ...values,
-          permissions: values.permissions || [],
+          permission: values.permissions || [],
         };
   
         await request(`/roles/${id}`, {
