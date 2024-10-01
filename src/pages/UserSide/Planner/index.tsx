@@ -24,10 +24,52 @@ const { RangePicker } = DatePicker;
 
 const ManufacturingPlanner = () => {
   const [scheduledJobs, setScheduledJobs] = useState([]);
-  const handleAddJob = (newJob) => {
-    setScheduledJobs((prevJobs) => [...prevJobs, newJob]);
+  // const handleAddJob = (newJob) => {
+  //   // Create a new object with the relevant information
+  //   const addedJob = {
+  //     id: newJob.id,
+  //     schedule_job_id: newJob.schedule_job_id,
+  //     job_line_id: newJob.job_line_id,
+  //     shift_id: newJob.shift_id,
+  //     schedule_date: newJob.schedule_date,
+  //     capacity: newJob.capacity,
+  //     booked_qty: newJob.booked_qty,
+  //     comments: newJob.comments,
+  //     schedule_status_id: newJob.schedule_status_id,
+  //   };
+  
+  //   // Update the state by adding the new job to the scheduled jobs
+  //   setScheduledJobs((prevJobs) => [...prevJobs, addedJob]);
+  // };
+  const handleAddJob = (newJob: any) => {
+    // Log the incoming new job data
+    console.log('New Job Data:', newJob);
+  
+    // Create a new object with the relevant information
+    const addedJob = {
+      id: newJob.id,
+      schedule_job_id: newJob.schedule_job_id,
+      job_line_id: newJob.job_line_id,
+      shift_id: newJob.shift_id,
+      schedule_date: newJob.schedule_date,
+      capacity: newJob.capacity,
+      booked_qty: newJob.booked_qty,
+      comments: newJob.comments,
+      schedule_status_id: newJob.schedule_status_id,
+    };
+  
+    // Log the newly created job object
+    console.log('Added Job Object:', addedJob);
+  
+    // Update the state by adding the new job to the scheduled jobs
+    setScheduledJobs((prevJobs) => {
+      const updatedJobs = [...prevJobs, addedJob];
+      // Log the updated scheduled jobs array
+      console.log('Updated Scheduled Jobs:', updatedJobs);
+      return updatedJobs;
+    });
   };
-
+  
   const [isModalVisible, setModalVisible] = useState(false);
 
   const [selectedSlot, setSelectedSlot] = useState<any>(null);
@@ -68,8 +110,12 @@ const ManufacturingPlanner = () => {
 
   const renderJobSlot = (record: any, hour: any, lineId: string, shiftId: string) => {
     const slotJobs = record[hour] || [];
-    const scheduledJobsForHour = scheduledJobs.filter(job => 
-      job.job_line_id === lineId && job.schedule_time === hour 
+    const scheduledJobsForHour = scheduledJobs.filter(
+      (job) =>
+        job.job_line_id === lineId &&
+        job.shift_id === shiftId &&
+        moment(job.schedule_date).format('YYYY-MM-DD') === record.date &&
+        job.schedule_time === hour 
     );
     return (
         <Droppable droppableId={`${record.day}-${hour}`}>
@@ -116,7 +162,11 @@ const ManufacturingPlanner = () => {
                                         ref={provided.innerRef}
                                         style={{ marginBottom: '10px' }}
                                     >
-                                        {job.name} ({job.status})
+                                       {`Job: ${job.schedule_job_id}`}<br />
+                                       {`Booked Quantity: ${job.booked_qty}`}<br />
+                                       {`Capacity: ${job.capacity}`}<br />
+                                       {`Status: ${job.schedule_status_id}`} 
+                                       {/* {job.name} ({job.status}) */}
                                     </Card>
                                 )}
                             </Draggable>

@@ -27,9 +27,9 @@ const AddJobModal = ({ visible, onCancel, onOk, selectedSlot, onAddJob }) => {
 
   const fetchJobData = async () => {
     try {
-      const response = await request('/schedule-jobs?paginate=false');
+      const response = await request('/schedule-jobs');
       if (response.success) {
-        const jobs = response.data.data.map(job => ({
+        const jobs = response.data.map(job => ({
           key: job.id,
           jobNumber: job.job_number,
           itemDetails: job.description,
@@ -83,8 +83,8 @@ const AddJobModal = ({ visible, onCancel, onOk, selectedSlot, onAddJob }) => {
       shift_id: selectedSlotData?.shift_id, // From selected slot
       schedule_date: selectedSlotData.schedule_date || new Date().toISOString(), // Ensure valid date format
       schedule_status_id: selectedSlotData.schedule_status_id, // From selected slot
-      booked_qty: values.bookedQuantity || selectedSlotData.bookedQuantity, // Get from form or slot
-      capacity: values.capacity, // Get from form or slot
+      booked_qty: values.bookedQuantity , // Get from form or slot
+      capacity: values.capacity || selectedSlotData.capacity , // Get from form or slot
       comments: values.comments, // From form
       schedule_time: selectedSlotData.schedule_time || values.schedule_time // From slot or form
     };
@@ -97,7 +97,7 @@ const AddJobModal = ({ visible, onCancel, onOk, selectedSlot, onAddJob }) => {
       // if (response.success) {
         onAddJob({
           ...payload,
-          id: response?.data?.id, 
+          id: response?.data, 
         });
         console.log(response?.data?.id)
         message.success('Job added successfully');
@@ -120,7 +120,7 @@ const AddJobModal = ({ visible, onCancel, onOk, selectedSlot, onAddJob }) => {
     setSelectedJob(job); // Set the selected job
     if (job) {
       form.setFieldsValue({
-        bookedQuantity: job.capacity,  // Pre-fill the booked quantity to match job capacity
+        capacity: job.capacity,  // Pre-fill the booked quantity to match job capacity
         jobType: job.jobType,          // Set job type from the selected job
         jobArea: job.jobArea,          // Set job area from the selected job
       });
@@ -174,7 +174,7 @@ const AddJobModal = ({ visible, onCancel, onOk, selectedSlot, onAddJob }) => {
 
         <Form.Item
           name="bookedQuantity"
-          label="Booked Quantity"
+          label="Capacity"
           rules={[{ required: true, message: 'Please enter booked quantity!' }]}
         >
           <Input placeholder="Enter booked quantity" />
@@ -182,21 +182,21 @@ const AddJobModal = ({ visible, onCancel, onOk, selectedSlot, onAddJob }) => {
 
         <Form.Item
           name="capacity"
-          label="Capacity"
-          rules={[
-            { required: true, message: 'Please enter capacity!' },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                const bookedQuantity = getFieldValue('bookedQuantity');
-                if (value && Number(value) > Number(bookedQuantity)) {
-                  return Promise.reject(new Error('Capacity cannot exceed booked quantity!'));
-                }
-                return Promise.resolve();
-              },
-            }),
-          ]}
+          label="Booked Quantity"
+          // rules={[
+          //   { required: true, message: 'Please enter capacity!' },
+          //   ({ getFieldValue }) => ({
+          //     validator(_, value) {
+          //       const bookedQuantity = getFieldValue('bookedQuantity');
+          //       if (value && Number(value) > Number(bookedQuantity)) {
+          //         return Promise.reject(new Error('Capacity cannot exceed booked quantity!'));
+          //       }
+          //       return Promise.resolve();
+          //     },
+          //   }),
+          // ]}
         >
-          <Input placeholder="Enter set capacity" />
+          <Input placeholder="Enter set quantity" />
         </Form.Item>
         
         <Form.Item name="comments" label="Comments">
