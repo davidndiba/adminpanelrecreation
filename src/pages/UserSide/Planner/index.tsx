@@ -7,10 +7,13 @@ import {
   Col,
   DatePicker,
   Divider,
+  Dropdown,
   Empty,
   Flex,
+  Menu,
   Row,
   Select,
+  Space,
   Spin,
   Tabs,
 } from 'antd';
@@ -18,28 +21,42 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import AddJobModal from './AddJobModal';
+// import { request } from '@umijs/max';
+
 
 const { RangePicker } = DatePicker;
 
 const ManufacturingPlanner = () => {
-  // const handleAddJob = (newJob) => {
-  //   // Create a new object with the relevant information
-  //   const addedJob = {
-  //     id: newJob.id,
-  //     schedule_job_id: newJob.schedule_job_id,
-  //     job_line_id: newJob.job_line_id,
-  //     shift_id: newJob.shift_id,
-  //     schedule_date: newJob.schedule_date,
-  //     capacity: newJob.capacity,
-  //     booked_qty: newJob.booked_qty,
-  //     comments: newJob.comments,
-  //     schedule_status_id: newJob.schedule_status_id,
-  //   };
+  const [scheduledJobs, setScheduledJobs] = useState<any[]>([]);
+   const { data: schedules = [], refresh:refreshSchedules } = useRequest(() =>
+    request('/schedules').then((res) => ({ data: res?.original?.data })),
+  );
 
-  //   // Update the state by adding the new job to the scheduled jobs
-  //   setScheduledJobs((prevJobs) => [...prevJobs, addedJob]);
-  // };
-  const handleAddJob = (newJob: any) => {
+  const { data: shifts = [] } = useRequest(() =>
+    request('/shifts').then((res) => ({ data: res?.data?.data })),
+  );
+
+   // Ensure that schedules and shifts are defined and are arrays
+   if (!Array.isArray(schedules) || !Array.isArray(shifts)) {
+    console.error('Schedules or shifts are not defined or not arrays');
+    return; // Early return or handle as necessary
+  }
+
+  // Safely find shift IDs
+  const dayShiftId = shifts.find((shift: any) => shift?.name === 'Day Shift')?.id;
+  const nightShiftId = shifts.find((shift: any) => shift?.name === 'Night Shift')?.id;
+
+  // Filter schedules safely
+  const dayShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === dayShiftId);
+  const nightShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === nightShiftId);
+
+  // Debug logging
+  console.log('Schedules:', schedules);
+  console.log('Shifts:', shifts);
+  console.log('Day Shift Schedules:', dayShiftSchedules);
+  console.log('Night Shift Schedules:', nightShiftSchedules);
+
+  const handleAddJob = async  (newJob: any) => {
     // Log the incoming new job data
     console.log('New Job Data:', newJob);
 
@@ -55,22 +72,28 @@ const ManufacturingPlanner = () => {
       comments: newJob.comments,
       schedule_status_id: newJob.schedule_status_id,
     };
-
-    // Log the newly created job object
-    console.log('Added Job Object:', addedJob);
-
-    // Update the state by adding the new job to the scheduled jobs
-    // setScheduledJobs((prevJobs) => {
-    //   const updatedJobs = [...prevJobs, addedJob];
-    //   // Log the updated scheduled jobs array
-    //   console.log('Updated Scheduled Jobs:', updatedJobs);
-    //   return updatedJobs;
-    // });
+    setScheduledJobs((prevJobs) => [...prevJobs, newJob]);
+    // await request.post('/schedules', { data: addedJob });
+    try {
+    //   const response = await request('/schedules', {
+    //     method: 'POST',
+    //    data:addedJob
+    //     // body: JSON.stringify(addedJob),
+    //   });
+     setModalVisible(true);
+      refreshSchedules();
+      console.log('Added Job Object:', addedJob);
+    } catch (error) {
+      console.error('Error adding job:', error);
+    }
   };
-
+  const handleModalClose = () => {
+    setModalVisible(false); // Close the modal
+  };
+  
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const [selectedSlot, setSelectedSlot] = useState<any>(null);
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [dateRange, setDateRange] = useState<any>([
     moment().startOf('day'),
     moment().endOf('day'),
@@ -93,12 +116,20 @@ const ManufacturingPlanner = () => {
     hour: any,
     lineId: string,
     shiftId: string,
+    job?: any,
   ) => {
     setSelectedSlot({
       schedule_date: record.date, // Store the selected day (date)
       hour, // Store the time (hour)
       job_line_id: lineId, // Store the job line ID
       shift_id: shiftId, // Store the shift ID
+      ...(job ? {
+        schedule_job_id: job.schedule_job_id,
+        capacity: job.capacity,
+        booked_qty: job.booked_qty,
+        comments: job.comments,
+        schedule_status_id: job.schedule_status_id,
+      } : {}), // Only add these if job is defined
     });
     setModalVisible(true);
 
@@ -117,10 +148,8 @@ const ManufacturingPlanner = () => {
   const { data: jobTypes } = useRequest(() =>
     request('/job-types').then((res) => ({ data: res?.data?.data })),
   );
-
   const [jobType, setJobType] = useState<any>();
   const [jobAreaPid, setJobAreaPid] = React.useState<any>();
-
   const { data: jobAreas, loading: jobAreasLoading } = useRequest(
     async () => {
       if (!jobType) return;
@@ -133,11 +162,6 @@ const ManufacturingPlanner = () => {
     },
     { refreshDeps: [jobType] },
   );
-
-  const { data: shifts } = useRequest(() =>
-    request('/shifts').then((res) => ({ data: res?.data?.data })),
-  );
-
   const { data: jobLines, loading: jobLinesLoading } = useRequest(
     async () => {
       if (!jobAreaPid) return;
@@ -149,6 +173,79 @@ const ManufacturingPlanner = () => {
     },
     { refreshDeps: [jobAreaPid] },
   );
+const onDragEnd = async (result: any) => {
+  if (!result.destination) {
+      return; // Dropped outside the list
+  }
+  const { source, destination } = result;
+  // Check if the indices are out of bounds
+  if (
+      source.index < 0 ||
+      source.index >= scheduledJobs.length ||
+      destination.index < 0 ||
+      destination.index >= scheduledJobs.length
+  ) {
+      console.error("Invalid indices for drag and drop");
+      return; // Early return if indices are out of bounds
+  }
+
+  // Handle moving jobs in the scheduledJobs state
+  const updatedJobs = Array.from(scheduledJobs);
+  const [movedJob] = updatedJobs.splice(source.index, 1);
+
+  // Check if movedJob is defined
+  if (!movedJob) {
+      console.error("Moved job is undefined");
+      return; // Early return if movedJob is not found
+  }
+
+  movedJob.schedule_date = destination.droppableId.split('-')[0]; // Update schedule date
+  updatedJobs.splice(destination.index, 0, movedJob);
+  setScheduledJobs(updatedJobs);
+
+  // Make the API request to update the moved job
+  try {
+      const response = await request(`/schedules/${movedJob.id}`, {
+          method: 'PATCH',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(movedJob),
+      });
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+
+      await response.json(); // Await the response to ensure it's processed
+      console.log('Updated Job Object:', movedJob);
+  } catch (error) {
+      console.error('Error updating job:', error);
+  }
+};
+
+
+const menu = (
+  <Menu>
+    {/* <Menu.Item key="1">
+      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">Add New Schedule</a>
+    </Menu.Item> */}
+      {/* <Menu.Item key="1" onClick={handleAddJob}>Add New Schedule</Menu.Item> */}
+      <Menu.Item key="1" onClick={() => handleAddJob(selectedSlot)}>Add New Schedule</Menu.Item>
+    <Menu.Item key="2">
+      <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">Change Job Status</a>
+    </Menu.Item>
+    <Menu.Item key="3" disabled>
+      <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">Reschedule (disabled)</a>
+    </Menu.Item>
+    <Menu.Item key="4" danger>
+      a danger item
+    </Menu.Item>
+  </Menu>
+);
+
+
+
   const renderJobSlot = (
     record: any,
     hour: any,
@@ -174,18 +271,6 @@ const ManufacturingPlanner = () => {
               borderRadius: '5px',
               cursor: 'pointer',
               textAlign: 'center',
-              //         backgroundColor: slotJobs.length === 0 ? '#F8F4FE' : '#FFFFFF',
-              //     }}
-              // >
-              //     {slotJobs.length === 0 ? (
-              //         <Card onClick={() => {
-              //             console.log("Rendering Job Slot Clicked:");
-              //             console.log("Line ID:", lineId);
-              //             console.log("Shift ID:", shiftId);
-              //             handleSlotClick(record, hour, lineId, shiftId);
-              //         }}>
-              //             FREE
-              //         </Card>
               backgroundColor:
                 scheduledJobsForHour.length === 0 ? '#F8F4FE' : '#FFFFFF',
             }}
@@ -209,16 +294,50 @@ const ManufacturingPlanner = () => {
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
-                      style={{ marginBottom: '10px' }}
+                      // style={{ marginBottom: '10px' ,background:'red'}}
+                      style={{ 
+                        marginBottom: '10px', 
+                        background: job.status_background_color || 'red', 
+                        color: job.status_text_color || '#000' 
+                      }}
+                      // onClick={() => {
+                      //   handleSlotClick(record, hour, lineId, shiftId, job); 
+                      // }}
                     >
-                      {`Job: ${job.schedule_job_id}`}
-                      <br />
-                      {`Booked Quantity: ${job.booked_qty}`}
-                      <br />
-                      {`Capacity: ${job.capacity}`}
-                      <br />
-                      {`Status: ${job.schedule_status_id}`}
-                      {/* {job.name} ({job.status}) */}
+                      <div>
+      {`Job: ${job.schedule_job_id}`}
+      <br />
+      {`Booked Quantity: ${job.booked_qty}`}
+      <br />
+      {`Capacity: ${job.capacity}`}
+      <br />
+      {`Status: ${job.schedule_status_id}`}
+    </div>
+     <Dropdown overlay={menu} trigger={['click']}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 16, // Adjust as needed
+            right: 16, // Adjust as needed
+            cursor: 'pointer', // Changes the cursor on hover
+          }}
+          aria-label="More options"
+        >
+          {/* SVG Icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 1024 1024"
+            style={{
+              fill: 'currentColor', // Inherit the current color
+              fontSize: '1.5em', // Adjust the size as needed
+            }}
+          >
+            <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0"/>
+          </svg>
+        </div>
+      </Dropdown>
                     </Card>
                   )}
                 </Draggable>
@@ -230,31 +349,15 @@ const ManufacturingPlanner = () => {
       </Droppable>
     );
   };
-  const { data: schedules } = useRequest(() =>
-    request('/schedules').then((res) => ({ data: res?.data?.data })),
-  );
-  const dayShiftSchedules = schedules?.filter?.(
-    (schedule: any) =>
-      schedule?.shift_id ===
-      shifts?.find((shift: any) => shift?.name === 'Day Shift')?.id,
-  );
-  const nightShiftSchedules = schedules?.filter?.(
-    (schedule: any) =>
-      schedule?.shift_id ===
-      shifts?.find((shift: any) => shift?.name === 'Night Shift')?.id,
-  );
-
+  
   const jobLineColumns = jobLines?.map((line: any, index: any) => ({
     title: line?.name,
     key: line?.id,
     width: 200,
     render: (text: any, record: any) => {
       return (
-        <DragDropContext
-          onDragEnd={() => {
-            /* Handle drag and drop functionality */
-          }}
-        >
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Row>
           {renderJobSlot(
             record,
             `h${index + 1}`,
@@ -272,6 +375,7 @@ const ManufacturingPlanner = () => {
             nightShiftSchedules,
           )}{' '}
           {/* Night Shift */}
+          </Row>
         </DragDropContext>
       );
     },
