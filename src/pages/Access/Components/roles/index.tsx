@@ -70,7 +70,7 @@
       setLoadingPermissions(true);
       try {
         const response = await request('/permissions');
-        const permissionsData = response.data;
+        const permissionsData = response?.data;
         const permissions = permissionsData.map((perm: any) => ({
           id: perm.id,
           name: perm.name,
