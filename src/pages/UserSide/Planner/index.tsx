@@ -27,6 +27,8 @@ import AddJobModal from './AddJobModal';
 const { RangePicker } = DatePicker;
 
 const ManufacturingPlanner = () => {
+  const [jobs, setJobs] = useState([]);
+  const [draggedJob, setDraggedJob] = useState(null);
   const [scheduledJobs, setScheduledJobs] = useState<any[]>([]);
    const { data: schedules = [], refresh:refreshSchedules } = useRequest(() =>
     request('/schedules').then((res) => ({ data: res?.original?.data })),
@@ -165,14 +167,33 @@ const ManufacturingPlanner = () => {
   const { data: jobLines, loading: jobLinesLoading } = useRequest(
     async () => {
       if (!jobAreaPid) return;
-      return await request(`/job-lines?job_area_id=${jobAreaPid}`).then(
+      return await request(`/job-areas/${jobAreaPid}`).then(
         (res) => ({
-          data: res?.data?.data,
+          data: res?.data?.job_lines,
         }),
       );
     },
     { refreshDeps: [jobAreaPid] },
   );
+
+  const handleDragStart = (e, job) => {
+    setDraggedJob(job);
+    e.dataTransfer.setData("text", job); // Set the data that will be transferred during the drag
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Allow the drop
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    // Handle what happens after the drop (e.g., you can display the dragged job on the card)
+    console.log(`Dropped: ${draggedJob}`);
+    // You can also use this space to update some state, or display in the card:
+    alert(`Job dropped: ${draggedJob}`);
+  };
+
+
 const onDragEnd = async (result: any) => {
   if (!result.destination) {
       return; // Dropped outside the list
@@ -298,20 +319,42 @@ const menu = (
                       style={{ 
                         marginBottom: '10px', 
                         background: job.status_background_color || 'red', 
-                        color: job.status_text_color || '#000' 
+                        color: job.status_text_color || '#000' ,
+                        position: 'relative'  
                       }}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
+                      onDragEnd={onDragEnd}
                       // onClick={() => {
                       //   handleSlotClick(record, hour, lineId, shiftId, job); 
                       // }}
                     >
+                      
+                   {/*  */}
                       <div>
-      {`Job: ${job.schedule_job_id}`}
+                      {job.job_validation_required && (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="yellow" // Star color
+          width="1.5em" // Adjust size as needed
+          height="1.5em"
+          style={{
+            position: 'absolute',
+            top: 8, // Adjust position as needed
+            left: 8, // Adjust position as needed
+          }}
+        >
+          <path d="M12 .587l3.668 7.431L23 9.587l-5.5 5.356L18.816 23 12 19.688 5.184 23 6.5 14.943 1 9.587l7.332-1.569L12 .587z" />
+        </svg>
+      )}         
+      {`Job: ${job.schedule_job_number}`}
       <br />
-      {`Booked Quantity: ${job.booked_qty}`}
+      {` ${job.job_description}`}
       <br />
-      {`Capacity: ${job.capacity}`}
+      {/* {`Capacity: ${job.capacity}`} */}
       <br />
-      {`Status: ${job.schedule_status_id}`}
+      {`Status: ${job.schedule_status_name}`}
     </div>
      <Dropdown overlay={menu} trigger={['click']}>
         <div
