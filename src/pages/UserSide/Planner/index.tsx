@@ -1,4 +1,4 @@
-import { DownloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageHeader, ProCard, ProTable } from '@ant-design/pro-components';
 import { request, useRequest } from '@umijs/max';
 import {
@@ -11,53 +11,49 @@ import {
   Empty,
   Flex,
   Menu,
+  message,
+  Modal,
   Row,
   Select,
   Space,
   Spin,
   Tabs,
+  Tooltip,
 } from 'antd';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import AddJobModal from './AddJobModal';
 // import { request } from '@umijs/max';
-
-
 const { RangePicker } = DatePicker;
-
 const ManufacturingPlanner = () => {
+  const [ setIsModalVisible] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [draggedJob, setDraggedJob] = useState(null);
   const [scheduledJobs, setScheduledJobs] = useState<any[]>([]);
    const { data: schedules = [], refresh:refreshSchedules } = useRequest(() =>
     request('/schedules').then((res) => ({ data: res?.original?.data })),
   );
-
   const { data: shifts = [] } = useRequest(() =>
     request('/shifts').then((res) => ({ data: res?.data?.data })),
   );
-
    // Ensure that schedules and shifts are defined and are arrays
    if (!Array.isArray(schedules) || !Array.isArray(shifts)) {
     console.error('Schedules or shifts are not defined or not arrays');
     return; // Early return or handle as necessary
   }
-
   // Safely find shift IDs
   const dayShiftId = shifts.find((shift: any) => shift?.name === 'Day Shift')?.id;
   const nightShiftId = shifts.find((shift: any) => shift?.name === 'Night Shift')?.id;
-
   // Filter schedules safely
   const dayShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === dayShiftId);
   const nightShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === nightShiftId);
-
   // Debug logging
   console.log('Schedules:', schedules);
   console.log('Shifts:', shifts);
   console.log('Day Shift Schedules:', dayShiftSchedules);
   console.log('Night Shift Schedules:', nightShiftSchedules);
-
+   
   const handleAddJob = async  (newJob: any) => {
     // Log the incoming new job data
     console.log('New Job Data:', newJob);
@@ -89,12 +85,11 @@ const ManufacturingPlanner = () => {
       console.error('Error adding job:', error);
     }
   };
+
   const handleModalClose = () => {
     setModalVisible(false); // Close the modal
-  };
-  
+  }; 
   const [isModalVisible, setModalVisible] = useState(false);
-
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [dateRange, setDateRange] = useState<any>([
     moment().startOf('day'),
@@ -134,7 +129,6 @@ const ManufacturingPlanner = () => {
       } : {}), // Only add these if job is defined
     });
     setModalVisible(true);
-
     // Move the console logs here
     console.log('Job Line ID:', lineId);
     console.log('Shift ID:', shiftId);
@@ -143,7 +137,6 @@ const ManufacturingPlanner = () => {
       hour,
     });
   };
-
   // Define the columns for the table (days + job lines + shifts)
   const daysOfWeek = getDaysOfWeek();
 
@@ -175,16 +168,13 @@ const ManufacturingPlanner = () => {
     },
     { refreshDeps: [jobAreaPid] },
   );
-
   const handleDragStart = (e, job) => {
     setDraggedJob(job);
     e.dataTransfer.setData("text", job); // Set the data that will be transferred during the drag
   };
-
   const handleDragOver = (e) => {
     e.preventDefault(); // Allow the drop
   };
-
   const handleDrop = (e) => {
     e.preventDefault();
     // Handle what happens after the drop (e.g., you can display the dragged job on the card)
@@ -192,8 +182,6 @@ const ManufacturingPlanner = () => {
     // You can also use this space to update some state, or display in the card:
     alert(`Job dropped: ${draggedJob}`);
   };
-
-
 const onDragEnd = async (result: any) => {
   if (!result.destination) {
       return; // Dropped outside the list
@@ -209,21 +197,17 @@ const onDragEnd = async (result: any) => {
       console.error("Invalid indices for drag and drop");
       return; // Early return if indices are out of bounds
   }
-
   // Handle moving jobs in the scheduledJobs state
   const updatedJobs = Array.from(scheduledJobs);
   const [movedJob] = updatedJobs.splice(source.index, 1);
-
   // Check if movedJob is defined
   if (!movedJob) {
       console.error("Moved job is undefined");
       return; // Early return if movedJob is not found
   }
-
   movedJob.schedule_date = destination.droppableId.split('-')[0]; // Update schedule date
   updatedJobs.splice(destination.index, 0, movedJob);
   setScheduledJobs(updatedJobs);
-
   // Make the API request to update the moved job
   try {
       const response = await request(`/schedules/${movedJob.id}`, {
@@ -244,29 +228,51 @@ const onDragEnd = async (result: any) => {
       console.error('Error updating job:', error);
   }
 };
+const handleCloseModal = () => {
+  setModalVisible(false);
+  setSelectedSlot(null); // Reset selected slot on close
+};
 
+const handleDeleteSchedule = async (scheduleId) => {
+  try {
+    const confirm = window.confirm('Are you sure you want to delete this schedule?');
+    if (confirm) {
+      await request(`/schedules/${scheduleId}`, {
+        method: 'DELETE',
+      });
+      message.success('Schedule deleted successfully.');
+      // Update the schedules list after deletion
+      // setSchedules(schedules.filter(schedule => schedule.id !== scheduleId));
+
+      window.location.reload();
+    }
+  } catch (error) {
+    message.error('Failed to delete schedule. Please try again.');
+    console.error('Delete Schedule Error:', error);
+  }
+};
 
 const menu = (
   <Menu>
-    {/* <Menu.Item key="1">
-      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">Add New Schedule</a>
-    </Menu.Item> */}
-      {/* <Menu.Item key="1" onClick={handleAddJob}>Add New Schedule</Menu.Item> */}
-      <Menu.Item key="1" onClick={() => handleAddJob(selectedSlot)}>Add New Schedule</Menu.Item>
+    <Menu.Item key="1" onClick={() => handleAddJob(selectedSlot)}>Add New Schedule</Menu.Item>
     <Menu.Item key="2">
       <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">Change Job Status</a>
     </Menu.Item>
     <Menu.Item key="3" disabled>
       <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">Reschedule (disabled)</a>
     </Menu.Item>
-    <Menu.Item key="4" danger>
-      a danger item
-    </Menu.Item>
+    {/* Map through schedules to display delete options */}
+    {schedules.map(schedule => (
+      <Menu.Item 
+        key={schedule.id} 
+        danger 
+        onClick={() => handleDeleteSchedule(schedule.id)} // Pass the correct schedule ID
+      >
+        Delete Schedule: {schedule.schedule_job_number} {/* Display job number for clarity */}
+      </Menu.Item>
+    ))}
   </Menu>
 );
-
-
-
   const renderJobSlot = (
     record: any,
     hour: any,
@@ -294,8 +300,12 @@ const menu = (
               textAlign: 'center',
               backgroundColor:
                 scheduledJobsForHour.length === 0 ? '#F8F4FE' : '#FFFFFF',
+                position:'relative',
             }}
           >
+               <div style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+              Add New Job
+              </div>
             {scheduledJobsForHour.length === 0 ? (
               <Card
                 onClick={() => {
@@ -307,10 +317,11 @@ const menu = (
               >
                 FREE
               </Card>
-            ) : (
+            ) : (     
               scheduledJobsForHour?.map((job: any, index: any) => (
                 <Draggable key={job.id} draggableId={job.id} index={index}>
                   {(provided) => (
+                    
                     <Card
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -327,10 +338,8 @@ const menu = (
                       onDragEnd={onDragEnd}
                       // onClick={() => {
                       //   handleSlotClick(record, hour, lineId, shiftId, job); 
-                      // }}
+                      // }} 
                     >
-                      
-                   {/*  */}
                       <div>
                       {job.job_validation_required && (
         <svg
@@ -348,14 +357,67 @@ const menu = (
           <path d="M12 .587l3.668 7.431L23 9.587l-5.5 5.356L18.816 23 12 19.688 5.184 23 6.5 14.943 1 9.587l7.332-1.569L12 .587z" />
         </svg>
       )}         
-      {`Job: ${job.schedule_job_number}`}
-      <br />
-      {` ${job.job_description}`}
-      <br />
-      {/* {`Capacity: ${job.capacity}`} */}
-      <br />
-      {`Status: ${job.schedule_status_name}`}
+      <span style={{ fontWeight: 'bold', color: 'black' }}>
+            {` ${job.schedule_job_number}`}
+          </span>  
+      <span style={{ marginLeft: '10px', color: '#007bff', textDecoration: 'underline' }}>
+            {` ${job.capacity}`}
+          </span> 
+          <Tooltip title={job.job_description} placement="top">
+          <div style={{ color: 'grey', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
+            {job.job_description.split(' ').slice(0, 3).join(' ') + (job.job_description.split(' ').length > 3 ? '...' : '')}
+          </div>
+        </Tooltip>
+      {` ${job.schedule_status_name}`}
     </div>
+ {/* More button */}
+     <Button
+          type="link"
+          style={{
+            color: '#ff5733',
+            whiteSpace: 'nowrap', // Prevent wrapping
+            overflow: 'hidden', // Hide overflow
+            textOverflow: 'ellipsis', // Show ellipsis if it overflows
+          }}
+          // onClick={() => setIsModalVisible(true)}
+          onClick={() => {
+            if (selectedSlot && selectedSlot.id) {
+                handleAddJob(selectedSlot);
+            } else {
+                console.error('Selected slot is null or does not have an id');
+            }
+        }}
+        
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 1024 1024"
+            style={{ fill: 'currentColor', marginRight: '4px' }}
+          >
+            <path d="M512 100c-227 0-412 185-412 412s185 412 412 412 412-185 412-412S739 100 512 100zm0 736c-179 0-324-145-324-324S333 188 512 188s324 145 324 324-145 324-324 324zm-75-387h150v150H437V449zm150 277h-150v-54h150v54z" />
+          </svg>
+          More Details
+        </Button>
+    <br/>
+    <Modal
+        title="Selected Slot Details"
+        visible={isModalVisible}
+        onCancel={handleCloseModal}
+        footer={null} // Customize footer if needed
+      >
+        {selectedSlot && (
+          <div>
+            <p><strong>Date:</strong> {selectedSlot.schedule_date}</p>
+            <p><strong>Hour:</strong> {selectedSlot.hour}</p>
+            <p><strong>Job Line ID:</strong> {selectedSlot.job_line_id}</p>
+            <p><strong>Shift ID:</strong> {selectedSlot.shift_id}</p>
+            {selectedSlot.schedule_job_id && <p><strong>Schedule Job ID:</strong> {selectedSlot.schedule_job_id}</p>}
+            {/* Add more fields as needed */}
+          </div>
+        )}
+      </Modal>
      <Dropdown overlay={menu} trigger={['click']}>
         <div
           style={{
@@ -386,13 +448,46 @@ const menu = (
                 </Draggable>
               ))
             )}
+             {scheduledJobsForHour.length > 0 && ( // Show button if there are existing scheduled jobs
+<Button
+  type="primary" // Change button style as needed
+  icon={<PlusOutlined />} // Add the icon to the button
+  style={{
+    position: 'absolute',
+    top: '10px', // Adjust position as needed
+    left: '50%', // Center horizontally
+    transform: 'translateX(-50%)', // Center the button
+    zIndex: 1, // Ensure button is above the card
+    backgroundColor: '#4CAF50', // Example background color
+    border: 'none', // Remove border for a cleaner look
+    borderRadius: '4px', // Slightly rounded corners
+    padding: '8px 16px', // Adjust padding for better sizing
+    fontSize: '16px', // Increase font size for readability
+    boxShadow: '0 2px 4px rgba(0,0,0,0.2)', // Add shadow for depth
+    transition: 'background-color 0.3s', // Transition effect for hover
+  }}
+  onClick={() => {
+    if (selectedSlot && selectedSlot.id) {
+        handleAddJob(selectedSlot);
+    } else {
+        console.error('Selected slot is null or does not have an id');
+    }
+}}
+
+  onMouseLeave={(e) => {
+    e.currentTarget.style.backgroundColor = '#4CAF50'; // Reset to original color
+  }}
+>
+    <br/>
+  Add New Schedule
+</Button>
+      )}
             {provided.placeholder}
           </div>
         )}
       </Droppable>
     );
-  };
-  
+  }; 
   const jobLineColumns = jobLines?.map((line: any, index: any) => ({
     title: line?.name,
     key: line?.id,
@@ -423,7 +518,6 @@ const menu = (
       );
     },
   }));
-
   return (
     <ProCard>
       <PageHeader
@@ -523,7 +617,6 @@ const menu = (
           )}
         </Col>
       </Row>
-
       <Button
         type="primary"
         icon={<DownloadOutlined />}
@@ -542,5 +635,4 @@ const menu = (
     </ProCard>
   );
 };
-
 export default ManufacturingPlanner;
