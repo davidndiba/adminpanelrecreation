@@ -69,7 +69,7 @@
                 (statistics?.user_counts_by_status?.Deactivated ?? 0) + 
                 (statistics?.user_counts_by_status?.Deleted ?? 0)
               );
-              setPendingActivation(response.data?.data?.reduce((acc, user) => acc + (user.login_count || 0), 0));
+              setPendingActivation(statistics?.user_counts_by_status?.['Pending Activation'] ?? 0); // Accessing Pending Activation
             } else {
               message.error('Failed to retrieve users statistics.');
             }
@@ -85,7 +85,8 @@
       setSelectedRowKeys(selectedKeys);
     };
 
-    const handleSearch = () => {
+    const handleSearch = (value: string) => {
+      setSearchTerm(value);
       // Trigger table reload on search
       tableActionRef.current?.reload();
     };
@@ -98,7 +99,7 @@
       // Set the form values
       addUserRef.current?.setFieldsValue({
         ...user,
-        status: { key: user.status }, 
+        status: { key: user.name }, 
       });
     
       // Open the modal form
@@ -219,7 +220,7 @@
         </Row>
 
         {/* Search field above the table */}
-        <Row gutter={16} style={{ marginBottom: '16px' }}>
+        {/* <Row gutter={16} style={{ marginBottom: '16px' }}>
           <Col span={24}>
             <Input
               placeholder="Search Users"
@@ -238,7 +239,19 @@
               allowClear // Add a clear button
             />
           </Col>
-        </Row>
+        </Row> */}
+<Row gutter={16} style={{ marginBottom: '16px' }}>
+        <Col span={24}>
+          <Input
+            placeholder="Search Users"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)} // Update search term and reload table
+            style={{ width: 200, marginBottom: '16px' }}
+            allowClear
+          />
+        </Col>
+      </Row>
+
 <div
         style={{
           display: 'flex',
