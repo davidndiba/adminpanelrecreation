@@ -6,7 +6,7 @@ import {
   ProFormSelect,
   ProTable,
 } from '@ant-design/pro-components';
-import { Button, Card, Row, Col, message, Popconfirm, Space, Tooltip, Typography, Tabs } from 'antd';
+import { Button, Card, Row, Col, message, Popconfirm, Space, Tooltip, Typography, Tabs, Form, Modal, Input } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { request } from 'umi';
 
@@ -14,6 +14,7 @@ const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
 const JobAreas: React.FC = () => {
+  const [editForm] = Form.useForm();
   const tableActionRef = useRef<ActionType>();
   const [formValues, setFormValues] = useState(undefined);
   const [jobTypes, setJobTypes] = useState([]);
@@ -21,7 +22,8 @@ const JobAreas: React.FC = () => {
   const [selectedJobType, setSelectedJobType] = useState(undefined);
   const [activeJobType, setActiveJobType] = useState(undefined);
   const [filteredJobAreas, setFilteredJobAreas] = useState([]);
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedJobArea, setSelectedJobArea] = useState(null);
   useEffect(() => {
     const fetchJobTypes = async () => {
       try {
@@ -55,10 +57,47 @@ const JobAreas: React.FC = () => {
   }, [activeJobType]);
 
   const handleEdit = (record) => {
-    setFormValues(record);
-    setNewJobArea(record.name);
-    setSelectedJobType(record.job_type_id);
+    setIsModalVisible(true);
+    setSelectedJobArea(record);
+    // Prefill the form with the selected job area's data
+    editForm.setFieldsValue({
+      name: record.name,
+      job_type_id: record.job_type_id,
+    });
   };
+ // Handle closing the modal
+ const closeModal = () => {
+  setIsModalVisible(false);
+  setSelectedJobArea(null);
+};
+ // Handle saving (editing) a job area
+ const handleSaveEdit = async () => {
+  try {
+    const values = await editForm.validateFields();
+    if (selectedJobArea) {
+      // Update the job area with a PUT request
+      await request(`/job-areas/${selectedJobArea.id}`, {
+        method: 'PUT',
+        data: {
+          name: values.name,
+          job_type_id: values.job_type_id,
+        },
+      });
+      // Update the UI with the modified data
+      setFilteredJobAreas((prevAreas) =>
+        prevAreas.map((area) =>
+          area.id === selectedJobArea.id
+            ? { ...area, name: values.name, job_type_id: values.job_type_id }
+            : area
+        )
+      );
+      message.success('Job area updated successfully.');
+      closeModal();
+    }
+  } catch (error) {
+    message.error('Failed to update job area.');
+  }
+};
 
   const handleDelete = async (id) => {
     try {
@@ -107,7 +146,7 @@ const JobAreas: React.FC = () => {
       key: 'actions',
       render: (_, record) => (
         <Space size="middle">
-          <Tooltip title="Edit">
+           <Tooltip title="Edit">
             <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} type="link" />
           </Tooltip>
           <Tooltip title="Delete">
@@ -215,6 +254,33 @@ const JobAreas: React.FC = () => {
           </Button>
         </Col>
       </Row>
+ {/* Edit Job Area Modal */}
+ <Modal
+        title="Edit Job Area"
+        visible={isModalVisible}
+        onCancel={closeModal}
+        onOk={handleSaveEdit}
+      >
+        <Form form={editForm} layout="vertical">
+          <Form.Item
+            label="Job Area Name"
+            name="name"
+            rules={[{ required: true, message: 'Please enter the job area name' }]}
+          >
+            <Input placeholder="Enter Job Area Name" />
+          </Form.Item>
+          <Form.Item
+            label="Job Type"
+            name="job_type_id"
+            rules={[{ required: true, message: 'Please select a job type' }]}
+          >
+            <ProFormSelect
+              options={jobTypes.map(type => ({ label: type.name, value: type.id }))}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+
     </div>
   );
 };

@@ -47,7 +47,7 @@ const LinesAndTanks: React.FC = () => {
     const fetchJobAreas = async () => {
       if (!activeJobType) return;
       try {
-        const response = await request(`/job-areas?job_type_id=${activeJobType}`);
+        const response = await request(`/job-areas?${activeJobType}`);
         setJobAreas(Array.isArray(response.data.data) ? response.data.data : []);
       } catch (error) {
         message.error('Failed to fetch job areas.');
