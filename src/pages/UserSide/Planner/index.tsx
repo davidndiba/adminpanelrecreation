@@ -53,13 +53,7 @@ const ManufacturingPlanner = () => {
       schedule_status_id: newJob.schedule_status_id,
     };
     setScheduledJobs((prevJobs) => [...prevJobs, newJob]);
-    // await request.post('/schedules', { data: addedJob });
-    try {
-    //   const response = await request('/schedules', {
-    //     method: 'POST',
-    //    data:addedJob
-    //     // body: JSON.stringify(addedJob),
-    //   });
+    try {;
      setModalVisible(true);
       refreshSchedules();
       console.log('Added Job Object:', addedJob);
@@ -260,7 +254,7 @@ const menu = (
     hour: any,
     lineId: string,
     shiftId: string,
-    scheduledJobs: any [],
+    scheduledJobs: any[],
   ) => {
     const scheduledJobsForHour = scheduledJobs.filter(
       (job: any) =>
@@ -275,242 +269,173 @@ const menu = (
 
 
     return (
-      <Droppable droppableId={`${record.day}-${hour}`}>
-        {(provided) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            style={{
-              padding: '10px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              backgroundColor:
-                scheduledJobsForHour.length === 0 ? '#F8F4FE' : '#FFFFFF',
-                position:'relative',
-                minHeight:'100px',
-            }}
-            onClick={() => !hasScheduledJobs && handleSlotClick(record, hour, lineId, shiftId)}
-            // Only handle click for free slots
-          >
-               {/* <div style={{ marginBottom: '10px', fontWeight: 'bold',textAlign:'right',padding:'0' }}>
-              Add New Job
-              </div> */}
-              {/* <Button
-  type="link" // Use link type for a button-like appearance
-  icon={<PlusOutlined />} // Add the icon before the text
-  style={{
-    color: '#4CAF50', // Set text color to green
-    padding: '0', // Remove padding for a cleaner look
-    marginBottom: '10px', // Add margin at the bottom
-    fontWeight: 'bold', // Make the text bold
-    textAlign: 'left', // Align text to the right
-    display: 'block', // Ensure the button takes up the full width for alignment
-  }}
-  onClick={() => {
-       handleSlotClick(record, hour, lineId, shiftId); 
-     }}   
->
-  Add New Job
-</Button> */}
-            {scheduledJobsForHour.length === 0 ? (
-              <Card
+<Droppable droppableId={`${record.day}-${hour}`}>
+{(provided) => (
+  <div
+    {...provided.droppableProps}
+    ref={provided.innerRef}
+    style={{
+      padding: '10px',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      textAlign: 'center',
+      backgroundColor: hasScheduledJobs ? '#FFFFFF' : '#F8F4FE',
+      position: 'relative',
+      minHeight: '100px',
+    }}
+    onClick={() => !hasScheduledJobs && handleSlotClick(record, hour, lineId, shiftId)}
+  >
+    {hasScheduledJobs && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+              <Button
+                type="link" // Use link type for a button-like appearance
+                icon={<PlusOutlined />} // Add the icon before the text
+                style={{
+                  color: '#4CAF50', // Set text color to green
+                  padding: '0', // Remove padding for a cleaner look
+                  fontWeight: 'bold', // Make the text bold
+                  display: 'block', // Ensure the button takes up the full width for alignment
+                }}
                 onClick={() => {
-                  console.log('Rendering Job Slot Clicked:');
-                  console.log('Line ID:', lineId);
-                  console.log('Shift ID:', shiftId);
                   handleSlotClick(record, hour, lineId, shiftId);
                 }}
               >
-                FREE
-              </Card>
-            ) : (     
-              scheduledJobsForHour?.map((job: any, index: any) => (
-                <Draggable key={job.id} draggableId={job.id} index={index}>
-                  {(provided) => (
-<Card
-  {...provided.draggableProps}
-  {...provided.dragHandleProps}
-  ref={provided.innerRef}
-  style={{
-    marginBottom: '10px',
-    background: job.status_background_color || 'red',
-    color: job.status_text_color || '#000',
-    position: 'relative',
-    padding: '8px',
-    maxHeight: '110px', // Set your desired max height here
-    // overflowY: 'auto', // Enables vertical scrolling if content exceeds max height
-  }}
-  onDragOver={handleDragOver}
-  onDrop={handleDrop}
-  onDragEnd={onDragEnd}
->
-  <div>
-    
-    {job.job_validation_required && (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="yellow" // Star color
-        width="1.5em" // Adjust size as needed
-        height="1.5em"
-        style={{
-          position: 'absolute',
-          top: 8, // Adjust position as needed
-          left: 8, // Adjust position as needed
+                Add New Job
+              </Button>
+            </div>
+          )}
+    {scheduledJobsForHour.length === 0 ? (
+      <Card
+        onClick={() => {
+          console.log('Rendering Job Slot Clicked:');
+          console.log('Line ID:', lineId);
+          console.log('Shift ID:', shiftId);
+          handleSlotClick(record, hour, lineId, shiftId);
         }}
       >
-        {` ${job.schedule_status_name}`}
-        <path d="M12 .587l3.668 7.431L23 9.587l-5.5 5.356L18.816 23 12 19.688 5.184 23 6.5 14.943 1 9.587l7.332-1.569L12 .587z" />
-      </svg>
+        FREE
+      </Card>
+    ) : (
+      scheduledJobsForHour.map((job: any, index: any) => (
+        <Draggable key={job.id} draggableId={job.id} index={index}>
+          {(provided) => (
+            <Card
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              ref={provided.innerRef}
+              style={{
+                marginBottom: '10px',
+                background: job.status_background_color || 'red',
+                color: job.status_text_color || '#000',
+                position: 'relative',
+                padding: '8px',
+                maxHeight: '110px', // Set your desired max height here
+              }}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onDragEnd={onDragEnd}
+            >
+              {/* Job Details Here */}
+              {job.job_validation_required && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="yellow" // Star color
+                        width="1.5em" // Adjust size as needed
+                        height="1.5em"
+                        style={{
+                          position: 'absolute',
+                          top: 8, // Adjust position as needed
+                          left: 8, // Adjust position as needed
+                        }}
+                      >
+                        <path d="M12 .587l3.668 7.431L23 9.587l-5.5 5.356L18.816 23 12 19.688 5.184 23 6.5 14.943 1 9.587l7.332-1.569L12 .587z" />
+                      </svg>
+                    )}
+
+                    {/* Job Number */}
+                    <span style={{ fontWeight: 'bold', color: 'black' }}>
+                      {job.schedule_job_number}
+                    </span>
+                    
+                    {/* Capacity */}
+                    <span style={{ marginLeft: '10px', color: '#007bff', textDecoration: 'underline' }}>
+                      {job.capacity}
+                    </span>
+
+                    {/* Tooltip for Job Description */}
+                    <Tooltip title={job.job_description} placement="top">
+                      <div style={{ color: 'grey', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
+                        {job.job_description.split(' ').slice(0, 3).join(' ') + (job.job_description.split(' ').length > 3 ? '...' : '')}
+                      </div>
+                    </Tooltip>
+
+                    {/* More Details Button */}
+                    <Button
+                      type="link"
+                      style={{
+                        marginTop: '0',
+                        marginBottom: '10px',
+                        color: '#ff5733',
+                        whiteSpace: 'nowrap', // Prevent wrapping
+                        overflow: 'hidden', // Hide overflow
+                        textOverflow: 'ellipsis', // Show ellipsis if it overflows
+                      }}
+                      onClick={() => {
+                        if (selectedSlot && selectedSlot.id) {
+                          handleAddJob(selectedSlot);
+                        } else {
+                          console.error('Selected slot is null or does not have an id');
+                        }
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="1em"
+                        height="1em"
+                        viewBox="0 0 1024 1024"
+                        style={{ fill: 'currentColor', marginRight: '4px' }}
+                      >
+                        <path d="M512 100c-227 0-412 185-412 412s185 412 412 412 412-185 412-412S739 100 512 100zm0 736c-179 0-324-145-324-324S333 188 512 188s324 145 324 324-145 324-324 324zm-75-387h150v150H437V449zm150 277h-150v-54h150v54z" />
+                      </svg>
+                      More Details
+                    </Button>
+
+                    {/* Dropdown Menu */}
+                    <Dropdown overlay={menu} trigger={['click']}>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 16, // Adjust as needed
+                          right: 16, // Adjust as needed
+                          cursor: 'pointer', // Changes the cursor on hover
+                        }}
+                        aria-label="More options"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="1em"
+                          height="1em"
+                          viewBox="0 0 1024 1024"
+                          style={{
+                            fill: 'currentColor', // Inherit the current color
+                            fontSize: '1.5em', // Adjust the size as needed
+                          }}
+                        >
+                          <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0" />
+                        </svg>
+                      </div>
+                    </Dropdown>
+              {/* More job details and buttons can go here */}
+            </Card>
+          )}
+        </Draggable>
+      ))
     )}
-    <span style={{ fontWeight: 'bold', color: 'black' }}>
-      {` ${job.schedule_job_number}`}
-    </span>
-    <span style={{ marginLeft: '10px', color: '#007bff', textDecoration: 'underline' }}>
-      {` ${job.capacity}`}
-    </span>
-    <Tooltip title={job.job_description} placement="top">
-      <div style={{ color: 'grey', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
-        {job.job_description.split(' ').slice(0, 3).join(' ') + (job.job_description.split(' ').length > 3 ? '...' : '')}
-      </div>
-    </Tooltip>
-    {/* {` ${job.schedule_status_name}`} */}
+    {provided.placeholder}
   </div>
-  {/* More button */}
-  <Button
-    type="link"
-    style={{
-      marginTop: '0',
-      marginBottom: '10px',
-      color: '#ff5733',
-      whiteSpace: 'nowrap', // Prevent wrapping
-      overflow: 'hidden', // Hide overflow
-      textOverflow: 'ellipsis', // Show ellipsis if it overflows
-    }}
-    onClick={() => {
-      if (selectedSlot && selectedSlot.id) {
-        handleAddJob(selectedSlot);
-      } else {
-        console.error('Selected slot is null or does not have an id');
-      }
-    }}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 1024 1024"
-      style={{ fill: 'currentColor', marginRight: '4px' }}
-    >
-      <path d="M512 100c-227 0-412 185-412 412s185 412 412 412 412-185 412-412S739 100 512 100zm0 736c-179 0-324-145-324-324S333 188 512 188s324 145 324 324-145 324-324 324zm-75-387h150v150H437V449zm150 277h-150v-54h150v54z" />
-    </svg>
-    More Details
-  </Button>
-  <br />
-  <Modal
-    title="Selected Slot Details"
-    visible={isModalVisible}
-    onCancel={handleCloseModal}
-    footer={null} // Customize footer if needed
-  >
-    {selectedSlot && (
-      <div>
-        <p><strong>Date:</strong> {selectedSlot.schedule_date}</p>
-        <p><strong>Hour:</strong> {selectedSlot.hour}</p>
-        <p><strong>Job Line ID:</strong> {selectedSlot.job_line_id}</p>
-        <p><strong>Shift ID:</strong> {selectedSlot.shift_id}</p>
-        {selectedSlot.schedule_job_id && <p><strong>Schedule Job ID:</strong> {selectedSlot.schedule_job_id}</p>}
-        {/* Add more fields as needed */}
-      </div>
-    )}
-  </Modal>
-  <Dropdown overlay={menu} trigger={['click']}>
-    <div
-      style={{
-        position: 'absolute',
-        top: 16, // Adjust as needed
-        right: 16, // Adjust as needed
-        cursor: 'pointer', // Changes the cursor on hover
-      }}
-      aria-label="More options"
-    >
-      {/* SVG Icon */}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="1em"
-        height="1em"
-        viewBox="0 0 1024 1024"
-        style={{
-          fill: 'currentColor', // Inherit the current color
-          fontSize: '1.5em', // Adjust the size as needed
-        }}
-      >
-        <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0" />
-      </svg>
-    </div>
-  </Dropdown>
-</Card>
-
-
-                  )}
-                </Draggable>
-              ))
-            )}
-              <Button
-  type="link" // Use link type for a button-like appearance
-  icon={<PlusOutlined />} // Add the icon before the text
-  style={{
-    color: '#4CAF50', // Set text color to green
-    padding: '0', // Remove padding for a cleaner look
-    marginBottom: '10px', // Add margin at the bottom
-    fontWeight: 'bold', // Make the text bold
-    textAlign: 'left', // Align text to the right
-    display: 'block', // Ensure the button takes up the full width for alignment
-  }}
-  onClick={() => {
-       handleSlotClick(record, hour, lineId, shiftId); 
-     }}   
->
-  Add New Job
-</Button>
-             {/* {scheduledJobsForHour.length > 0 && ( // Show button if there are existing scheduled jobs
-<Button
-  type="primary" // Change button style as needed
-  // icon={<PlusOutlined />} // Add the icon to the button
-  style={{
-    position: 'absolute',
-    top: '10px', // Adjust position as needed
-    right: '10px', // Center horizontally
-    // transform: 'translateX(-50%)', // Center the button
-    zIndex: 1, // Ensure button is above the card
-    backgroundColor: 'transparent', // Example background color
-    border: 'none', // Remove border for a cleaner look
-    borderRadius: '4px', // Slightly rounded corners
-    padding: '2px 6px', // Adjust padding for better sizing
-    fontSize: '12px', // Increase font size for readability
-    boxShadow: 'none', // Add shadow for depth
-    transition: 'background-color 0.3s', // Transition effect for hover
-  }}
-  onClick={() => {
-    if (selectedSlot && selectedSlot.id) {
-        handleAddJob(selectedSlot);
-    } else {
-        console.error('Selected slot is null or does not have an id');
-    }
-}}
-
-  onMouseLeave={(e) => {
-    e.currentTarget.style.backgroundColor = '#4CAF50'; // Reset to original color
-  }}
->
-    <br/>
-</Button>
-      )} */}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+)}
+</Droppable>
     );
   }; 
   const jobLineColumns = jobLines?.map((line: any, index: any) => ({
@@ -597,41 +522,6 @@ const menu = (
             key: jobArea?.id,
             label: jobArea?.name,
             children: (
-              // <ProTable
-              //   toolBarRender={false}
-              //   search={false}
-              //   dataSource={daysOfWeek}
-              //   scroll={{ x: 1400, y: 1400 }}  // Ensure both scroll.x and scroll.y are set
-              //   loading={jobLinesLoading}
-              //   virtual  // Enable virtual scrolling
-              //   columns={[
-              //     {
-              //       title: 'Day',
-              //       key: 'day',
-              //       renderText: (text) => `${text.day} (${text.date})`,
-              //       align: 'left',
-              //       fixed: true,
-              //       width: 100,
-              //     },
-              //     {
-              //       title: 'Shift',
-              //       dataIndex: 'shift',
-              //       fixed: true,
-              //       width: 100,
-              //       key: 'shift',
-              //       render: () => (
-              //         <div>
-              //           {shifts?.map((shift: any, index: any) => (
-              //             <div key={index}>
-              //               {shift?.name}
-              //             </div>
-              //           ))}
-              //         </div>
-              //       ),
-              //     },
-              //     ...(jobLines ? jobLineColumns : []),
-              //   ]}
-              // />
                 <ProTable
     toolBarRender={false}
     search={false}
@@ -650,7 +540,7 @@ const menu = (
       },
       // Job Lines column
       {
-        title: 'Job Lines',
+        title: 'Shift',
         key: 'jobLines',
         align: 'center',
         render: (_, record) => {
