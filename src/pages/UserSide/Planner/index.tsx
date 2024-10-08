@@ -54,11 +54,7 @@ import ChangeStatusModal from './ChangeStatusModal';
     // Filter schedules safely
     const dayShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === dayShiftId);
     const nightShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === nightShiftId);
-    // Debug logging
-    console.log('Schedules:', schedules);
-    console.log('Shifts:', shifts);
-    console.log('Day Shift Schedules:', dayShiftSchedules);
-    console.log('Night Shift Schedules:', nightShiftSchedules);  
+    // Debug logging 
     const handleAddJob = async  (newJob: any) => {
       // Log the incoming new job data
       console.log('New Job Data:', newJob);
@@ -110,12 +106,14 @@ import ChangeStatusModal from './ChangeStatusModal';
       hour: any,
       lineId: string,
       shiftId: string,
-      job?: any,
+      job: any,
     ) => {
+      console.log(job)
       setSelectedSlot({
         schedule_date: record.date, // Store the selected day (date)
         hour, // Store the time (hour)
-        job_line_id: lineId, // Store the job line ID
+        job_line_id: lineId?.id, // Store the job line ID
+        job_line_name:lineId?.name,
         shift_id: shiftId, // Store the shift ID
         ...(job ? {
           schedule_job_id: job.schedule_job_id,
@@ -125,6 +123,7 @@ import ChangeStatusModal from './ChangeStatusModal';
           schedule_status_id: job.schedule_status_id,
         } : {}), // Only add these if job is defined
       });
+     
       setModalVisible(true);
       // Move the console logs here
       console.log('Job Line ID:', lineId);
@@ -144,6 +143,7 @@ import ChangeStatusModal from './ChangeStatusModal';
         } : {}),
       });
     };
+    console.log(selectedSlot)
     // Define the columns for the table (days + job lines + shifts)
     const daysOfWeek = getDaysOfWeek();
     const { data: jobTypes } = useRequest(() =>
@@ -287,10 +287,12 @@ import ChangeStatusModal from './ChangeStatusModal';
       lineId: string,
       shiftId: string,
       scheduledJobs: any[],
+      line:any,
     ) => {
+      // console.log(line)
       const scheduledJobsForHour = scheduledJobs.filter(
         (job: any) =>
-          job?.job_line_id === lineId &&
+          job?.job_line_id === lineId?.id &&
           job?.shift_id === shiftId &&
           moment(job?.schedule_date).format('YYYY-MM-DD') === record?.date,
         // job.schedule_time === hour,
@@ -338,10 +340,8 @@ import ChangeStatusModal from './ChangeStatusModal';
       {scheduledJobsForHour.length === 0 ? (
         <Card
           onClick={() => {
-            console.log('Rendering Job Slot Clicked:');
-            console.log('Line ID:', lineId);
-            console.log('Shift ID:', shiftId);
-            handleSlotClick(record, hour, lineId, shiftId);
+          console.log(line)  
+          handleSlotClick(record, hour, lineId, shiftId,line);
           }}
         >
           FREE
@@ -472,9 +472,10 @@ import ChangeStatusModal from './ChangeStatusModal';
             {renderJobSlot(
               record,
               `h${index + 1}`,
-              line.id,
+              line,
               shifts?.[0]?.id,
               dayShiftSchedules,
+              line.name,
             )}
             </Row>
             {/* Day Shift */}
@@ -483,9 +484,10 @@ import ChangeStatusModal from './ChangeStatusModal';
             {renderJobSlot(
               record,
               `h${index + 1}-night`,
-              line.id,
+              line,
               shifts?.[1]?.id,
               nightShiftSchedules,
+              line.name,
             )}{' '}
             {/* Night Shift */}
             </Row>
