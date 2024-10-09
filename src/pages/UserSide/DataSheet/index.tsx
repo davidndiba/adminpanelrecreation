@@ -225,6 +225,9 @@ const DataSheet = () => {
           },
           pageSize: 10,
         }}
+        rowClassName={(record) =>
+          record.shift === 'Night Shift' ? 'night-shift-row' : ''
+        }
       />
     </div>
   );
