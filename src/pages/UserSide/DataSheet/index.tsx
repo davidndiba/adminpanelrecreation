@@ -201,14 +201,27 @@ const DataSheet = () => {
     setCurrentWeek(date.startOf('isoWeek'));
   };
 
+  const handlePreviousWeek = () => {
+    setCurrentWeek((prevWeek) => moment(prevWeek).subtract(1, 'week'));
+  };
+
+  const handleNextWeek = () => {
+    setCurrentWeek((prevWeek) => moment(prevWeek).add(1, 'week'));
+  };
+
   return (
     <div>
-      <DatePicker
-        picker="week"
-        defaultValue={currentWeek}
-        onChange={handleWeekChange}
-        format="YYYY-wo"
-      />
+      <Space style={{ marginBottom: 16 }}>
+        <Button onClick={handlePreviousWeek}>Previous Week</Button>
+        <DatePicker
+          disabled
+          picker="week"
+          value={currentWeek}
+          onChange={handleWeekChange}
+          format="YYYY-wo"
+        />
+        <Button onClick={handleNextWeek}>Next Week</Button>
+      </Space>
       <Table
         loading={loading}
         columns={columns}
