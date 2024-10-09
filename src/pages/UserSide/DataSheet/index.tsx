@@ -7,6 +7,8 @@ import { useState } from 'react';
 const DataSheet = () => {
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('isoWeek'));
 
+  const [clickedSchedule, setClickedSchedule] = useState<any>(null);
+
   const { data, loading } = useRequest(() =>
     request('/schedules').then((res) => ({ data: res?.original?.data })),
   );
@@ -56,6 +58,8 @@ const DataSheet = () => {
             job_description: schedule?.job_description,
             job_line_id: schedule?.job_line_id,
             // add other required fields you need here i.e background colors
+            bgColor: schedule?.status_background_color,
+            textColor: schedule?.status_text_color,
           })),
         });
       });
@@ -89,18 +93,47 @@ const DataSheet = () => {
           width: 300,
           render: (jobs: any, record: any) => {
             return (
-              <Space direction="vertical" size="middle">
-                {jobs
-                  ?.filter((j: any) => j?.job_line_id === job?.id)
-                  ?.map((job: any) => (
-                    <Card
-                      key={job?.id}
-                      size="small"
-                      style={{ background: 'red', width: '100%' }}
-                    >
-                      {job?.job_description} (Count: {job?.job_count})
-                    </Card>
-                  ))}
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <ModalForm
+                  title={
+                    <>
+                      You are viewing{' '}
+                      <span style={{ color: clickedSchedule?.textColor }}>
+                        {clickedSchedule?.job_description}
+                      </span>
+                    </>
+                  }
+                  submitter={false}
+                  trigger={
+                    <div>
+                      {jobs
+                        ?.filter((j: any) => j?.job_line_id === job?.id)
+                        ?.map((job: any) => (
+                          <Card
+                            key={job?.id}
+                            size="small"
+                            style={{
+                              background: job?.bgColor || 'transparent',
+                              width: '100%',
+                              color: job?.textColor,
+                              borderRadius: 0,
+                              marginBottom: 1,
+                            }}
+                            onClick={() => setClickedSchedule(job)}
+                          >
+                            {job?.job_description} (Count: {job?.job_count})
+                          </Card>
+                        ))}
+                    </div>
+                  }
+                >
+                  {/* More details about the clicked schedule */}
+                  Content HERE
+                </ModalForm>
                 {jobs?.filter((j: any) => j?.job_line_id === job?.id)?.length <=
                   3 && (
                   <ModalForm
@@ -111,7 +144,11 @@ const DataSheet = () => {
                         resetText: 'Cancel',
                       },
                     }}
-                    trigger={<Button style={{ width: '100%' }}>FREE</Button>}
+                    trigger={
+                      <Button style={{ width: '100%', borderRadius: 0 }}>
+                        FREE
+                      </Button>
+                    }
                     onFinish={async (values: any) => {
                       console.log(values);
 
