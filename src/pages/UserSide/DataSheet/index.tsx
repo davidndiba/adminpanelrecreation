@@ -1,16 +1,16 @@
+import { ModalForm, ProFormText } from '@ant-design/pro-components';
 import { request, useRequest } from '@umijs/max';
-import { Card, Space, Table } from 'antd';
+import { Button, Card, DatePicker, Space, Table } from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
 
 const DataSheet = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [currentWeek, setCurrentWeek] = useState(moment().startOf('week'));
-  // console.log(currentWeek);
-  const { data, loading } = useRequest(
-    () => request('/schedules').then((res) => ({ data: res?.original?.data })),
-    // { refreshDeps: [currentWeek] },
+  const [currentWeek, setCurrentWeek] = useState(moment().startOf('isoWeek'));
+
+  const { data, loading } = useRequest(() =>
+    request('/schedules').then((res) => ({ data: res?.original?.data })),
   );
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [jobAreaPid, setJobAreaPid] = useState<any>(
     '9d198046-7cf7-463a-9759-ade3f9b311aa',
@@ -27,24 +27,28 @@ const DataSheet = () => {
     { refreshDeps: [jobAreaPid] },
   );
 
+  const { data: shiftsFromApi } = useRequest(() =>
+    request('/shifts').then((res) => ({ data: res?.data?.data })),
+  );
+
   const transformData = (schedules: any) => {
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-    const shifts = ['Day Shift', 'Night Shift'];
+    const shifts: any[] = shiftsFromApi?.map((shift: any) => shift?.name);
 
     const transformedData: any[] = [];
 
-    daysOfWeek.forEach((day) => {
-      shifts.forEach((shift) => {
+    daysOfWeek.forEach((day, dayIndex) => {
+      shifts?.forEach((shift) => {
+        const date = moment(currentWeek).add(dayIndex, 'days');
         const schedulesForDayShift = schedules?.filter(
           (s: any) =>
-            moment(s?.schedule_date).format('dddd') === day &&
-            s.shift_name === shift &&
-            moment(s?.schedule_date).isSame(currentWeek, 'week'),
+            moment(s?.schedule_date).isSame(date, 'day') &&
+            s.shift_name === shift,
         );
 
         transformedData.push({
           key: `${day}-${shift}`,
-          day,
+          day: date.format('ll'),
           shift,
           jobs: schedulesForDayShift?.map((schedule: any) => ({
             id: schedule?.schedule_job_id,
@@ -64,9 +68,14 @@ const DataSheet = () => {
     {
       title: 'Day',
       dataIndex: 'day',
-      onCell: (_: any, index: any) => {
+      render: (text: string, record: any, index: number) => {
         const rowSpan = index % 2 === 0 ? 2 : 0;
-        return { rowSpan };
+        return {
+          children: text,
+          props: {
+            rowSpan,
+          },
+        };
       },
     },
     {
@@ -77,7 +86,8 @@ const DataSheet = () => {
       ? jobLines?.map((job: any) => ({
           title: job?.name,
           dataIndex: 'jobs',
-          render: (jobs: any) => {
+          width: 300,
+          render: (jobs: any, record: any) => {
             return (
               <Space direction="vertical" size="middle">
                 {jobs
@@ -91,6 +101,58 @@ const DataSheet = () => {
                       {job?.job_description} (Count: {job?.job_count})
                     </Card>
                   ))}
+                {jobs?.filter((j: any) => j?.job_line_id === job?.id)?.length <=
+                  3 && (
+                  <ModalForm
+                    title="Add Job"
+                    submitter={{
+                      searchConfig: {
+                        submitText: 'Add Job',
+                        resetText: 'Cancel',
+                      },
+                    }}
+                    trigger={<Button style={{ width: '100%' }}>FREE</Button>}
+                    onFinish={async (values: any) => {
+                      console.log(values);
+
+                      const getShiftId = shiftsFromApi?.find(
+                        (shift: any) => shift?.name === record?.shift,
+                      );
+
+                      // // you have the day here with the standard format
+                      console.log(moment(record?.day).format('YYYY-MM-DD'));
+
+                      // // you have the shift id here
+                      console.log(getShiftId?.id);
+
+                      // Do your POST here for Adding a new job
+                      try {
+                        // await request('/schedules', {
+                        //   method: 'POST',
+                        //   data: {
+                        //     ...values,
+                        //     shift_id: getShiftId?.id,
+                        //     schedule_date: record?.day,
+                        //   },
+                        // })
+
+                        // you have success MESSAGE here and REFRESH the schedules on the table i.e
+
+                        // this keeps modal open when success
+                        return true;
+                      } catch (error) {
+                        // CATCH ERROR
+                        // console.error('Error adding job:', error);
+
+                        // this keeps modal open when there is an error
+                        return false;
+                      }
+                    }}
+                  >
+                    {/* Replace here with content for the form i.e Job Number, booked qty, ...rest */}
+                    <ProFormText name="name" label="Job Number" />
+                  </ModalForm>
+                )}
               </Space>
             );
           },
@@ -98,29 +160,29 @@ const DataSheet = () => {
       : []),
   ];
 
-  // const handleWeekChange = (date: any) => {
-  //   setCurrentWeek(date.startOf('week'));
-  // };
+  const handleWeekChange = (date: any) => {
+    setCurrentWeek(date.startOf('isoWeek'));
+  };
 
   return (
     <div>
-      {/* Modify this */}
-      {/* <DatePicker
+      <DatePicker
         picker="week"
         defaultValue={currentWeek}
         onChange={handleWeekChange}
-        
-      /> */}
+        format="YYYY-wo"
+      />
       <Table
         loading={loading}
         columns={columns}
         dataSource={transformData(data || [])}
         bordered
         rowKey="key"
+        scroll={{ x: 1400 }}
         pagination={{
           onChange: (page) => {
             const date = moment()
-              .startOf('week')
+              .startOf('isoWeek')
               .add((page - 1) * 10, 'days');
             console.log(date.format('YYYY-MM-DD'));
           },
