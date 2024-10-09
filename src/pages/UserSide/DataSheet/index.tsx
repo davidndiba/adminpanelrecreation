@@ -1,18 +1,21 @@
 import { request, useRequest } from '@umijs/max';
 import { Card, Space, Table } from 'antd';
 import moment from 'moment';
-import React from 'react';
+import { useState } from 'react';
 
 const DataSheet = () => {
-  const { data } = useRequest(() =>
-    request('/schedules').then((res) => ({ data: res?.original?.data })),
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [currentWeek, setCurrentWeek] = useState(moment().startOf('week'));
+  // console.log(currentWeek);
+  const { data, loading } = useRequest(
+    () => request('/schedules').then((res) => ({ data: res?.original?.data })),
+    // { refreshDeps: [currentWeek] },
   );
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [jobAreaPid, setJobAreaPid] = React.useState<any>(
+  const [jobAreaPid, setJobAreaPid] = useState<any>(
     '9d198046-7cf7-463a-9759-ade3f9b311aa',
   );
 
-  console.log(data?.slice(0, 5));
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: jobLines, loading: jobLinesLoading } = useRequest(
     async () => {
@@ -23,6 +26,7 @@ const DataSheet = () => {
     },
     { refreshDeps: [jobAreaPid] },
   );
+
   const transformData = (schedules: any) => {
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     const shifts = ['Day Shift', 'Night Shift'];
@@ -34,7 +38,8 @@ const DataSheet = () => {
         const schedulesForDayShift = schedules?.filter(
           (s: any) =>
             moment(s?.schedule_date).format('dddd') === day &&
-            s.shift_name === shift,
+            s.shift_name === shift &&
+            moment(s?.schedule_date).isSame(currentWeek, 'week'),
         );
 
         transformedData.push({
@@ -93,9 +98,21 @@ const DataSheet = () => {
       : []),
   ];
 
+  // const handleWeekChange = (date: any) => {
+  //   setCurrentWeek(date.startOf('week'));
+  // };
+
   return (
     <div>
+      {/* Modify this */}
+      {/* <DatePicker
+        picker="week"
+        defaultValue={currentWeek}
+        onChange={handleWeekChange}
+        
+      /> */}
       <Table
+        loading={loading}
         columns={columns}
         dataSource={transformData(data || [])}
         bordered
