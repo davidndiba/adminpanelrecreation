@@ -109,7 +109,7 @@ const DataSheet = () => {
                   }
                   submitter={false}
                   trigger={
-                    <div>
+                    <div style={{ cursor: 'pointer' }}>
                       {jobs
                         ?.filter((j: any) => j?.job_line_id === job?.id)
                         ?.map((job: any) => (
