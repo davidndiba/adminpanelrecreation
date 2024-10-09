@@ -31,9 +31,9 @@ const DataSheet = () => {
 
     daysOfWeek.forEach((day) => {
       shifts.forEach((shift) => {
-        const schedulesForDayShift = schedules.filter(
+        const schedulesForDayShift = schedules?.filter(
           (s: any) =>
-            moment(s.schedule_date).format('dddd') === day &&
+            moment(s?.schedule_date).format('dddd') === day &&
             s.shift_name === shift,
         );
 
@@ -46,6 +46,7 @@ const DataSheet = () => {
             job_count: schedule?.booked_qty,
             job_description: schedule?.job_description,
             job_line_id: schedule?.job_line_id,
+            // add other required fields you need here i.e background colors
           })),
         });
       });
@@ -72,14 +73,13 @@ const DataSheet = () => {
           title: job?.name,
           dataIndex: 'jobs',
           render: (jobs: any) => {
-            console.log(jobs);
             return (
               <Space direction="vertical" size="middle">
                 {jobs
-                  ?.filter((j: any) => j.job_line_id === job.id)
+                  ?.filter((j: any) => j?.job_line_id === job?.id)
                   ?.map((job: any) => (
                     <Card
-                      key={job.id}
+                      key={job?.id}
                       size="small"
                       style={{ background: 'red', width: '100%' }}
                     >
