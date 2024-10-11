@@ -1,28 +1,28 @@
-import { Card, Space, Table, Row, Col, Select, Input, Typography, DatePicker, Tabs, Modal, Button, Form, Checkbox, message, Tooltip, Dropdown, Menu } from 'antd';
+import { Card, Space, Table, Select,  DatePicker, Tabs, Button, Form, Checkbox, message, Tooltip, Dropdown, Menu } from 'antd';
 import { request, useRequest } from '@umijs/max';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { ModalForm, ProFormText } from '@ant-design/pro-components';
-const { Title, Text } = Typography;
+// const { Title, Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 const DataSheet = () => {
-  const [existingJobs, setExistingJobs] = useState<any[]>([]);
+  const [ setExistingJobs] = useState<any[]>([]);
   const [selectedJob, setSelectedJob] = useState(null); 
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('isoWeek'));
   const [jobType, setJobType] = useState<any>();
   const [jobAreaPid, setJobAreaPid] = useState<any>(null);
   const [jobAreas, setJobAreas] = useState<any[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState<any>(null); 
+  const [ setIsModalVisible] = useState(false);
+  const [ setSelectedSlot] = useState<any>(null); 
   const [form] = Form.useForm();
   const [jobData, setJobData] = useState<any[]>([]);
   const [jobStatuses, setJobStatuses] = useState([]);
   const [clickedSchedule, setClickedSchedule] = useState<any>(null);
   const [selectedJobLineId, setSelectedJobLineId] = useState(null);
   const [selectedScheduleJobId, setSelectedScheduleJobId] = useState(null);
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [slotJobs, setSlotJobs] = useState([]);
+  const [ setTableData] = useState<any[]>([]);
+  const [ setSlotJobs] = useState([]);
   // const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false); // State for AddNewJobModal visibility
   // Load job types on mount
   const { data: jobTypes, loading: jobTypesLoading } = useRequest(() =>
@@ -37,7 +37,7 @@ const DataSheet = () => {
     }
   };
   // Fetch job lines for the selected job area
-  const { data: jobLines, loading: jobLinesLoading } = useRequest(
+  const { data: jobLines,  } = useRequest(
     async () => {
       if (!jobAreaPid) return;
       return await request(`/job-areas/${jobAreaPid}`).then((res) => ({
@@ -52,6 +52,9 @@ const DataSheet = () => {
   const { data, loading } = useRequest(() =>
         request('/schedules').then((res) => ({ data: res?.original?.data })),
       );
+       useEffect(() => {
+    fetchJobData();  // Fetch job data when the component mounts or jobType changes
+  }, [jobType]); 
   // Transform the schedule data for the table display
   const transformData = (schedules: any) => {
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday'];
@@ -93,17 +96,17 @@ const DataSheet = () => {
 
     return transformedData;
   };
-  const handleJobLineSelection = (value) => {
-    setSelectedJobLineId(value); // Set job_line_id based on selection
-  };
+  // const handleJobLineSelection = (value) => {
+  //   setSelectedJobLineId(value); // Set job_line_id based on selection
+  // };
  // Handle Job Type Change (Dropdown)
   const handleJobTypeChange = (value: string) => {
     setJobType(value);
     fetchJobAreas(value); // Fetch the corresponding job areas
   };
-  useEffect(() => {
-    fetchJobData();  // Fetch job data when the component mounts or jobType changes
-  }, [jobType]);  // Add jobType to the dependency array to refetch if jobType changes
+  // useEffect(() => {
+  //   fetchJobData();  // Fetch job data when the component mounts or jobType changes
+  // }, [jobType]);  // Add jobType to the dependency array to refetch if jobType changes
   useEffect(() => {
     const fetchData = async () => {
       const res = await request('/schedules');
@@ -204,8 +207,8 @@ const DataSheet = () => {
         <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">Change Job Status</a>
       </Menu.Item> */}
        <Menu.Item key="2" onClick={() => {
-      setSelectedJobForStatusChange(selectedSlot); // assuming selectedSlot is the currently selected job
-      setChangeStatusModalVisible(true);
+      // setSelectedJobForStatusChange(selectedSlot); // assuming selectedSlot is the currently selected job
+      // setChangeStatusModalVisible(true);
     }}>
       Change Job Status
     </Menu.Item>
