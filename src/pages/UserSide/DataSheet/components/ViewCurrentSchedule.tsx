@@ -48,6 +48,7 @@ export const ViewCurrentScheduleModal = ({
     >
       {/* More details about the clicked schedule */}
       Content HERE
+      {clickedSchedule?.schedule_status_id}
     </ModalForm>
   );
 };

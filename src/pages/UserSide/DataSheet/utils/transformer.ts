@@ -31,6 +31,7 @@ export const transformData = (
           // add other required fields you need here i.e background colors
           bgColor: schedule?.status_background_color,
           textColor: schedule?.status_text_color,
+          schedule_status_id: schedule?.schedule_status_id,
         })),
       });
     });
