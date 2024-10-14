@@ -505,6 +505,7 @@ onFinish={async (values: any) => {
         job_line_id: job?.id, // Include the job_line_id
         schedule_job_id: selectedScheduleJobId,
         shift_id: getShiftId?.id,
+        // booked_qty:values.booked_qty,
         job_validation_required: values.job_validation_required ? 1 : 0,
         schedule_date: formattedScheduleDate,
         capacity: selectedJob?.capacity || values.capacity,
@@ -847,7 +848,7 @@ onVisibleChange={async (visible) => {
           format="YYYY-wo"
         />
         {/* <Button onClick={handleNextWeek}>Next Week</Button> */}
-        <Select
+        {/* <Select
           showSearch
           value={selectedJob}
           placeholder="Search Jobs"
@@ -861,7 +862,26 @@ onVisibleChange={async (visible) => {
               {job.jobNumber} 
             </Option>
           ))}
-        </Select>
+        </Select> */}
+        <Select
+  placeholder="Select Job Number"
+  onChange={handleJobNumberChange}
+  showSearch
+  filterOption={(input, option) =>
+    option.children.toLowerCase().includes(input.toLowerCase())
+  }
+>
+  {jobData && jobData.length > 0 ? (
+    jobData.map((job) => (
+      <Option key={job.key} value={job.key}>
+        {job.name}
+      </Option>
+    ))
+  ) : (
+    <Option disabled>No jobs available</Option>
+  )}
+</Select>
+
         <Select
           defaultValue={jobType}
           style={{ width: 200 }}
