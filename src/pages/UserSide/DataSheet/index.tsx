@@ -1,28 +1,34 @@
-import { Card, Space, Table, Select,  DatePicker, Tabs, Button, Form, Checkbox, message, Tooltip, Dropdown, Menu } from 'antd';
+import { Card, Space, Table, Row, Col, Select, Input, Typography, DatePicker, Tabs, Modal, Button, Form, Checkbox, message, Tooltip, Dropdown, Menu } from 'antd';
 import { request, useRequest } from '@umijs/max';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { ModalForm, ProFormText } from '@ant-design/pro-components';
-// const { Title, Text } = Typography;
+import { ModalForm, ProForm, ProFormText } from '@ant-design/pro-components';
+const { Title, Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
 const DataSheet = () => {
-  const [ setExistingJobs] = useState<any[]>([]);
+  const [existingJobs, setExistingJobs] = useState<any[]>([]);
   const [selectedJob, setSelectedJob] = useState(null); 
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('isoWeek'));
   const [jobType, setJobType] = useState<any>();
   const [jobAreaPid, setJobAreaPid] = useState<any>(null);
   const [jobAreas, setJobAreas] = useState<any[]>([]);
-  const [ setIsModalVisible] = useState(false);
-  const [ setSelectedSlot] = useState<any>(null); 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<any>(null); 
   const [form] = Form.useForm();
   const [jobData, setJobData] = useState<any[]>([]);
   const [jobStatuses, setJobStatuses] = useState([]);
   const [clickedSchedule, setClickedSchedule] = useState<any>(null);
   const [selectedJobLineId, setSelectedJobLineId] = useState(null);
   const [selectedScheduleJobId, setSelectedScheduleJobId] = useState(null);
-  const [ setTableData] = useState<any[]>([]);
-  const [ setSlotJobs] = useState([]);
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [slotJobs, setSlotJobs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedJobDetails, setSelectedJobDetails] = useState<any>(null);
+  const [isCustomModalVisible, setIsCustomModalVisible] = useState(false);
+  const [isAnotherModalVisible, setIsAnotherModalVisible] = useState(false);
+  const [isJobEditModalVisible, setIsJobEditModalVisible] = useState(false);
+  const [activeTabKey, setActiveTabKey] = useState<string>('1'); // Track the active tab
   // const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false); // State for AddNewJobModal visibility
   // Load job types on mount
   const { data: jobTypes, loading: jobTypesLoading } = useRequest(() =>
@@ -37,7 +43,7 @@ const DataSheet = () => {
     }
   };
   // Fetch job lines for the selected job area
-  const { data: jobLines,  } = useRequest(
+  const { data: jobLines, loading: jobLinesLoading } = useRequest(
     async () => {
       if (!jobAreaPid) return;
       return await request(`/job-areas/${jobAreaPid}`).then((res) => ({
@@ -52,9 +58,6 @@ const DataSheet = () => {
   const { data, loading } = useRequest(() =>
         request('/schedules').then((res) => ({ data: res?.original?.data })),
       );
-       useEffect(() => {
-    fetchJobData();  // Fetch job data when the component mounts or jobType changes
-  }, [jobType]); 
   // Transform the schedule data for the table display
   const transformData = (schedules: any) => {
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday'];
@@ -70,12 +73,7 @@ const DataSheet = () => {
                   );
         transformedData.push({
           key: `${day}-${shift}`,
-          day: (
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontWeight: 'bold' }}>{day}</div>
-              <div>{date.format('MMM DD YYYY')}</div>
-            </div>
-          ),
+          day: date,
           shift,
           jobs: schedulesForDayShift?.map((schedule: any) => ({
             id: schedule?.schedule_job_id,
@@ -96,17 +94,101 @@ const DataSheet = () => {
 
     return transformedData;
   };
-  // const handleJobLineSelection = (value) => {
-  //   setSelectedJobLineId(value); // Set job_line_id based on selection
-  // };
+ // Fetch job details and set the modal visibility
+ const fetchJobDetails = async (jobId: string) => {
+  try {
+    const response = await request(`/schedule-jobs/${jobId}`);
+    if (response.success) {
+      setSelectedJob(response.data); // Update state with the fetched job details
+      console.log("Job details:", response.data);
+      
+      // Set form fields with fetched job data
+      form.setFieldsValue({
+        job_number: response.data.job_number,
+        description: response.data.description,
+        capacity: response.data.capacity,
+        yield_qty: response.data.yield_qty,
+        produced_qty: response.data.produced_qty,
+        job_status: response.data.job_status,
+        validation: response.data.validation,
+      });
+
+      // Open the modal
+      setIsJobEditModalVisible(true)
+      setIsCustomModalVisible(true);
+    } else {
+      message.error("Failed to fetch job details");
+    }
+  } catch (error) {
+    console.error("Error fetching job details:", error);
+    message.error("Error fetching job details");
+  }
+};
+
+// Handle job selection
+const handleJobSelect = (value: string) => {
+  setSelectedJob(value); // Set selected job
+  fetchJobDetails(value); // Fetch job details
+};
+// const handleEditJobSubmit = async (values) => {
+//   try {
+//     const response = await request(`/schedule-jobs/${selectedJob.id}`, {
+//       method: 'PUT',
+//       data: values, // Send the updated job details
+//     });
+//     if (response.success) {
+//       message.success("Job updated successfully");
+//       setIsJobEditModalVisible(false); // Close the modal
+//       fetchJobData(); // Refresh job data
+//     } else {
+//       message.error("Failed to update job");
+//     }
+//   } catch (error) {
+//     console.error("Error updating job:", error);
+//     message.error("Error updating job");
+//   }
+// };
+const handleEditJobSubmit = async (values) => {
+  if (!selectedJob) return; // Ensure selectedJob is not null
+
+  try {
+    const response = await request(`/schedule-jobs/${selectedJob.id}`, {
+      method: 'PUT',
+      data: values, // Send the updated job details
+    });
+    if (response.success) {
+      message.success("Job updated successfully");
+      setIsJobEditModalVisible(false); // Close the modal
+      fetchJobData(); // Refresh job data
+    } else {
+      message.error("Failed to update job");
+    }
+  } catch (error) {
+    console.error("Error updating job:", error);
+    message.error("Error updating job");
+  }
+};
+
+  useEffect(() => {
+    fetchJobData(); // Fetch job data on mount
+  }, []);
+   // Handle the tab change
+   const handleTabChange = (key: string) => {
+    setActiveTabKey(key);
+    // Optionally, you can trigger different data fetches based on the tab here
+    console.log(`Active tab: ${key}`);
+  };
+  const handleJobLineSelection = (value) => {
+    setSelectedJobLineId(value); // Set job_line_id based on selection
+  };
  // Handle Job Type Change (Dropdown)
   const handleJobTypeChange = (value: string) => {
     setJobType(value);
     fetchJobAreas(value); // Fetch the corresponding job areas
   };
-  // useEffect(() => {
-  //   fetchJobData();  // Fetch job data when the component mounts or jobType changes
-  // }, [jobType]);  // Add jobType to the dependency array to refetch if jobType changes
+  useEffect(() => {
+    fetchJobData();  // Fetch job data when the component mounts or jobType changes
+  }, [jobType]);  // Add jobType to the dependency array to refetch if jobType changes
   useEffect(() => {
     const fetchData = async () => {
       const res = await request('/schedules');
@@ -139,6 +221,41 @@ const DataSheet = () => {
       message.error("Error fetching job data");
     }
   }; 
+  const showCustomModal = () => {
+  setIsCustomModalVisible(true);
+};
+
+// To close the modal
+const handleCustomModalCancel = () => {
+  setIsCustomModalVisible(false);
+};
+    // Handle search
+    const handleSearch = async (value: string) => {
+      setSearchTerm(value); // Update search term state
+      try {
+        const response = await request(`/schedule-jobs`, {
+          params: { search: value }, // Pass the search parameter
+        });
+        if (response.success) {
+          setJobData(
+            response.data.map((job) => ({
+              key: job.id,
+              jobNumber: job.job_number,
+              itemDetails: job.description,
+              capacity: job.capacity,
+              jobType: job.job_type_id,
+              jobArea: job.job_area,
+            }))
+          );
+        } else {
+          message.error("No jobs found");
+        }
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        message.error("Error fetching search results");
+      }
+    };
+  
   const fetchJobStatuses = async (jobTypeId) => {
     try {
       const response = await request(`/schedule-statuses/job-type/${jobTypeId}`);
@@ -164,48 +281,20 @@ const DataSheet = () => {
       fetchJobStatuses(job.jobType);
     }
   };
-  // const fetchSlotJobs = async (slot) => {
-  //   try {
-  //     const response = await request(`/schedules/${slot.key}/jobs`); // Replace with your actual endpoint
-  //     if (response.success) {
-  //       setSlotJobs(response.data); // Set the jobs for the selected slot
-  //     } else {
-  //       message.error('Failed to fetch jobs for the selected slot');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching slot jobs:', error);
-  //     message.error('Error fetching slot jobs');
-  //   }
-  // };
-  const fetchSlotJobs = async (job) => {
+  const fetchSlotJobs = async (params:any) => {
     try {
       // Construct the endpoint URL with the required parameters
-      const baseUrl = "/schedules"; // Replace with your actual base URL
-      const scheduleDate = job.scheduleDate; // Assuming slot contains scheduleDate
-      const shiftId = job.shiftId; // Assuming slot contains shiftId
-      const jobLineId = job.jobLineId; // Assuming slot contains jobLineId
-  
-      // Create the query string using template literals
-      const queryString = `?schedule_date=${encodeURIComponent(scheduleDate)}&shift=${encodeURIComponent(shiftId)}&job_line=${encodeURIComponent(jobLineId)}`;
-      const response = await request(`${baseUrl}${queryString}`); // Make the request with the constructed URL
-  
-      if (response.success) {
-        setSlotJobs(response.data); // Set the jobs for the selected slot
-      } else {
-        message.error('Failed to fetch jobs for the selected slot');
-      }
+     
+      const response = await request(`/schedules`,{params}); 
+      setSelectedJob(response?.original?.data);
+      console.log(response);
     } catch (error) {
       console.error('Error fetching slot jobs:', error);
       message.error('Error fetching slot jobs');
     }
   };
-  
   const menu = (
     <Menu>
-      {/* <Menu.Item key="1" onClick={() => handleAddJob(selectedSlot)}>Add New Schedule</Menu.Item> */}
-      {/* <Menu.Item key="2">
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">Change Job Status</a>
-      </Menu.Item> */}
        <Menu.Item key="2" onClick={() => {
       // setSelectedJobForStatusChange(selectedSlot); // assuming selectedSlot is the currently selected job
       // setChangeStatusModalVisible(true);
@@ -215,7 +304,6 @@ const DataSheet = () => {
       <Menu.Item key="3" disabled>
         <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">Reschedule (disabled)</a>
         </Menu.Item>
-      {/* Only show delete option if a slot is selected */}
     </Menu>
   );
   // Columns for the job line
@@ -226,7 +314,11 @@ const DataSheet = () => {
             render: (text: string, record: any, index: number) => {
               const rowSpan = index % 2 === 0 ? 2 : 0;
               return {
-                children: text,
+                children: <div style={{ textAlign: 'center' }}>
+                <div style={{ fontWeight: 'bold' }}>{moment(text).format('dddd')}</div>
+                <div>{moment(text).format('ll')}</div>
+              </div>,
+
                 props: {
                   rowSpan,
                 },
@@ -244,13 +336,16 @@ const DataSheet = () => {
               width: 300,
               render: (jobs: any, record: any) => {
                 const filteredJobs = jobs?.filter((j: any) => j?.job_line_id === job?.id);
+                const getShiftId = shiftsFromApi?.find(
+                  (shift: any) => shift?.name === record?.shift,
+                );
                 return (
                   <Space
                     direction="vertical"
                     size="middle"
                     style={{ width: '100%' }}
                   >
-                    <ModalForm
+                    <ModalForm 
                       title={
                         <>
                           You are viewing{' '}
@@ -260,7 +355,7 @@ const DataSheet = () => {
                         </>
                       }
                       submitter={{searchConfig:{
-                        submitText:'Add new Job Schedule',
+                        submitText:'Save Schedule',
                         resetText:'cancel',
                       }}}
                       trigger={
@@ -279,10 +374,11 @@ const DataSheet = () => {
                     display: 'block',
                   }}
                   onClick={() => {
+                    console.log('Selected job:', job?.id,getShiftId?.id,moment(record?.day).format('YYYY-MM-DD'));
                     // Handle adding a new job
                     setSelectedSlot(job);
                     setExistingJobs(record.jobs);
-                    fetchSlotJobs(record);
+                    fetchSlotJobs({schedule_date:moment(record?.day).format('YYYY-MM-DD'),shift:getShiftId?.id,job_line:job?.id});
                     setIsModalVisible(true);
                     // handleAddJobModalClick(record)
                   }}
@@ -304,21 +400,22 @@ const DataSheet = () => {
     borderRadius: 5,
     marginBottom: 8,
     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-    maxHeight:'80px',
-    padding: '2px 4px', // Reduce padding to minimize vertical space
-    minHeight: '30px', // You can set a min height to control the card height
+    maxHeight:'90px',
+    padding: '2px 4px', 
+    minHeight: '30px', 
   }}
   onClick={() => {
     setClickedSchedule(job);
-    setSelectedSlot(job); // Update the slot status when clicking
+    setSelectedSlot(job);
   }}
 >
   <div style={{ textAlign: 'center' }}>
-    {/* Schedule job number in bold and black */}
-    <div style={{ fontWeight: 'bold', color: '#000', fontSize: '12px' }}> {/* Reduce font size if needed */}
-      {job?.schedule_job_number}
-    </div>
-    
+  <Button
+          type="link"
+          style={{ fontWeight: 'bold', color: '#000', fontSize: '12px' }}
+        >
+          {job?.schedule_job_number} 
+        </Button>
     <Tooltip title={job.job_description} placement="top">
       <div style={{ 
           color: 'grey', 
@@ -326,7 +423,7 @@ const DataSheet = () => {
           overflow: 'hidden', 
           textOverflow: 'ellipsis', 
           maxWidth: '150px', 
-          fontSize: '12px' // Reduce font size to decrease vertical height
+          fontSize: '12px' 
       }}>
         {job.job_description.split(' ').slice(0, 3).join(' ') + (job.job_description.split(' ').length > 3 ? '...' : '')}
       </div>
@@ -340,6 +437,7 @@ const DataSheet = () => {
 
       {/* More Details Button */}
       <Button
+        onClick={() => fetchJobDetails(job.id)}
         type="link"
         style={{
           color: '#ff5733',
@@ -395,13 +493,8 @@ const DataSheet = () => {
     ))}
 </div>
 }
-// onFinish={async(values:any)=>{}}
 onFinish={async (values: any) => {
   console.log(values);
-
-  const getShiftId = shiftsFromApi?.find(
-    (shift: any) => shift?.name === record?.shift,
-  );
   // Do your POST here for Adding a new job
   const formattedScheduleDate = moment(values.schedule_date).format('YYYY-MM-DD');
   try {
@@ -409,11 +502,10 @@ onFinish={async (values: any) => {
       method: 'POST',
       data: {
         ...values,
-        job_line_id: selectedJobLineId, // Include the job_line_id
+        job_line_id: job?.id, // Include the job_line_id
         schedule_job_id: selectedScheduleJobId,
         shift_id: getShiftId?.id,
         job_validation_required: values.job_validation_required ? 1 : 0,
-        // schedule_date: record?.day,
         schedule_date: formattedScheduleDate,
         capacity: selectedJob?.capacity || values.capacity,
       },
@@ -428,6 +520,7 @@ onFinish={async (values: any) => {
     const updatedSchedules = await request('/schedules'); // Refetch the schedules data
     const transformedSchedules = transformData(updatedSchedules?.data);
     setJobData(updatedSchedules?.data);
+    setTableData(transformedSchedules)
     data(transformedSchedules);
     // you have success MESSAGE here and REFRESH the schedules on the table i.e
     message.success('Job added successfully');
@@ -452,58 +545,119 @@ onVisibleChange={async (visible) => {
 >
 {/* Replace here with content for the form i.e Job Number, booked qty, ...rest */}
 {/* <ProFormText name="name" label="Job Number" /> */}
-<ProFormText name="job_number" label="Job Number">
-<Select
-placeholder="Select Job Number"
-onChange={handleJobNumberChange}
-showSearch
-filterOption={(input, option) =>
-option.children
-.toLowerCase()
-.includes(input.toLowerCase())
-}
->
-{jobData?.length > 0 ? (
-jobData.map((job) => (
-<Option key={job.key} value={job.jobNumber}>
-{job.jobNumber} - {job.itemDetails}
-</Option>
-))
-) : (
-<p>No jobs available</p>
-)}
-</Select>
-</ProFormText>
-<ProFormText name="booked_qty" label="Booked Quantity" />
-{/* <ProFormText name="capacity" label="Capacity" /> */}
-<ProFormText 
-name="capacity" 
-label="Capacity" 
-value={selectedJob?.capacity} // Ensure it's being populated correctly
-disabled={true} // Mark the field as read-only
-/>
-<ProFormText name="comments" label="Comments" />
+<ProForm>
+      <Row gutter={24}>
+          <Col span={8}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+    {existingJobs?.map((job) => (
+      <Button 
+        key={job?.id}
+        type="default"
+        style={{ 
+          marginBottom: '10px', 
+          width: '150px', 
+          backgroundColor: 'white', // White background
+          color: 'black',            // Black text
+          fontWeight: 'bold',        // Bold text
+          // border: '1px solid #d9d9d9', // Border for a clean look
+        }}
+        onClick={() => fetchJobDetails(job?.id)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#d9d9d9'; // Grey background on hover
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'white'; // Reset to white on leave
+        }}
+      >
+        Job #: {job?.schedule_job_number}
+      </Button>
+    ))}
+  </div>
+</Col>
+        {/* Form fields on the right side */}
+        <Col span={16}>
+        {/* <Col span={12}> */}
+            {/* Tabs Section */}
+            <Tabs activeKey={activeTabKey} onChange={handleTabChange}>
+              <Tabs.TabPane tab="Other Schedules" key="1">
+                {/* Data for Other Schedules */}
+                {selectedSlot?.other_schedules?.map((schedule: any) => (
+                  <Card key={schedule.id}>
+                    <p>{schedule.name}</p>
+                  </Card>
+                ))}
+              </Tabs.TabPane>
+              
+              <Tabs.TabPane tab="Bulk/Pack Jobs" key="2">
+                {/* Data for Bulk/Pack Jobs */}
+                <p>Bulk or Pack jobs data here...</p>
+              </Tabs.TabPane>
+              
+              <Tabs.TabPane tab="Logs" key="3">
+                {/* Data for Logs */}
+                <p>Logs data here...</p>
+              </Tabs.TabPane>
 
-<Form.Item name="schedule_status_id" label="Job Status">
-<Select>
-{jobStatuses.map(status => (
-<Option key={status.id} value={status.value}>
-{status.name}
-</Option>
-))}
-</Select>
-</Form.Item>
-{/* <Checkbox name="need_validation" label="Need Validation" /> */}
-<Form.Item
-name="job_validation_required"
-valuePropName="checked" // This maps the checked state to the form value
->
-<Checkbox>Need Validation</Checkbox>
-</Form.Item>
+              <Tabs.TabPane tab="Comments" key="4">
+                {/* Data for Comments */}
+                {selectedSlot?.comments?.map((comment: any) => (
+                  <Card key={comment.id}>
+                    <p>{comment.text}</p>
+                  </Card>
+                ))}
+              </Tabs.TabPane>
+            </Tabs>
+          {/* </Col> */}
+          <ProFormText name="job_number" label="Job Number">
+            <Select
+              placeholder="Select Job Number"
+              onChange={handleJobNumberChange}
+              showSearch
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+            >
+              {jobData?.length > 0 ? (
+                jobData.map((job) => (
+                  <Option key={job.key} value={job.jobNumber}>
+                    {job.jobNumber} - {job.itemDetails}
+                  </Option>
+                ))
+              ) : (
+                <p>No jobs available</p>
+              )}
+            </Select>
+          </ProFormText>
 
-                    
-                      {/* More details about the clicked schedule */}
-                      Content HERE
+          <ProFormText name="booked_qty" label="Booked Quantity" />
+          <ProFormText
+            name="capacity"
+            label="Capacity"
+            value={selectedJob?.capacity}
+            disabled={true}
+          />
+          <ProFormText name="comments" label="Comments" />
+
+          <Form.Item name="schedule_status_id" label="Job Status">
+            <Select>
+              {jobStatuses.map((status) => (
+                <Option key={status.id} value={status.value}>
+                  {status.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="job_validation_required"
+            valuePropName="checked"
+          >
+            <Checkbox>Need Validation</Checkbox>
+          </Form.Item>
+        </Col>
+      </Row>
+    </ProForm>
+                   
                     </ModalForm>
                     {jobs?.filter((j: any) => j?.job_line_id === job?.id)?.length <=
                       3 && (
@@ -540,9 +694,9 @@ valuePropName="checked" // This maps the checked state to the form value
                         onFinish={async (values: any) => {
                           console.log(values);
     
-                          const getShiftId = shiftsFromApi?.find(
-                            (shift: any) => shift?.name === record?.shift,
-                          );
+                          // const getShiftId = shiftsFromApi?.find(
+                          //   (shift: any) => shift?.name === record?.shift,
+                          // );
                           // // you have the day here with the standard format
                           console.log(moment(record?.day).format('YYYY-MM-DD'));
     
@@ -671,19 +825,43 @@ valuePropName="checked" // This maps the checked state to the form value
   };
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
+       {/* Page Title and Subtitle */}
+       <div style={{ marginBottom: 16 }}>
+        <h1 style={{ fontWeight: 'bold', color: 'black', margin: 0 }}>TRT Manufacturing Planner</h1>
+        <h2 style={{ fontSize: '14px', color: '#666', margin: '4px 0 0 0' }}>
+          Hi System Administrator, welcome back! Here's your planner summary.
+        </h2>
+      </div>
+      <Space style={{ marginBottom: 16,display:'flex',justifyContent:'space-between',width:'100%' }}>
+        <div style={{display:'flex',alignItems:'center'}}>
         <Button onClick={handlePreviousWeek}>Previous Week</Button>
-        <DatePicker
+       
+        </div>
+      {/* Dropdown for Job Type Selection */}
+      <Space style={{ marginBottom: 16 }}>
+      <DatePicker
           disabled
           picker="week"
           value={currentWeek}
           onChange={handleWeekChange}
           format="YYYY-wo"
         />
-        <Button onClick={handleNextWeek}>Next Week</Button>
-      </Space>
-      {/* Dropdown for Job Type Selection */}
-      <Space style={{ marginBottom: 16 }}>
+        {/* <Button onClick={handleNextWeek}>Next Week</Button> */}
+        <Select
+          showSearch
+          value={selectedJob}
+          placeholder="Search Jobs"
+          style={{ width: 200 }}
+          onSearch={handleSearch} // Trigger search when typing
+          onSelect={handleJobSelect} // Set selected job
+          filterOption={false} // Disable built-in filter since we're fetching from API
+        >
+          {jobData.map((job) => (
+            <Option key={job.key} value={job.key}>
+              {job.jobNumber} 
+            </Option>
+          ))}
+        </Select>
         <Select
           defaultValue={jobType}
           style={{ width: 200 }}
@@ -698,6 +876,9 @@ valuePropName="checked" // This maps the checked state to the form value
           ))}
         </Select>
       </Space>
+      <Button onClick={handleNextWeek}>Next Week</Button>
+      </Space>
+      {/* </div> */}
       {/* Tabs for Job Areas */}
       <Tabs
         defaultActiveKey={jobAreaPid?.toString()}
@@ -729,6 +910,101 @@ valuePropName="checked" // This maps the checked state to the form value
           </TabPane>
         ))}
       </Tabs>
+      {/* job edit modal */}
+      <ModalForm
+        title="Edit Job Details"
+        visible={isJobEditModalVisible}
+        form={form}
+        footer={null}
+        onVisibleChange={setIsCustomModalVisible}
+        onCancel={() => setIsJobEditModalVisible(false)}
+        onFinish={handleEditJobSubmit}
+      >
+        <ProFormText
+          name="job_number"
+          label="Job Number"
+          readonly
+        />
+        <ProFormText
+          name="description"
+          label="Description"
+          readonly
+        />
+        <ProFormText
+          name="capacity"
+          label="Capacity"
+        />
+        <ProFormText
+          name="produced_qty"
+          label="Produced Quantity"
+        />
+        <ProFormText
+          name="yield_qty"
+          label="Yield Quantity"
+        />
+        <ProFormText
+          name="job_status"
+          label="Job Status"
+        />
+             <Form.Item name="schedule_status_id" label="Job Status">
+    <Select>
+        {jobStatuses.map(status => (
+            <Option key={status.id} value={status.value}>
+                {status.name}
+            </Option>
+        ))}
+    </Select>
+</Form.Item>
+        <ProFormText
+          name="validation"
+          label="Need Validation"
+          valuePropName="checked"
+        />
+      </ModalForm>
+      <ModalForm
+        title="Job Details"
+        visible={isCustomModalVisible}
+        form={form}
+        onVisibleChange={setIsCustomModalVisible}
+        onCancel={() => setIsCustomModalVisible(false)}
+        onFinish={async (values) => {
+          console.log("Submitted form values:", values);
+          // Handle form submission
+          return true;
+        }}
+      >
+        <ProFormText
+          name="job_number"
+          label="Job Number"
+          readonly
+        />
+        <ProFormText
+          name="description"
+          label="Description"
+          readonly
+        />
+        <ProFormText
+          name="capacity"
+          label="Capacity"
+        />
+        <ProFormText
+          name="produced_qty"
+          label="Produced Quantity"
+        />
+        <ProFormText
+          name="yield_qty"
+          label="Yield Quantity"
+        />
+        <ProFormText
+          name="job_status"
+          label="Job Status"
+        />
+        <ProFormText
+          name="validation"
+          label="Need Validation"
+          valuePropName="checked"
+        />
+      </ModalForm>
     </div>
   );
 };

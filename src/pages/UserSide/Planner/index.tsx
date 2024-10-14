@@ -1,1556 +1,1011 @@
-  import { DownloadOutlined, PlusOutlined } from '@ant-design/icons';
-  import { PageHeader, ProCard, ProTable } from '@ant-design/pro-components';
-  import { request, useRequest } from '@umijs/max';
-  import { Button,Card,Col,DatePicker,Divider,Dropdown,Empty, Flex, Menu,message, Modal,Row, Select, Space, Spin,Tabs,Tooltip,} from 'antd';
-  import moment from 'moment';
-  import React, { useState } from 'react';
-  import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-  import AddJobModal from './AddJobModal';
-import JobDetailsModal from './JobDetailsModal';
-import ChangeStatusModal from './ChangeStatusModal';
-  // import { request } from '@umijs/max';
-  const { RangePicker } = DatePicker;
-  const ManufacturingPlanner = () => {
-    const [isJobDetailsModalVisible, setJobDetailsModalVisible] = useState(false);
-    const [selectedJobData, setSelectedJobData] = useState(null);
-    const [isChangeStatusModalVisible, setChangeStatusModalVisible] = useState(false);
-    const [selectedJobForStatusChange, setSelectedJobForStatusChange] = useState(null);  
-    const [selectedScheduleId, setSelectedScheduleId] = useState(null);
-    const [ setIsModalVisible] = useState(false);
-    const [jobs, setJobs] = useState([]);
-    const [draggedJob, setDraggedJob] = useState(null);
-    const [scheduledJobs, setScheduledJobs] = useState<any[]>([]);
-      // Handle status change
-  const handleChangeJobStatus = async (jobId, newStatus) => {
-    try {
-      await request(`/schedules/${jobId}`, {
-        method: 'PUT',
-        body: JSON.stringify({ schedule_status_id: newStatus }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      message.success('Job status updated successfully.');
-      refreshSchedules(); // Refresh the job data after updating status
-    } catch (error) {
-      console.error('Error updating job status:', error);
-      message.error('Failed to update job status. Please try again.');
+import { Card, Space, Table, Row, Col, Select, Input, Typography, DatePicker, Tabs, Modal, Button, Form, Checkbox, message, Tooltip, Dropdown, Menu } from 'antd';
+import { request, useRequest } from '@umijs/max';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import { ModalForm, ProForm, ProFormText } from '@ant-design/pro-components';
+const { Title, Text } = Typography;
+const { Option } = Select;
+const { TabPane } = Tabs;
+const ManufacturingPlanner = () => {
+  const [existingJobs, setExistingJobs] = useState<any[]>([]);
+  const [selectedJob, setSelectedJob] = useState(null); 
+  const [currentWeek, setCurrentWeek] = useState(moment().startOf('isoWeek'));
+  const [jobType, setJobType] = useState<any>();
+  const [jobAreaPid, setJobAreaPid] = useState<any>(null);
+  const [jobAreas, setJobAreas] = useState<any[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<any>(null); 
+  const [form] = Form.useForm();
+  const [jobData, setJobData] = useState<any[]>([]);
+  const [jobStatuses, setJobStatuses] = useState([]);
+  const [clickedSchedule, setClickedSchedule] = useState<any>(null);
+  const [selectedJobLineId, setSelectedJobLineId] = useState(null);
+  const [selectedScheduleJobId, setSelectedScheduleJobId] = useState(null);
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [slotJobs, setSlotJobs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedJobDetails, setSelectedJobDetails] = useState<any>(null);
+  const [isCustomModalVisible, setIsCustomModalVisible] = useState(false);
+  const [isAnotherModalVisible, setIsAnotherModalVisible] = useState(false);
+  const [isJobEditModalVisible, setIsJobEditModalVisible] = useState(false);
+  const [activeTabKey, setActiveTabKey] = useState<string>('1'); // Track the active tab
+  // const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false); // State for AddNewJobModal visibility
+  // Load job types on mount
+  const { data: jobTypes, loading: jobTypesLoading } = useRequest(() =>
+    request('/job-types').then((res) => ({ data: res?.data?.data }))
+  );
+  // Fetch job areas when the job type is changed
+  const fetchJobAreas = async (jobTypeId: string) => {
+    const res = await request(`/job-types/${jobTypeId}`);
+    if (res?.data?.job_areas) {
+      setJobAreas(res?.data?.job_areas);
+      setJobAreaPid(res?.data?.job_areas[0]?.id);  
     }
   };
-    const { data: schedules = [], refresh:refreshSchedules } = useRequest(() =>
-      request('/schedules').then((res) => ({ data: res?.original?.data })),
-    );
-    const { data: shifts = [] } = useRequest(() =>
-      request('/shifts').then((res) => ({ data: res?.data?.data })),
-    );
-    // Ensure that schedules and shifts are defined and are arrays
-    if (!Array.isArray(schedules) || !Array.isArray(shifts)) {
-      console.error('Schedules or shifts are not defined or not arrays');
-      return; // Early return or handle as necessary
-    }
-    // Safely find shift IDs
-    const dayShiftId = shifts.find((shift: any) => shift?.name === 'Day Shift')?.id;
-    const nightShiftId = shifts.find((shift: any) => shift?.name === 'Night Shift')?.id;
-    // Filter schedules safely
-    const dayShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === dayShiftId);
-    const nightShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === nightShiftId);
-    // Debug logging 
-    const handleAddJob = async  (newJob: any) => {
-      // Log the incoming new job data
-      console.log('New Job Data:', newJob);
-      // Create a new object with the relevant information
-      const addedJob = {
-        id: newJob.id,
-        schedule_job_id: newJob.schedule_job_id,
-        job_line_id: newJob.job_line_id,
-        shift_id: newJob.shift_id,
-        schedule_date: newJob.schedule_date,
-        capacity: newJob.capacity,
-        booked_qty: newJob.booked_qty,
-        comments: newJob.comments,
-        schedule_status_id: newJob.schedule_status_id,
-      };
-      setScheduledJobs((prevJobs) => [...prevJobs, newJob]);
-      try {;
-      setModalVisible(true);
-        refreshSchedules();
-        console.log('Added Job Object:', addedJob);
-      } catch (error) {
-        console.error('Error adding job:', error);
-      }
-    };
-    const handleModalClose = () => {
-      setModalVisible(false); // Close the modal
-    }; 
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [selectedSlot, setSelectedSlot] = useState(null);
-    const [dateRange, setDateRange] = useState<any>([
-      moment().startOf('day'),
-      moment().endOf('day'),
-    ]);
-    console.log(selectedSlot);
-    // Generate the days of the current week (Monday to Saturday)
-    const getDaysOfWeek = () => {
-      const startOfWeek = moment().startOf('week').add(1, 'day');
-      const days = [];
-      for (let i = 0; i < 6; i++) {
-        days.push({
-          day: startOfWeek.clone().add(i, 'days').format('dddd'),
-          date: startOfWeek.clone().add(i, 'days').format('YYYY-MM-DD'),
+  // Fetch job lines for the selected job area
+  const { data: jobLines, loading: jobLinesLoading } = useRequest(
+    async () => {
+      if (!jobAreaPid) return;
+      return await request(`/job-areas/${jobAreaPid}`).then((res) => ({
+        data: res?.data?.job_lines,
+      }));
+    },
+    { refreshDeps: [jobAreaPid] }
+  );
+  const { data: shiftsFromApi } = useRequest(() =>
+        request('/shifts').then((res) => ({ data: res?.data?.data })),
+      );
+  const { data, loading } = useRequest(() =>
+        request('/schedules').then((res) => ({ data: res?.original?.data })),
+      );
+  // Transform the schedule data for the table display
+  const transformData = (schedules: any) => {
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday'];
+    const shifts = Array.isArray(shiftsFromApi) ? shiftsFromApi?.map((shift) => shift?.name) : [];
+    const transformedData: any[] = [];
+    daysOfWeek.forEach((day, dayIndex) => {
+            shifts?.forEach((shift) => {
+              const date = moment(currentWeek).add(dayIndex, 'days');
+        const schedulesForDayShift = schedules?.filter(
+                    (s: any) =>
+                      moment(s?.schedule_date).isSame(date, 'day') &&
+                      s.shift_name === shift,
+                  );
+        transformedData.push({
+          key: `${day}-${shift}`,
+          day: date,
+          shift,
+          jobs: schedulesForDayShift?.map((schedule: any) => ({
+            id: schedule?.schedule_job_id,
+            // job_count: schedule?.booked_qty,
+            job_description: schedule?.job_description,
+            booked_qty: schedule?.booked_qty,
+            schedule_job_number: schedule?.schedule_job_number,
+            schedule_status_name: schedule?.schedule_status_name,
+            job_line_id: schedule?.job_line_id,
+            job_validation_required: schedule.job_validation_required ? 1 : 0 , 
+            // need_validation: schedule.need_validation,
+            bgColor: schedule?.status_background_color,
+            textColor: schedule?.status_text_color,
+          })),
         });
-      }
-      return days;
-    };
-    const handleSlotClick = (
-      record: any,
-      hour: any,
-      lineId: string,
-      shiftId: string,
-      job: any,
-    ) => {
-      console.log(job)
-      setSelectedSlot({
-        schedule_date: record.date, // Store the selected day (date)
-        hour, // Store the time (hour)
-        job_line_id: lineId?.id, // Store the job line ID
-        job_line_name:lineId?.name,
-        shift_id: shiftId, // Store the shift ID
-        ...(job ? {
-          schedule_job_id: job.schedule_job_id,
-          capacity: job.capacity,
-          booked_qty: job.booked_qty,
-          comments: job.comments,
-          schedule_status_id: job.schedule_status_id,
-        } : {}), // Only add these if job is defined
       });
-     
-      setModalVisible(true);
-      // Move the console logs here
-      console.log('Job Line ID:', lineId);
-      console.log('Shift ID:', shiftId);
-      console.log('Slot clicked:', { record, hour, lineId, shiftId });
-      console.log('Selected Slot:', {
-        schedule_date: record.date,
-        hour,
-        job_line_id: lineId,
-        shift_id: shiftId,
-        ...(job ? {
-          schedule_job_id: job.schedule_job_id,
-          capacity: job.capacity,
-          booked_qty: job.booked_qty,
-          comments: job.comments,
-          schedule_status_id: job.schedule_status_id,
-        } : {}),
+    });
+
+    return transformedData;
+  };
+ // Fetch job details and set the modal visibility
+ const fetchJobDetails = async (jobId: string) => {
+  try {
+    const response = await request(`/schedule-jobs/${jobId}`);
+    if (response.success) {
+      setSelectedJob(response.data); // Update state with the fetched job details
+      console.log("Job details:", response.data);
+      
+      // Set form fields with fetched job data
+      form.setFieldsValue({
+        job_number: response.data.job_number,
+        description: response.data.description,
+        capacity: response.data.capacity,
+        yield_qty: response.data.yield_qty,
+        produced_qty: response.data.produced_qty,
+        job_status: response.data.job_status,
+        validation: response.data.validation,
       });
+
+      // Open the modal
+      setIsJobEditModalVisible(true)
+      setIsCustomModalVisible(true);
+    } else {
+      message.error("Failed to fetch job details");
+    }
+  } catch (error) {
+    console.error("Error fetching job details:", error);
+    message.error("Error fetching job details");
+  }
+};
+
+// Handle job selection
+const handleJobSelect = (value: string) => {
+  setSelectedJob(value); // Set selected job
+  fetchJobDetails(value); // Fetch job details
+};
+// const handleEditJobSubmit = async (values) => {
+//   try {
+//     const response = await request(`/schedule-jobs/${selectedJob.id}`, {
+//       method: 'PUT',
+//       data: values, // Send the updated job details
+//     });
+//     if (response.success) {
+//       message.success("Job updated successfully");
+//       setIsJobEditModalVisible(false); // Close the modal
+//       fetchJobData(); // Refresh job data
+//     } else {
+//       message.error("Failed to update job");
+//     }
+//   } catch (error) {
+//     console.error("Error updating job:", error);
+//     message.error("Error updating job");
+//   }
+// };
+const handleEditJobSubmit = async (values) => {
+  if (!selectedJob) return; // Ensure selectedJob is not null
+
+  try {
+    const response = await request(`/schedule-jobs/${selectedJob.id}`, {
+      method: 'PUT',
+      data: values, // Send the updated job details
+    });
+    if (response.success) {
+      message.success("Job updated successfully");
+      setIsJobEditModalVisible(false); // Close the modal
+      fetchJobData(); // Refresh job data
+    } else {
+      message.error("Failed to update job");
+    }
+  } catch (error) {
+    console.error("Error updating job:", error);
+    message.error("Error updating job");
+  }
+};
+
+  useEffect(() => {
+    fetchJobData(); // Fetch job data on mount
+  }, []);
+   // Handle the tab change
+   const handleTabChange = (key: string) => {
+    setActiveTabKey(key);
+    // Optionally, you can trigger different data fetches based on the tab here
+    console.log(`Active tab: ${key}`);
+  };
+  const handleJobLineSelection = (value) => {
+    setSelectedJobLineId(value); // Set job_line_id based on selection
+  };
+ // Handle Job Type Change (Dropdown)
+  const handleJobTypeChange = (value: string) => {
+    setJobType(value);
+    fetchJobAreas(value); // Fetch the corresponding job areas
+  };
+  useEffect(() => {
+    fetchJobData();  // Fetch job data when the component mounts or jobType changes
+  }, [jobType]);  // Add jobType to the dependency array to refetch if jobType changes
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await request('/schedules');
+      const transformedSchedules = transformData(res?.data);
+      setTableData(transformedSchedules)
+      // setData(transformedSchedules);  // Update transformed data
     };
-    console.log(selectedSlot)
-    // Define the columns for the table (days + job lines + shifts)
-    const daysOfWeek = getDaysOfWeek();
-    const { data: jobTypes } = useRequest(() =>
-      request('/job-types').then((res) => ({ data: res?.data?.data })),
-    );
-    const [jobType, setJobType] = useState<any>();
-    const [jobAreaPid, setJobAreaPid] = React.useState<any>();
-    const { data: jobAreas, loading: jobAreasLoading } = useRequest(
-      async () => {
-        if (!jobType) return;
-        const resp: any = await request(`/job-types/${jobType}`).then((res) => ({
-          data: res?.data?.job_areas,
-        }));
-        console.log(resp?.data?.[0]?.id);
-        setJobAreaPid(resp?.data?.[0]?.id);
-        return resp;
-      },
-      { refreshDeps: [jobType] },
-    );
-    const { data: jobLines, loading: jobLinesLoading } = useRequest(
-      async () => {
-        if (!jobAreaPid) return;
-        return await request(`/job-areas/${jobAreaPid}`).then(
-          (res) => ({
-            data: res?.data?.job_lines,
-          }),
+    fetchData();
+  }, [currentWeek, data]);  // Add currentWeek dependency to refetch data when the week changes
+  const fetchJobData = async () => {
+    try {
+      const response = await request("/schedule-jobs");
+      console.log("Job Data Response:", response); 
+      if (response.success) {
+        setJobData(
+          response.data.map((job) => ({
+            key: job.id,
+            jobNumber: job.job_number,
+            itemDetails: job.description,
+            capacity: job.capacity,
+            jobType: job.job_type_id,
+            jobArea: job.job_area,
+          }))
         );
-      },
-      { refreshDeps: [jobAreaPid] },
-    );
-    const handleDragStart = (e, job) => {
-      setDraggedJob(job);
-      e.dataTransfer.setData("text", job); // Set the data that will be transferred during the drag
-    };
-    const handleDragOver = (e) => {
-      e.preventDefault(); // Allow the drop
-    };
-    const handleDrop = (e) => {
-      e.preventDefault();
-      // Handle what happens after the drop (e.g., you can display the dragged job on the card)
-      console.log(`Dropped: ${draggedJob}`);
-      // You can also use this space to update some state, or display in the card:
-      alert(`Job dropped: ${draggedJob}`);
-    };
-  const onDragEnd = async (result: any) => {
-    if (!result.destination) {
-        return; // Dropped outside the list
-    }
-    const { source, destination } = result;
-    // Check if the indices are out of bounds
-    if (
-        source.index < 0 ||
-        source.index >= scheduledJobs.length ||
-        destination.index < 0 ||
-        destination.index >= scheduledJobs.length
-    ) {
-        console.error("Invalid indices for drag and drop");
-        return; // Early return if indices are out of bounds
-    }
-    // Handle moving jobs in the scheduledJobs state
-    const updatedJobs = Array.from(scheduledJobs);
-    const [movedJob] = updatedJobs.splice(source.index, 1);
-    // Check if movedJob is defined
-    if (!movedJob) {
-        console.error("Moved job is undefined");
-        return; // Early return if movedJob is not found
-    }
-    movedJob.schedule_date = destination.droppableId.split('-')[0]; // Update schedule date
-    updatedJobs.splice(destination.index, 0, movedJob);
-    setScheduledJobs(updatedJobs);
-    // Make the API request to update the moved job
-    try {
-        const response = await request(`/schedules/${movedJob.id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(movedJob),
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        await response.json(); // Await the response to ensure it's processed
-        console.log('Updated Job Object:', movedJob);
-    } catch (error) {
-        console.error('Error updating job:', error);
-    }
-  };
-  const handleCloseModal = () => {
-    setModalVisible(false);
-    setSelectedSlot(null); // Reset selected slot on close
-  };
-   // The delete function will now delete based on the selectedSlot
-   const handleDeleteSchedule = async () => {
-    console.log('Delete Schedule initiated with selectedSlot:', selectedSlot);
-
-    if (!selectedSlot || !selectedSlot.schedule_job_id) {
-      message.error('No schedule selected for deletion.');
-      console.error('No schedule selected for deletion.');
-      return;
-    }
-    try {
-      const confirm = window.confirm('Are you sure you want to delete this schedule?');
-      if (confirm) {
-        await request(`/schedules/${selectedSlot.schedule_job_id}`, {
-          method: 'DELETE',
-        });
-        message.success('Schedule deleted successfully.');
-        console.log('Schedule deleted successfully for job ID:', selectedSlot.schedule_job_id);
-        // Refresh the schedule data
-        refreshSchedules();
-        handleModalClose(); // Close modal after deletion
+      } else {
+        message.error("Failed to fetch job data");
       }
     } catch (error) {
-      message.error('Failed to delete schedule. Please try again.');
-      console.error('Delete Schedule Error:', error);
+      console.error("Error fetching job data:", error);
+      message.error("Error fetching job data");
+    }
+  }; 
+  const showCustomModal = () => {
+  setIsCustomModalVisible(true);
+};
+
+// To close the modal
+const handleCustomModalCancel = () => {
+  setIsCustomModalVisible(false);
+};
+    // Handle search
+    const handleSearch = async (value: string) => {
+      setSearchTerm(value); // Update search term state
+      try {
+        const response = await request(`/schedule-jobs`, {
+          params: { search: value }, // Pass the search parameter
+        });
+        if (response.success) {
+          setJobData(
+            response.data.map((job) => ({
+              key: job.id,
+              jobNumber: job.job_number,
+              itemDetails: job.description,
+              capacity: job.capacity,
+              jobType: job.job_type_id,
+              jobArea: job.job_area,
+            }))
+          );
+        } else {
+          message.error("No jobs found");
+        }
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+        message.error("Error fetching search results");
+      }
+    };
+  
+  const fetchJobStatuses = async (jobTypeId) => {
+    try {
+      const response = await request(`/schedule-statuses/job-type/${jobTypeId}`);
+      if (response.success) {
+        setJobStatuses(response.data);
+      } else {
+        message.error("Failed to fetch job statuses");
+      }
+    } catch (error) {
+      console.error("Error fetching job statuses:", error);
+      message.error("Error fetching job statuses");
+    }
+  };
+  const handleJobNumberChange = (value) => {
+    const job = jobData.find((job) => job.jobNumber === value);
+    setSelectedJob(job);
+    if (job) {
+      form.setFieldsValue({
+        // capacity: job.capacity,
+        capacity: selectedJob?.capacity || 'default capacity value', 
+      });
+      setSelectedScheduleJobId(job.key);
+      fetchJobStatuses(job.jobType);
+    }
+  };
+  const fetchSlotJobs = async (params:any) => {
+    try {
+      // Construct the endpoint URL with the required parameters
+     
+      const response = await request(`/schedules`,{params}); 
+      setSelectedJob(response?.original?.data);
+      console.log(response);
+    } catch (error) {
+      console.error('Error fetching slot jobs:', error);
+      message.error('Error fetching slot jobs');
     }
   };
   const menu = (
     <Menu>
-      {/* <Menu.Item key="1" onClick={() => handleAddJob(selectedSlot)}>Add New Schedule</Menu.Item> */}
-      {/* <Menu.Item key="2">
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">Change Job Status</a>
-      </Menu.Item> */}
        <Menu.Item key="2" onClick={() => {
-      setSelectedJobForStatusChange(selectedSlot); // assuming selectedSlot is the currently selected job
-      setChangeStatusModalVisible(true);
+      // setSelectedJobForStatusChange(selectedSlot); // assuming selectedSlot is the currently selected job
+      // setChangeStatusModalVisible(true);
     }}>
       Change Job Status
     </Menu.Item>
       <Menu.Item key="3" disabled>
         <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">Reschedule (disabled)</a>
         </Menu.Item>
-      {/* Only show delete option if a slot is selected */}
     </Menu>
   );
-    const renderJobSlot = (
-      record: any,
-      hour: any,
-      lineId: string,
-      shiftId: string,
-      scheduledJobs: any[],
-      line:any,
-    ) => {
-      // console.log(line)
-      const scheduledJobsForHour = scheduledJobs.filter(
-        (job: any) =>
-          job?.job_line_id === lineId?.id &&
-          job?.shift_id === shiftId &&
-          moment(job?.schedule_date).format('YYYY-MM-DD') === record?.date,
-        // job.schedule_time === hour,
-      );
-  // Determine if there are any jobs scheduled for this slot
-  const hasScheduledJobs = scheduledJobsForHour.length > 0;
-      return (
-  <Droppable droppableId={`${record.day}-${hour}`}>
-  {(provided) => (
-    <div
-      {...provided.droppableProps}
-      ref={provided.innerRef}
-      style={{
-        padding: '10px',
-        borderRadius: '5px',
-        cursor: 'pointer',
-        textAlign: 'center',
-        backgroundColor: hasScheduledJobs ? '#FFFFFF' : '#F8F4FE',
-        position: 'relative',
-        minHeight: '100px',
-      }}
-      onClick={() => !hasScheduledJobs && handleSlotClick(record, hour, lineId, shiftId)}
-    >
-      {hasScheduledJobs && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px' }}>
+  // Columns for the job line
+  const columns = [
+    {
+            title: 'Day',
+            dataIndex: 'day',
+            render: (text: string, record: any, index: number) => {
+              const rowSpan = index % 2 === 0 ? 2 : 0;
+              return {
+                children: <div style={{ textAlign: 'center' }}>
+                <div style={{ fontWeight: 'bold' }}>{moment(text).format('dddd')}</div>
+                <div>{moment(text).format('ll')}</div>
+              </div>,
+
+                props: {
+                  rowSpan,
+                },
+              };
+            },
+          },
+          {
+            title: 'Shift',
+            dataIndex: 'shift',
+          },
+  ...(jobLines?.length
+          ? jobLines?.map((job: any) => ({
+              title: job?.name,
+              dataIndex: 'jobs',
+              width: 300,
+              render: (jobs: any, record: any) => {
+                const filteredJobs = jobs?.filter((j: any) => j?.job_line_id === job?.id);
+                const getShiftId = shiftsFromApi?.find(
+                  (shift: any) => shift?.name === record?.shift,
+                );
+                return (
+                  <Space
+                    direction="vertical"
+                    size="middle"
+                    style={{ width: '100%' }}
+                  >
+                    <ModalForm 
+                      title={
+                        <>
+                          You are viewing{' '}
+                          <span style={{ color: clickedSchedule?.textColor }}>
+                            {clickedSchedule?.job_description}
+                          </span>
+                        </>
+                      }
+                      submitter={{searchConfig:{
+                        submitText:'Save Schedule',
+                        resetText:'cancel',
+                      }}}
+                      trigger={
+<div style={{ cursor: 'pointer' }}>
+{filteredJobs.length > 0 ? (
                 <Button
-  type="primary" // Changes to a primary button
+                  type="primary"
+                  style={{
+                    backgroundColor: '#4CAF50',
+                    borderColor: '#4CAF50',
+                    color: '#fff',
+                    padding: '10px 0',
+                    fontWeight: 'bold',
+                    width: '80%',
+                    textAlign: 'center',
+                    display: 'block',
+                  }}
+                  onClick={() => {
+                    console.log('Selected job:', job?.id,getShiftId?.id,moment(record?.day).format('YYYY-MM-DD'));
+                    // Handle adding a new job
+                    setSelectedSlot(job);
+                    setExistingJobs(record.jobs);
+                    fetchSlotJobs({schedule_date:moment(record?.day).format('YYYY-MM-DD'),shift:getShiftId?.id,job_line:job?.id});
+                    setIsModalVisible(true);
+                    // handleAddJobModalClick(record)
+                  }}
+                >
+                  Add New Job
+                </Button>
+              ): null
+              }
+  {jobs
+    ?.filter((j: any) => j?.job_line_id === job?.id)
+    ?.map((job: any) => (
+<Card
+  key={job?.id}
+  size="small"
   style={{
-    backgroundColor: '#4CAF50', // Green background color
-    borderColor: '#4CAF50', // Match border color to the background
-    color: '#fff', // White text color
-    padding: '0 10px', // Add padding for better spacing
-    fontWeight: 'bold', // Keep the text bold
-    display: 'block', // Ensure the button takes up the full width for alignment if needed
+    background: job?.bgColor || 'transparent',
+    width: '80%',
+    color: job?.status_text_Color,
+    borderRadius: 5,
+    marginBottom: 8,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+    maxHeight:'90px',
+    padding: '2px 4px', 
+    minHeight: '30px', 
   }}
   onClick={() => {
-    handleSlotClick(record, hour, lineId, shiftId);
+    setClickedSchedule(job);
+    setSelectedSlot(job);
   }}
 >
-  Add New Job
-</Button>
+  <div style={{ textAlign: 'center' }}>
+  <Button
+          type="link"
+          style={{ fontWeight: 'bold', color: '#000', fontSize: '12px' }}
+        >
+          {job?.schedule_job_number} 
+        </Button>
+    <Tooltip title={job.job_description} placement="top">
+      <div style={{ 
+          color: 'grey', 
+          whiteSpace: 'nowrap', 
+          overflow: 'hidden', 
+          textOverflow: 'ellipsis', 
+          maxWidth: '150px', 
+          fontSize: '12px' 
+      }}>
+        {job.job_description.split(' ').slice(0, 3).join(' ') + (job.job_description.split(' ').length > 3 ? '...' : '')}
+      </div>
+    </Tooltip>
 
-              </div>
-            )}
-      {scheduledJobsForHour.length === 0 ? (
-        <Card
-          onClick={() => {
-          console.log(line)  
-          handleSlotClick(record, hour, lineId, shiftId,line);
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
+      {/* Status Name */}
+      <div style={{ color: job?.statusColor || '#000', fontSize: '12px' }}> {/* Reduce font size */}
+        {job?.schedule_status_name}
+      </div>
+
+      {/* More Details Button */}
+      <Button
+        onClick={() => fetchJobDetails(job.id)}
+        type="link"
+        style={{
+          color: '#ff5733',
+          padding: '0', // Remove padding
+          display: 'flex',
+          alignItems: 'center',
+          fontSize: '12px', // Reduce font size
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="1em"
+          height="1em"
+          viewBox="0 0 1024 1024"
+          style={{ fill: 'currentColor', marginRight: '4px' }}
+        >
+          <path d="M512 100c-227 0-412 185-412 412s185 412 412 412 412-185 412-412S739 100 512 100zm0 736c-179 0-324-145-324-324S333 188 512 188s324 145 324 324-145 324-324 324zm-75-387h150v150H437V449zm150 277h-150v-54h150v54z" />
+        </svg>
+        More
+      </Button>
+    </div>
+
+    {/* Dropdown Menu */}
+    <Dropdown overlay={menu} trigger={['click']}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '12px', // Adjusted to reduce vertical height
+          right: '12px',
+          cursor: 'pointer',
+        }}
+        aria-label="More options"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="1em"
+          height="1em"
+          viewBox="0 0 1024 1024"
+          style={{
+            fill: 'currentColor',
+            fontSize: '1.5em',
           }}
         >
-          FREE
-        </Card>
-      ) : (
-        scheduledJobsForHour.map((job: any, index: any) => (
-          <Draggable key={job.id} draggableId={job.id} index={index}>
-            {(provided) => (
-              <Card
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-                ref={provided.innerRef}
-                style={{
-                  marginBottom: '10px',
-                  background: job.status_background_color || 'red',
-                  color: job.status_text_color || '#000',
-                  position: 'relative',
-                  padding: '8px',
-                  maxHeight: '110px', // Set your desired max height here
-                }}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onDragEnd={onDragEnd}
-              >
-                {/* Job Details Here */}
-                {job.job_validation_required && (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="yellow" // Star color
-                          width="1.5em" // Adjust size as needed
-                          height="1.5em"
-                          style={{
-                            position: 'absolute',
-                            top: 8, // Adjust position as needed
-                            left: 8, // Adjust position as needed
-                          }}
-                        >
-                          <path d="M12 .587l3.668 7.431L23 9.587l-5.5 5.356L18.816 23 12 19.688 5.184 23 6.5 14.943 1 9.587l7.332-1.569L12 .587z" />
-                        </svg>
-                      )}
-                      {/* Job Number */}
-                      <span style={{ fontWeight: 'bold', color: 'black' }}>
-                        {job.schedule_job_number}
-                      </span> 
-                      {/* Capacity */}
-                      <span style={{ marginLeft: '10px', color: '#007bff', textDecoration: 'underline' }}>
-                        {job.capacity}
-                      </span>
-
-                      {/* Tooltip for Job Description */}
-                      <Tooltip title={job.job_description} placement="top">
-                        <div style={{ color: 'grey', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
-                          {job.job_description.split(' ').slice(0, 3).join(' ') + (job.job_description.split(' ').length > 3 ? '...' : '')}
-                        </div>
-                      </Tooltip>
-                      {/* More Details Button */}
-                      <Button
-                        type="link"
-                        style={{
-                          marginTop: '0',
-                          marginBottom: '10px',
-                          color: '#ff5733',
-                          whiteSpace: 'nowrap', // Prevent wrapping
-                          overflow: 'hidden', // Hide overflow
-                          textOverflow: 'ellipsis', // Show ellipsis if it overflows
-                        }}
-                        onClick={() => {
-                          setSelectedJobData(job);
-                          setJobDetailsModalVisible(true);
-                        }}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="1em"
-                          height="1em"
-                          viewBox="0 0 1024 1024"
-                          style={{ fill: 'currentColor', marginRight: '4px' }}
-                        >
-                          <path d="M512 100c-227 0-412 185-412 412s185 412 412 412 412-185 412-412S739 100 512 100zm0 736c-179 0-324-145-324-324S333 188 512 188s324 145 324 324-145 324-324 324zm-75-387h150v150H437V449zm150 277h-150v-54h150v54z" />
-                        </svg>
-                        More Details
-                      </Button>
-                      {/* Dropdown Menu */}
-                      <Dropdown overlay={menu} trigger={['click']}>
-                        <div
-                          style={{
-                            position: 'absolute',
-                            top: 16, // Adjust as needed
-                            right: 16, // Adjust as needed
-                            cursor: 'pointer', // Changes the cursor on hover
-                          }}
-                          aria-label="More options"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="1em"
-                            height="1em"
-                            viewBox="0 0 1024 1024"
-                            style={{
-                              fill: 'currentColor', // Inherit the current color
-                              fontSize: '1.5em', // Adjust the size as needed
-                            }}
-                          >
-                            <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0" />
-                          </svg>
-                        </div>
-                      </Dropdown>
-              </Card>
-            )}
-          </Draggable>
-        ))
-      )}
-      {provided.placeholder}
-    </div>
+          <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0" />
+        </svg>
+      </div>
+    </Dropdown>
+    {job.job_validation_required === 1 && (
+    <div style={{ position: 'absolute', top: '5px', left: '5px', color: '#FFD700' ,fontSize: '24px'}}>★</div>
   )}
-  </Droppable>
-      );
-    }; 
-    const jobLineColumns = jobLines?.map((line: any, index: any) => ({
-      title: line?.name,
-      key: line?.id,
-      width: 200,
-      render: (text: any, record: any) => {
-        return (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Row>
-            {renderJobSlot(
-              record,
-              `h${index + 1}`,
-              line,
-              shifts?.[0]?.id,
-              dayShiftSchedules,
-              line.name,
-            )}
-            </Row>
-            {/* Day Shift */}
-            <Divider style={{ margin: '20px 10px',borderColor:'black',borderWidth:'1px' }} />{' '}
-            <Row>
-            {renderJobSlot(
-              record,
-              `h${index + 1}-night`,
-              line,
-              shifts?.[1]?.id,
-              nightShiftSchedules,
-              line.name,
-            )}{' '}
-            {/* Night Shift */}
-            </Row>
-          </DragDropContext>
-        );
+  </div>
+</Card>   
+    ))}
+</div>
+}
+onFinish={async (values: any) => {
+  console.log(values);
+  // Do your POST here for Adding a new job
+  const formattedScheduleDate = moment(values.schedule_date).format('YYYY-MM-DD');
+  try {
+    await request('/schedules', {
+      method: 'POST',
+      data: {
+        ...values,
+        job_line_id: job?.id, // Include the job_line_id
+        schedule_job_id: selectedScheduleJobId,
+        shift_id: getShiftId?.id,
+        job_validation_required: values.job_validation_required ? 1 : 0,
+        schedule_date: formattedScheduleDate,
+        capacity: selectedJob?.capacity || values.capacity,
       },
-    }));
-    return (
-      <ProCard>
-        <PageHeader
-          title="Manufacturing Planner"
-          subTitle="Manage your production schedules effectively"
-        />
-        <Row gutter={[16, 16]}>
+    })   
+    console.log({
+      job_line_id: selectedJobLineId,
+      schedule_job_id: selectedScheduleJobId,
+      shift_id: getShiftId?.id,
+      schedule_date: record?.day,
+      capacity: selectedJob?.capacity || values.capacity,
+    });
+    const updatedSchedules = await request('/schedules'); // Refetch the schedules data
+    const transformedSchedules = transformData(updatedSchedules?.data);
+    setJobData(updatedSchedules?.data);
+    setTableData(transformedSchedules)
+    data(transformedSchedules);
+    // you have success MESSAGE here and REFRESH the schedules on the table i.e
+    message.success('Job added successfully');
+    // this keeps modal open when success
+    setIsModalVisible(false);
+    return true;
+  } catch (error) {
+    // this keeps modal open when there is an error
+    return false;
+  }
+}}
+// onVisibleChange={(visible) => setIsModalVisible(visible)}
+onVisibleChange={async (visible) => {
+  setIsModalVisible(visible);
+  if (visible && selectedJobLineId) {
+      const selectedJob = jobData.find((job) => job.id === selectedJobLineId);
+      if (selectedJob) {
+          await fetchJobStatuses(selectedJob.jobType); // Make sure to pass the job type ID
+      }
+  }
+}}
+>
+{/* Replace here with content for the form i.e Job Number, booked qty, ...rest */}
+{/* <ProFormText name="name" label="Job Number" /> */}
+<ProForm>
+      <Row gutter={24}>
           <Col span={8}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+    {existingJobs?.map((job) => (
+      <Button 
+        key={job?.id}
+        type="default"
+        style={{ 
+          marginBottom: '10px', 
+          width: '150px', 
+          backgroundColor: 'white', // White background
+          color: 'black',            // Black text
+          fontWeight: 'bold',        // Bold text
+          // border: '1px solid #d9d9d9', // Border for a clean look
+        }}
+        onClick={() => fetchJobDetails(job?.id)}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#d9d9d9'; // Grey background on hover
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'white'; // Reset to white on leave
+        }}
+      >
+        Job #: {job?.schedule_job_number}
+      </Button>
+    ))}
+  </div>
+</Col>
+        {/* Form fields on the right side */}
+        <Col span={16}>
+        {/* <Col span={12}> */}
+            {/* Tabs Section */}
+            <Tabs activeKey={activeTabKey} onChange={handleTabChange}>
+              <Tabs.TabPane tab="Other Schedules" key="1">
+                {/* Data for Other Schedules */}
+                {selectedSlot?.other_schedules?.map((schedule: any) => (
+                  <Card key={schedule.id}>
+                    <p>{schedule.name}</p>
+                  </Card>
+                ))}
+              </Tabs.TabPane>
+              
+              <Tabs.TabPane tab="Bulk/Pack Jobs" key="2">
+                {/* Data for Bulk/Pack Jobs */}
+                <p>Bulk or Pack jobs data here...</p>
+              </Tabs.TabPane>
+              
+              <Tabs.TabPane tab="Logs" key="3">
+                {/* Data for Logs */}
+                <p>Logs data here...</p>
+              </Tabs.TabPane>
+
+              <Tabs.TabPane tab="Comments" key="4">
+                {/* Data for Comments */}
+                {selectedSlot?.comments?.map((comment: any) => (
+                  <Card key={comment.id}>
+                    <p>{comment.text}</p>
+                  </Card>
+                ))}
+              </Tabs.TabPane>
+            </Tabs>
+          {/* </Col> */}
+          <ProFormText name="job_number" label="Job Number">
             <Select
-              options={jobTypes?.map((job: any) => ({
-                label: job?.name,
-                value: job?.id,
-              }))}
-              placeholder="Select Job Type"
-              style={{ width: '100%' }}
-              onChange={(value) => {
-                setJobType(value);
-              }}
-            />
-          </Col>
-          <Col span={8}>
-            <RangePicker
-              value={dateRange}
-              onChange={(dates) => setDateRange(dates)}
-              style={{ width: '100%' }}
-            />
-          </Col>
-          <Col span={24}>
-            {jobAreasLoading ? (
-              <Flex
-                align="center"
-                justify="center"
-                style={{ width: '100%', height: '240px' }}
-              >
-                <Spin />
-              </Flex>
-            ) : jobAreas?.length <= 0 ? (
-              <Flex
-                align="center"
-                justify="center"
-                style={{ width: '100%', height: '240px' }}
-              >
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No job areas found"
-                />
-              </Flex>
-            ) : (
-            <Tabs
-            defaultActiveKey="1"
-            items={jobAreas?.map((jobArea: any) => ({
-              key: jobArea?.id,
-              label: jobArea?.name,
-              children: (
-                  <ProTable
-      toolBarRender={false}
-      search={false}
-      dataSource={daysOfWeek}
-      scroll={{ x: 1400, y: 1400 }} // Ensure both scroll.x and scroll.y are set
-      loading={jobLinesLoading}
-      virtual // Enable virtual scrolling
-      columns={[
-        {
-          title: 'Day',
-          key: 'day',
-          render: (text) => (
-            <div style={{ textAlign: 'center',alignSelf:'center' }}>
-              <div>{text.day}</div>
-              <div style={{ fontSize: '1.1em' }}>
-                {moment(text.date).format('DD MMM YYYY')} {/* This formats the date as Month abbreviation and day */}
-              </div>
-            </div>
-          ),
-          align: 'center',
-          fixed: true,
-          width: 100,
-        },
-        {
-          title: 'Shift',
-          key: 'jobLines',
-          align: 'center',
-          render: (_, record) => {
-            console.log('Record:', record);
-            console.log('Shifts:', shifts);
+              placeholder="Select Job Number"
+              onChange={handleJobNumberChange}
+              showSearch
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+            >
+              {jobData?.length > 0 ? (
+                jobData.map((job) => (
+                  <Option key={job.key} value={job.jobNumber}>
+                    {job.jobNumber} - {job.itemDetails}
+                  </Option>
+                ))
+              ) : (
+                <p>No jobs available</p>
+              )}
+            </Select>
+          </ProFormText>
 
-            return (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {shifts?.map((shift: any) => {
-                  // Check if jobLines is defined and is an array
-                  const jobLineForShift = Array.isArray(record.jobLines) 
-                    ? record.jobLines.find((line: any) => line.shiftId === shift.id)
-                    : undefined;
-
-                  return (
-                    <div key={shift.id} style={{ display: 'flex', alignItems: 'center' }}>
-                      <strong>{shift?.name}</strong>: {/* Shift name */}
-                      <span>{jobLineForShift ? jobLineForShift.value : '-'}</span> {/* Display job line value or placeholder */}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          },
-          width: 100, // Adjust width as necessary
-        },
-        ...(jobLines ? jobLineColumns : []),
-      ]}
-    />
-              ),
-            }))}
-            onChange={(value) => {
-              console.log(value);
-              setJobAreaPid(value);
-            }}
+          <ProFormText name="booked_qty" label="Booked Quantity" />
+          <ProFormText
+            name="capacity"
+            label="Capacity"
+            value={selectedJob?.capacity}
+            disabled={true}
           />
-            )}
-          </Col>
-        </Row>
-        <Button
-          type="primary"
-          icon={<DownloadOutlined />}
-          style={{ marginTop: 16 }}
-        >
-          Export
-        </Button>
-        <AddJobModal
-          visible={isModalVisible}
-          onCancel={() => setModalVisible(false)}
-          onOk={() => setModalVisible(false)}
-          selectedSlot={selectedSlot}
-          onAddJob={handleAddJob}
-          // onAddJob={(newJob) => setScheduledJobs((prevJobs) => [...prevJobs, newJob])}
-        />
-         <JobDetailsModal
-        visible={isJobDetailsModalVisible}
-        jobData={selectedJobData}
-        onClose={() => setJobDetailsModalVisible(false)}
-      />
-       <ChangeStatusModal
-      visible={isChangeStatusModalVisible}
-      onClose={() => setChangeStatusModalVisible(false)}
-      jobData={selectedJobForStatusChange}
-      onChangeStatus={handleChangeJobStatus}
-    />
-      </ProCard>
-    );
-  };
-  export default ManufacturingPlanner;
-  
+          <ProFormText name="comments" label="Comments" />
 
+          <Form.Item name="schedule_status_id" label="Job Status">
+            <Select>
+              {jobStatuses.map((status) => (
+                <Option key={status.id} value={status.value}>
+                  {status.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
 
-// import { DownloadOutlined } from '@ant-design/icons';
-// import { PageHeader, ProCard, ProTable } from '@ant-design/pro-components';
-// import { request, useRequest } from '@umijs/max';
-// import {
-//   Button,
-//   Card,
-//   Col,
-//   DatePicker,
-//   Divider,
-//   Dropdown,
-//   Empty,
-//   Flex,
-//   Menu,
-//   Row,
-//   Select,
-//   Space,
-//   Spin,
-//   Tabs,
-// } from 'antd';
-// import moment from 'moment';
-// import React, { useState } from 'react';
-// import AddJobModal from './AddJobModal';
-
-// const { RangePicker } = DatePicker;
-
-// const ManufacturingPlanner = () => {
-//   const [scheduledJobs, setScheduledJobs] = useState<any[]>([]);
-//   const { data: schedules = [], refresh: refreshSchedules } = useRequest(() =>
-//     request('/schedules').then((res) => ({ data: res?.original?.data })),
-//   );
-
-//   const { data: shifts = [] } = useRequest(() =>
-//     request('/shifts').then((res) => ({ data: res?.data?.data })),
-//   );
-
-//   if (!Array.isArray(schedules) || !Array.isArray(shifts)) {
-//     console.error('Schedules or shifts are not defined or not arrays');
-//     return; 
-//   }
-
-//   const dayShiftId = shifts.find((shift: any) => shift?.name === 'Day Shift')?.id;
-//   const nightShiftId = shifts.find((shift: any) => shift?.name === 'Night Shift')?.id;
-
-//   const dayShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === dayShiftId);
-//   const nightShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === nightShiftId);
-
-//   console.log('Schedules:', schedules);
-//   console.log('Shifts:', shifts);
-//   console.log('Day Shift Schedules:', dayShiftSchedules);
-//   console.log('Night Shift Schedules:', nightShiftSchedules);
-
-//   const handleAddJob = async (newJob: any) => {
-//     console.log('New Job Data:', newJob);
-
-//     const addedJob = {
-//       id: newJob.id,
-//       schedule_job_id: newJob.schedule_job_id,
-//       job_line_id: newJob.job_line_id,
-//       shift_id: newJob.shift_id,
-//       schedule_date: newJob.schedule_date,
-//       capacity: newJob.capacity,
-//       booked_qty: newJob.booked_qty,
-//       comments: newJob.comments,
-//       schedule_status_id: newJob.schedule_status_id,
-//     };
-//     setScheduledJobs((prevJobs) => [...prevJobs, newJob]);
-
-//     try {
-//       setModalVisible(true);
-//       refreshSchedules();
-//       console.log('Added Job Object:', addedJob);
-//     } catch (error) {
-//       console.error('Error adding job:', error);
-//     }
-//   };
-
-//   const handleModalClose = () => {
-//     setModalVisible(false);
-//   };
-
-//   const [isModalVisible, setModalVisible] = useState(false);
-//   const [selectedSlot, setSelectedSlot] = useState(null);
-//   const [dateRange, setDateRange] = useState<any>([
-//     moment().startOf('day'),
-//     moment().endOf('day'),
-//   ]);
-
-//   console.log(selectedSlot);
-
-//   const getDaysOfWeek = () => {
-//     const startOfWeek = moment().startOf('week').add(1, 'day');
-//     const days = [];
-//     for (let i = 0; i < 6; i++) {
-//       days.push({
-//         day: startOfWeek.clone().add(i, 'days').format('dddd'),
-//         date: startOfWeek.clone().add(i, 'days').format('YYYY-MM-DD'),
-//       });
-//     }
-//     return days;
-//   };
-
-//   const handleSlotClick = (
-//     record: any,
-//     hour: any,
-//     lineId: string,
-//     shiftId: string,
-//     job?: any,
-//   ) => {
-//     setSelectedSlot({
-//       schedule_date: record.date,
-//       hour,
-//       job_line_id: lineId,
-//       shift_id: shiftId,
-//       ...(job
-//         ? {
-//             schedule_job_id: job.schedule_job_id,
-//             capacity: job.capacity,
-//             booked_qty: job.booked_qty,
-//             comments: job.comments,
-//             schedule_status_id: job.schedule_status_id,
-//           }
-//         : {}),
-//     });
-//     setModalVisible(true);
-
-//     console.log('Job Line ID:', lineId);
-//     console.log('Shift ID:', shiftId);
-//     console.log('Selected Slot:', {
-//       schedule_date: record.date,
-//       hour,
-//     });
-//   };
-
-//   const daysOfWeek = getDaysOfWeek();
-
-//   const { data: jobTypes } = useRequest(() =>
-//     request('/job-types').then((res) => ({ data: res?.data?.data })),
-//   );
-
-//   const [jobType, setJobType] = useState<any>();
-//   const [jobAreaPid, setJobAreaPid] = React.useState<any>();
-
-//   const { data: jobAreas, loading: jobAreasLoading } = useRequest(
-//     async () => {
-//       if (!jobType) return;
-//       const resp: any = await request(`/job-types/${jobType}`).then((res) => ({
-//         data: res?.data?.job_areas,
-//       }));
-//       console.log(resp?.data?.[0]?.id);
-//       setJobAreaPid(resp?.data?.[0]?.id);
-//       return resp;
-//     },
-//     { refreshDeps: [jobType] },
-//   );
-
-//   const { data: jobLines, loading: jobLinesLoading } = useRequest(
-//     async () => {
-//       if (!jobAreaPid) return;
-//       return await request(`/job-lines?job_area_id=${jobAreaPid}`).then((res) => ({
-//         data: res?.data?.data,
-//       }));
-//     },
-//     { refreshDeps: [jobAreaPid] },
-//   );
-
-//   const menu = (
-//     <Menu>
-//       <Menu.Item key="1" onClick={() => handleAddJob(selectedSlot)}>
-//         Add New Schedule
-//       </Menu.Item>
-//       <Menu.Item key="2">
-//         <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-//           Change Job Status
-//         </a>
-//       </Menu.Item>
-//       <Menu.Item key="3" disabled>
-//         <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-//           Reschedule (disabled)
-//         </a>
-//       </Menu.Item>
-//       <Menu.Item key="4" danger>
-//         a danger item
-//       </Menu.Item>
-//     </Menu>
-//   );
-
-//   const renderJobSlot = (
-//     record: any,
-//     hour: any,
-//     lineId: string,
-//     shiftId: string,
-//     scheduledJobs: any,
-//   ) => {
-//     const scheduledJobsForHour = scheduledJobs.filter(
-//       (job: any) =>
-//         job?.job_line_id === lineId &&
-//         job?.shift_id === shiftId &&
-//         moment(job?.schedule_date).format('YYYY-MM-DD') === record?.date,
-//     );
+          <Form.Item
+            name="job_validation_required"
+            valuePropName="checked"
+          >
+            <Checkbox>Need Validation</Checkbox>
+          </Form.Item>
+        </Col>
+      </Row>
+    </ProForm>
+                   
+                    </ModalForm>
+                    {jobs?.filter((j: any) => j?.job_line_id === job?.id)?.length <=
+                      3 && (
+                      <ModalForm
+                        title="Add Job"
+                        submitter={{
+                          searchConfig: {
+                            submitText: 'Add Job',
+                            resetText: 'Cancel',
+                          },
+                        }}
+                        trigger={
+<Card
+      style={{ width: '80%', borderRadius: 0, cursor: 'pointer',height:'40px',display:'flex',justifyContent:'center',alignItems:'center',padding:'0',backgroundColor:'#F8F4FE',color:'#6200EE',border:'none' }}
+      onClick={() => {
+        setSelectedJobLineId(job?.id); // Update the selected job line
+        const selectedShift = shiftsFromApi?.find(
+          (shift) => shift.name === record?.shift
+        );
+        const selectedScheduleDate = moment(record?.day).format('YYYY-MM-DD'); // Capture the schedule date
+        setClickedSchedule({
+          job_line_id: job?.id,
+          shift_id: selectedShift?.id,
+          schedule_date: selectedScheduleDate,
+          job_description: job?.job_description,
+          // need_validation: job?.need_validation,
+        });
+        setIsModalVisible(true); // Open the modal
+      }}
+    >
+      <span style={{color:'#6200EE'}}>FREE</span>
+    </Card>
+                        }
+                        onFinish={async (values: any) => {
+                          console.log(values);
     
-//     return (
-//       <div
-//         style={{
-//           padding: '10px',
-//           borderRadius: '5px',
-//           cursor: 'pointer',
-//           textAlign: 'center',
-//           backgroundColor:
-//             scheduledJobsForHour.length === 0 ? '#F8F4FE' : '#FFFFFF',
-//         }}
-//       >
-//         {scheduledJobsForHour.length === 0 ? (
-//           <Card
-//             onClick={() => {
-//               console.log('Rendering Job Slot Clicked:');
-//               console.log('Line ID:', lineId);
-//               console.log('Shift ID:', shiftId);
-//               handleSlotClick(record, hour, lineId, shiftId);
-//             }}
-//           >
-//             FREE
-//           </Card>
-//         ) : (
-//           scheduledJobsForHour?.map((job: any, index: any) => (
-//             <Card
-//               key={job.id}
-//               style={{
-//                 marginBottom: '10px',
-//                 background: job.status_background_color || 'red',
-//                 color: job.status_text_color || '#000',
-//               }}
-//             >
-//               <div>
-//                 {`Job: ${job.schedule_job_id}`}
-//                 <br />
-//                 {`Booked Quantity: ${job.booked_qty}`}
-//                 <br />
-//                 {`Capacity: ${job.capacity}`}
-//                 <br />
-//                 {`Status: ${job.schedule_status_id}`}
-//               </div>
-//               <Dropdown overlay={menu} trigger={['click']}>
-//                 <div
-//                   style={{
-//                     position: 'absolute',
-//                     top: 16,
-//                     right: 16,
-//                     cursor: 'pointer',
-//                   }}
-//                   aria-label="More options"
-//                 >
-//                   <svg
-//                     xmlns="http://www.w3.org/2000/svg"
-//                     width="1em"
-//                     height="1em"
-//                     viewBox="0 0 1024 1024"
-//                     style={{
-//                       fill: 'currentColor',
-//                       fontSize: '1.5em',
-//                     }}
-//                   >
-//                     <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0"/>
-//                   </svg>
-//                 </div>
-//               </Dropdown>
-//             </Card>
-//           ))
-//         )}
-//       </div>
-//     );
-//   };
+                          // const getShiftId = shiftsFromApi?.find(
+                          //   (shift: any) => shift?.name === record?.shift,
+                          // );
+                          // // you have the day here with the standard format
+                          console.log(moment(record?.day).format('YYYY-MM-DD'));
+    
+                          // // you have the shift id here
+                          console.log(getShiftId?.id);
+    
+                          // Do your POST here for Adding a new job
+                          
+                          const formattedScheduleDate = moment(values.schedule_date).format('YYYY-MM-DD');
+                          try {
+                            await request('/schedules', {
+                              method: 'POST',
+                              data: {
+                                ...values,
+                                job_line_id: selectedJobLineId, // Include the job_line_id
+                                schedule_job_id: selectedScheduleJobId,
+                                shift_id: getShiftId?.id,
+                                job_validation_required: values.job_validation_required ? 1 : 0,
+                                // schedule_date: record?.day,
+                                schedule_date: formattedScheduleDate,
+                                capacity: selectedJob?.capacity || values.capacity,
+                              },
+                            })   
+                            console.log({
+                              job_line_id: selectedJobLineId,
+                              schedule_job_id: selectedScheduleJobId,
+                              shift_id: getShiftId?.id,
+                              schedule_date: record?.day,
+                              capacity: selectedJob?.capacity || values.capacity,
+                            });
 
-//   // Define jobLineColumns
-//   const jobLineColumns = jobLines?.map((line: any, index: any) => ({
-//     title: line?.name,
-//     key: line?.id,
-//     width: 200,
-//     render: (text: any, record: any) =>
-//       renderJobSlot(record, index + 1, line?.id, dayShiftId, scheduledJobs),
-//   }));
-//   return (
-//     <div>
-//       {/* Your component's main structure */}
-//       <ProCard>
-//        <PageHeader
-//         title="Manufacturing Planner"
-//         subTitle="Manage your production schedules effectively"
-//       />
-//       <Row gutter={[16, 16]}>
-//         <Col span={8}>
-//           <Select
-//             options={jobTypes?.map((job: any) => ({
-//               label: job?.name,
-//               value: job?.id,
-//             }))}
-//             placeholder="Select Job Type"
-//             style={{ width: '100%' }}
-//             onChange={(value) => {
-//               setJobType(value);
-//             }}
-//           />
-//         </Col>
-//         <Col span={8}>
-//           <RangePicker
-//             value={dateRange}
-//             onChange={(dates) => setDateRange(dates)}
-//             style={{ width: '100%' }}
-//           />
-//         </Col>
-//         <Col span={24}>
-//           {jobAreasLoading ? (
-//             <Flex
-//               align="center"
-//               justify="center"
-//               style={{ width: '100%', height: '240px' }}
-//             >
-//               <Spin />
-//             </Flex>
-//           ) : jobAreas?.length <= 0 ? (
-//             <Flex
-//               align="center"
-//               justify="center"
-//               style={{ width: '100%', height: '240px' }}
-//             >
-//               <Empty
-//                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-//                 description="No job areas found"
-//               />
-//             </Flex>
-//           ) : (
-//             <Tabs
-//               defaultActiveKey="1"
-//               items={jobAreas?.map((jobArea: any) => ({
-//                 key: jobArea?.id,
-//                 label: jobArea?.name,
-//                 children: (
-//                   <ProTable
-//                     toolBarRender={false}
-//                     search={false}
-//                     dataSource={daysOfWeek}
-//                     scroll={{ x: 1400 }}
-//                     loading={jobLinesLoading}
-//                     columns={[
-//                       {
-//                         title: 'Day',
-//                         // dataIndex: 'day',
-//                         key: 'day',
-//                         renderText: (text) => `${text.day} (${text.date})`,
-//                         align: 'left',
-//                         fixed: true,
-//                         width: 100,
-//                       },
-//                       {
-//                         title: 'Shift',
-//                         dataIndex: 'shift',
-//                         fixed: true,
-//                         width: 100,
-//                         key: 'shift',
-//                         render: () => (
-//                           <div>
-//                             {shifts?.map((shift: any, index: any) => (
-//                               <div key={index} style={{}}>
-//                                 {shift?.name}
-//                               </div>
-//                             ))}
-//                           </div>
-//                         ),
-//                       },
-//                       ...(jobLines ? jobLineColumns : []),
-//                     ]}
-//                   />
-//                 ),
-//               }))}
-//               onChange={(value) => {
-//                 console.log(value);
-//                 setJobAreaPid(value);
-//               }}
-//             />
-//           )}
-//         </Col>
-//       </Row>
+                            const updatedSchedules = await request('/schedules'); // Refetch the schedules data
+                            const transformedSchedules = transformData(updatedSchedules?.data);
+                            setJobData(updatedSchedules?.data);
+                            data(transformedSchedules);
 
-//       <Button
-//         type="primary"
-//         icon={<DownloadOutlined />}
-//         style={{ marginTop: 16 }}
-//       >
-//         Export
-//       </Button>
-//       <AddJobModal
-//         visible={isModalVisible}
-//         onCancel={() => setModalVisible(false)}
-//         onOk={() => setModalVisible(false)}
-//         selectedSlot={selectedSlot}
-//         onAddJob={handleAddJob}
-//         // onAddJob={(newJob) => setScheduledJobs((prevJobs) => [...prevJobs, newJob])}
-//       />
-//     </ProCard>
-//     </div>
-//   );
-// };
+                            // you have success MESSAGE here and REFRESH the schedules on the table i.e
+                            message.success('Job added successfully');
+                            // this keeps modal open when success
+                            setIsModalVisible(false);
+                            return true;
+                          } catch (error) {
+                            // this keeps modal open when there is an error
+                            return false;
+                          }
+                        }}
+                        // onVisibleChange={(visible) => setIsModalVisible(visible)}
+                        onVisibleChange={async (visible) => {
+                          setIsModalVisible(visible);
+                          if (visible && selectedJobLineId) {
+                              const selectedJob = jobData.find((job) => job.id === selectedJobLineId);
+                              if (selectedJob) {
+                                  await fetchJobStatuses(selectedJob.jobType); // Make sure to pass the job type ID
+                              }
+                          }
+                      }}
+                      >
+                        {/* Replace here with content for the form i.e Job Number, booked qty, ...rest */}
+                        {/* <ProFormText name="name" label="Job Number" /> */}
+                        <ProFormText name="job_number" label="Job Number">
+                       <Select
+          placeholder="Select Job Number"
+          onChange={handleJobNumberChange}
+          showSearch
+          filterOption={(input, option) =>
+            option.children
+              .toLowerCase()
+              .includes(input.toLowerCase())
+          }
+        >
+          {jobData?.length > 0 ? (
+  jobData.map((job) => (
+    <Option key={job.key} value={job.jobNumber}>
+      {job.jobNumber} - {job.itemDetails}
+    </Option>
+  ))
+) : (
+  <p>No jobs available</p>
+)}
+        </Select>
+                    </ProFormText>
+                    <ProFormText name="booked_qty" label="Booked Quantity" />
+                    {/* <ProFormText name="capacity" label="Capacity" /> */}
+                    <ProFormText 
+  name="capacity" 
+  label="Capacity" 
+  value={selectedJob?.capacity} // Ensure it's being populated correctly
+  disabled={true} // Mark the field as read-only
+/>
+                    <ProFormText name="comments" label="Comments" />
+                    
+                    <Form.Item name="schedule_status_id" label="Job Status">
+    <Select>
+        {jobStatuses.map(status => (
+            <Option key={status.id} value={status.value}>
+                {status.name}
+            </Option>
+        ))}
+    </Select>
+</Form.Item>
+{/* <Checkbox name="need_validation" label="Need Validation" /> */}
+<Form.Item
+  name="job_validation_required"
+  valuePropName="checked" // This maps the checked state to the form value
+>
+  <Checkbox>Need Validation</Checkbox>
+</Form.Item>
 
-// export default ManufacturingPlanner;
-
-
-// import { DownloadOutlined } from '@ant-design/icons';
-// import { PageHeader, ProCard, ProTable } from '@ant-design/pro-components';
-// import { request, useRequest } from '@umijs/max';
-// import {
-//   Button,
-//   Card,
-//   Col,
-//   DatePicker,
-//   Divider,
-//   Dropdown,
-//   Empty,
-//   Flex,
-//   Menu,
-//   Row,
-//   Select,
-//   Space,
-//   Spin,
-//   Tabs,
-// } from 'antd';
-// import moment from 'moment';
-// import React, { useState } from 'react';
-// import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-// import AddJobModal from './AddJobModal';
-// // import { request } from '@umijs/max';
-
-
-// const { RangePicker } = DatePicker;
-
-// const ManufacturingPlanner = () => {
-//   const [scheduledJobs, setScheduledJobs] = useState<any[]>([]);
-//    const { data: schedules = [], refresh:refreshSchedules } = useRequest(() =>
-//     request('/schedules').then((res) => ({ data: res?.original?.data })),
-//   );
-
-//   const { data: shifts = [] } = useRequest(() =>
-//     request('/shifts').then((res) => ({ data: res?.data?.data })),
-//   );
-
-//    // Ensure that schedules and shifts are defined and are arrays
-//    if (!Array.isArray(schedules) || !Array.isArray(shifts)) {
-//     console.error('Schedules or shifts are not defined or not arrays');
-//     return; // Early return or handle as necessary
-//   }
-
-//   // Safely find shift IDs
-//   const dayShiftId = shifts.find((shift: any) => shift?.name === 'Day Shift')?.id;
-//   const nightShiftId = shifts.find((shift: any) => shift?.name === 'Night Shift')?.id;
-
-//   // Filter schedules safely
-//   const dayShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === dayShiftId);
-//   const nightShiftSchedules = schedules.filter((schedule: any) => schedule?.shift_id === nightShiftId);
-
-//   // Debug logging
-//   console.log('Schedules:', schedules);
-//   console.log('Shifts:', shifts);
-//   console.log('Day Shift Schedules:', dayShiftSchedules);
-//   console.log('Night Shift Schedules:', nightShiftSchedules);
-
-//   const handleAddJob = async  (newJob: any) => {
-//     // Log the incoming new job data
-//     console.log('New Job Data:', newJob);
-
-//     // Create a new object with the relevant information
-//     const addedJob = {
-//       id: newJob.id,
-//       schedule_job_id: newJob.schedule_job_id,
-//       job_line_id: newJob.job_line_id,
-//       shift_id: newJob.shift_id,
-//       schedule_date: newJob.schedule_date,
-//       capacity: newJob.capacity,
-//       booked_qty: newJob.booked_qty,
-//       comments: newJob.comments,
-//       schedule_status_id: newJob.schedule_status_id,
-//     };
-//     setScheduledJobs((prevJobs) => [...prevJobs, newJob]);
-//     // await request.post('/schedules', { data: addedJob });
-//     try {
-//     //   const response = await request('/schedules', {
-//     //     method: 'POST',
-//     //    data:addedJob
-//     //     // body: JSON.stringify(addedJob),
-//     //   });
-//      setModalVisible(true);
-//       refreshSchedules();
-//       console.log('Added Job Object:', addedJob);
-//     } catch (error) {
-//       console.error('Error adding job:', error);
-//     }
-//   };
-//   const handleModalClose = () => {
-//     setModalVisible(false); // Close the modal
-//   };
-
-//   const [isModalVisible, setModalVisible] = useState(false);
-
-//   const [selectedSlot, setSelectedSlot] = useState(null);
-//   const [dateRange, setDateRange] = useState<any>([
-//     moment().startOf('day'),
-//     moment().endOf('day'),
-//   ]);
-//   console.log(selectedSlot);
-//   // Generate the days of the current week (Monday to Saturday)
-//   const getDaysOfWeek = () => {
-//     const startOfWeek = moment().startOf('week').add(1, 'day');
-//     const days = [];
-//     for (let i = 0; i < 6; i++) {
-//       days.push({
-//         day: startOfWeek.clone().add(i, 'days').format('dddd'),
-//         date: startOfWeek.clone().add(i, 'days').format('YYYY-MM-DD'),
-//       });
-//     }
-//     return days;
-//   };
-//   const handleSlotClick = (
-//     record: any,
-//     hour: any,
-//     lineId: string,
-//     shiftId: string,
-//     job?: any,
-//   ) => {
-//     setSelectedSlot({
-//       schedule_date: record.date, // Store the selected day (date)
-//       hour, // Store the time (hour)
-//       job_line_id: lineId, // Store the job line ID
-//       shift_id: shiftId, // Store the shift ID
-//       ...(job ? {
-//         schedule_job_id: job.schedule_job_id,
-//         capacity: job.capacity,
-//         booked_qty: job.booked_qty,
-//         comments: job.comments,
-//         schedule_status_id: job.schedule_status_id,
-//       } : {}), // Only add these if job is defined
-//     });
-//     setModalVisible(true);
-
-//     // Move the console logs here
-//     console.log('Job Line ID:', lineId);
-//     console.log('Shift ID:', shiftId);
-//     console.log('Selected Slot:', {
-//       schedule_date: record.date,
-//       hour,
-//     });
-//   };
-
-//   // Define the columns for the table (days + job lines + shifts)
-//   const daysOfWeek = getDaysOfWeek();
-
-//   const { data: jobTypes } = useRequest(() =>
-//     request('/job-types').then((res) => ({ data: res?.data?.data })),
-//   );
-//   const [jobType, setJobType] = useState<any>();
-//   const [jobAreaPid, setJobAreaPid] = React.useState<any>();
-//   const { data: jobAreas, loading: jobAreasLoading } = useRequest(
-//     async () => {
-//       if (!jobType) return;
-//       const resp: any = await request(`/job-types/${jobType}`).then((res) => ({
-//         data: res?.data?.job_areas,
-//       }));
-//       console.log(resp?.data?.[0]?.id);
-//       setJobAreaPid(resp?.data?.[0]?.id);
-//       return resp;
-//     },
-//     { refreshDeps: [jobType] },
-//   );
-//   const { data: jobLines, loading: jobLinesLoading } = useRequest(
-//     async () => {
-//       if (!jobAreaPid) return;
-//       return await request(`/job-lines?job_area_id=${jobAreaPid}`).then(
-//         (res) => ({
-//           data: res?.data?.data,
-//         }),
-//       );
-//     },
-//     { refreshDeps: [jobAreaPid] },
-//   );
-// const onDragEnd = async (result: any) => {
-//   if (!result.destination) {
-//       return; // Dropped outside the list
-//   }
-//   const { source, destination } = result;
-//   // Check if the indices are out of bounds
-//   if (
-//       source.index < 0 ||
-//       source.index >= scheduledJobs.length ||
-//       destination.index < 0 ||
-//       destination.index >= scheduledJobs.length
-//   ) {
-//       console.error("Invalid indices for drag and drop");
-//       return; // Early return if indices are out of bounds
-//   }
-
-//   // Handle moving jobs in the scheduledJobs state
-//   const updatedJobs = Array.from(scheduledJobs);
-//   const [movedJob] = updatedJobs.splice(source.index, 1);
-
-//   // Check if movedJob is defined
-//   if (!movedJob) {
-//       console.error("Moved job is undefined");
-//       return; // Early return if movedJob is not found
-//   }
-
-//   movedJob.schedule_date = destination.droppableId.split('-')[0]; // Update schedule date
-//   updatedJobs.splice(destination.index, 0, movedJob);
-//   setScheduledJobs(updatedJobs);
-
-//   // Make the API request to update the moved job
-//   try {
-//       const response = await request(`/schedules/${movedJob.id}`, {
-//           method: 'PATCH',
-//           headers: {
-//               'Content-Type': 'application/json',
-//           },
-//           body: JSON.stringify(movedJob),
-//       });
-
-//       if (!response.ok) {
-//           throw new Error('Network response was not ok');
-//       }
-
-//       await response.json(); // Await the response to ensure it's processed
-//       console.log('Updated Job Object:', movedJob);
-//   } catch (error) {
-//       console.error('Error updating job:', error);
-//   }
-// };
-
-
-// const menu = (
-//   <Menu>
-//     {/* <Menu.Item key="1">
-//       <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">Add New Schedule</a>
-//     </Menu.Item> */}
-//       {/* <Menu.Item key="1" onClick={handleAddJob}>Add New Schedule</Menu.Item> */}
-//       <Menu.Item key="1" onClick={() => handleAddJob(selectedSlot)}>Add New Schedule</Menu.Item>
-//     <Menu.Item key="2">
-//       <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">Change Job Status</a>
-//     </Menu.Item>
-//     <Menu.Item key="3" disabled>
-//       <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">Reschedule (disabled)</a>
-//     </Menu.Item>
-//     <Menu.Item key="4" danger>
-//       a danger item
-//     </Menu.Item>
-//   </Menu>
-// );
-
-
-
-//   const renderJobSlot = (
-//     record: any,
-//     hour: any,
-//     lineId: string,
-//     shiftId: string,
-//     scheduledJobs: any,
-//   ) => {
-//     const scheduledJobsForHour = scheduledJobs.filter(
-//       (job: any) =>
-//         job?.job_line_id === lineId &&
-//         job?.shift_id === shiftId &&
-//         moment(job?.schedule_date).format('YYYY-MM-DD') === record?.date,
-//       // job.schedule_time === hour,
-//     );
-//     return (
-//       <Droppable droppableId={`${record.day}-${hour}`}>
-//         {(provided) => (
-//           <div
-//             {...provided.droppableProps}
-//             ref={provided.innerRef}
-//             style={{
-//               padding: '10px',
-//               borderRadius: '5px',
-//               cursor: 'pointer',
-//               textAlign: 'center',
-//               backgroundColor:
-//                 scheduledJobsForHour.length === 0 ? '#F8F4FE' : '#FFFFFF',
-//             }}
-//           >
-//             {scheduledJobsForHour.length === 0 ? (
-//               <Card
-//                 onClick={() => {
-//                   console.log('Rendering Job Slot Clicked:');
-//                   console.log('Line ID:', lineId);
-//                   console.log('Shift ID:', shiftId);
-//                   handleSlotClick(record, hour, lineId, shiftId);
-//                 }}
-//               >
-//                 FREE
-//               </Card>
-//             ) : (
-//               scheduledJobsForHour?.map((job: any, index: any) => (
-//                 <Draggable key={job.id} draggableId={job.id} index={index}>
-//                   {(provided) => (
-//                     <Card
-//                       {...provided.draggableProps}
-//                       {...provided.dragHandleProps}
-//                       ref={provided.innerRef}
-//                       // style={{ marginBottom: '10px' ,background:'red'}}
-//                       style={{ 
-//                         marginBottom: '10px', 
-//                         background: job.status_background_color || 'red', 
-//                         color: job.status_text_color || '#000' 
-//                       }}
-//                       // onClick={() => {
-//                       //   handleSlotClick(record, hour, lineId, shiftId, job); 
-//                       // }}
-//                     >
-//                       <div>
-//       {`Job: ${job.schedule_job_id}`}
-//       <br />
-//       {`Booked Quantity: ${job.booked_qty}`}
-//       <br />
-//       {`Capacity: ${job.capacity}`}
-//       <br />
-//       {`Status: ${job.schedule_status_id}`}
-//     </div>
-//      <Dropdown overlay={menu} trigger={['click']}>
-//         <div
-//           style={{
-//             position: 'absolute',
-//             top: 16, // Adjust as needed
-//             right: 16, // Adjust as needed
-//             cursor: 'pointer', // Changes the cursor on hover
-//           }}
-//           aria-label="More options"
-//         >
-//           {/* SVG Icon */}
-//           <svg
-//             xmlns="http://www.w3.org/2000/svg"
-//             width="1em"
-//             height="1em"
-//             viewBox="0 0 1024 1024"
-//             style={{
-//               fill: 'currentColor', // Inherit the current color
-//               fontSize: '1.5em', // Adjust the size as needed
-//             }}
-//           >
-//             <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0"/>
-//           </svg>
-//         </div>
-//       </Dropdown>
-//                     </Card>
-//                   )}
-//                 </Draggable>
-//               ))
-//             )}
-//             {provided.placeholder}
-//           </div>
-//         )}
-//       </Droppable>
-//     );
-//   };
-
-//   const jobLineColumns = jobLines?.map((line: any, index: any) => ({
-//     title: line?.name,
-//     key: line?.id,
-//     width: 200,
-//     render: (text: any, record: any) => {
-//       return (
-//         <DragDropContext onDragEnd={onDragEnd}>
-//           <Row>
-//           {renderJobSlot(
-//             record,
-//             `h${index + 1}`,
-//             line.id,
-//             shifts?.[0]?.id,
-//             dayShiftSchedules,
-//           )}
-//           {/* Day Shift */}
-//           <Divider style={{ margin: '10px 0' }} />{' '}
-//           {renderJobSlot(
-//             record,
-//             `h${index + 1}-night`,
-//             line.id,
-//             shifts?.[1]?.id,
-//             nightShiftSchedules,
-//           )}{' '}
-//           {/* Night Shift */}
-//           </Row>
-//         </DragDropContext>
-//       );
-//     },
-//   }));
-
-//   return (
-//     <ProCard>
-//       <PageHeader
-//         title="Manufacturing Planner"
-//         subTitle="Manage your production schedules effectively"
-//       />
-//       <Row gutter={[16, 16]}>
-//         <Col span={8}>
-//           <Select
-//             options={jobTypes?.map((job: any) => ({
-//               label: job?.name,
-//               value: job?.id,
-//             }))}
-//             placeholder="Select Job Type"
-//             style={{ width: '100%' }}
-//             onChange={(value) => {
-//               setJobType(value);
-//             }}
-//           />
-//         </Col>
-//         <Col span={8}>
-//           <RangePicker
-//             value={dateRange}
-//             onChange={(dates) => setDateRange(dates)}
-//             style={{ width: '100%' }}
-//           />
-//         </Col>
-//         <Col span={24}>
-//           {jobAreasLoading ? (
-//             <Flex
-//               align="center"
-//               justify="center"
-//               style={{ width: '100%', height: '240px' }}
-//             >
-//               <Spin />
-//             </Flex>
-//           ) : jobAreas?.length <= 0 ? (
-//             <Flex
-//               align="center"
-//               justify="center"
-//               style={{ width: '100%', height: '240px' }}
-//             >
-//               <Empty
-//                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-//                 description="No job areas found"
-//               />
-//             </Flex>
-//           ) : (
-//             <Tabs
-//               defaultActiveKey="1"
-//               items={jobAreas?.map((jobArea: any) => ({
-//                 key: jobArea?.id,
-//                 label: jobArea?.name,
-//                 children: (
-//                   <ProTable
-//                     toolBarRender={false}
-//                     search={false}
-//                     dataSource={daysOfWeek}
-//                     scroll={{ x: 1400 }}
-//                     loading={jobLinesLoading}
-//                     columns={[
-//                       {
-//                         title: 'Day',
-//                         // dataIndex: 'day',
-//                         key: 'day',
-//                         renderText: (text) => `${text.day} (${text.date})`,
-//                         align: 'left',
-//                         fixed: true,
-//                         width: 100,
-//                       },
-//                       {
-//                         title: 'Shift',
-//                         dataIndex: 'shift',
-//                         fixed: true,
-//                         width: 100,
-//                         key: 'shift',
-//                         render: () => (
-//                           <div>
-//                             {shifts?.map((shift: any, index: any) => (
-//                               <div key={index} style={{}}>
-//                                 {shift?.name}
-//                               </div>
-//                             ))}
-//                           </div>
-//                         ),
-//                       },
-//                       ...(jobLines ? jobLineColumns : []),
-//                     ]}
-//                   />
-//                 ),
-//               }))}
-//               onChange={(value) => {
-//                 console.log(value);
-//                 setJobAreaPid(value);
-//               }}
-//             />
-//           )}
-//         </Col>
-//       </Row>
-
-//       <Button
-//         type="primary"
-//         icon={<DownloadOutlined />}
-//         style={{ marginTop: 16 }}
-//       >
-//         Export
-//       </Button>
-//       <AddJobModal
-//         visible={isModalVisible}
-//         onCancel={() => setModalVisible(false)}
-//         onOk={() => setModalVisible(false)}
-//         selectedSlot={selectedSlot}
-//         onAddJob={handleAddJob}
-//         // onAddJob={(newJob) => setScheduledJobs((prevJobs) => [...prevJobs, newJob])}
-//       />
-//     </ProCard>
-//   );
-// };
-
-// export default ManufacturingPlanner;
+                      </ModalForm>
+                    )}
+                  </Space>
+                );
+              },
+            }))
+          : []),
+      ];    
+  // Handle week change
+  const handleWeekChange = (date: any) => {
+    setCurrentWeek(date.startOf('isoWeek'));
+  };
+  const handlePreviousWeek = () => {
+    setCurrentWeek((prevWeek) => moment(prevWeek).subtract(1, 'week'));
+  };
+  const handleNextWeek = () => {
+    setCurrentWeek((prevWeek) => moment(prevWeek).add(1, 'week'));
+  };
+  return (
+    <div>
+       {/* Page Title and Subtitle */}
+       <div style={{ marginBottom: 16 }}>
+        <h1 style={{ fontWeight: 'bold', color: 'black', margin: 0 }}>TRT Manufacturing Planner</h1>
+        <h2 style={{ fontSize: '14px', color: '#666', margin: '4px 0 0 0' }}>
+          Hi System Administrator, welcome back! Here's your planner summary.
+        </h2>
+      </div>
+      <Space style={{ marginBottom: 16,display:'flex',justifyContent:'space-between',width:'100%' }}>
+        <div style={{display:'flex',alignItems:'center'}}>
+        <Button onClick={handlePreviousWeek}>Previous Week</Button>
+       
+        </div>
+      {/* Dropdown for Job Type Selection */}
+      <Space style={{ marginBottom: 16 }}>
+      <DatePicker
+          disabled
+          picker="week"
+          value={currentWeek}
+          onChange={handleWeekChange}
+          format="YYYY-wo"
+        />
+        {/* <Button onClick={handleNextWeek}>Next Week</Button> */}
+        <Select
+          showSearch
+          value={selectedJob}
+          placeholder="Search Jobs"
+          style={{ width: 200 }}
+          onSearch={handleSearch} // Trigger search when typing
+          onSelect={handleJobSelect} // Set selected job
+          filterOption={false} // Disable built-in filter since we're fetching from API
+        >
+          {jobData.map((job) => (
+            <Option key={job.key} value={job.key}>
+              {job.jobNumber} 
+            </Option>
+          ))}
+        </Select>
+        <Select
+          defaultValue={jobType}
+          style={{ width: 200 }}
+          onChange={handleJobTypeChange}
+          loading={jobTypesLoading}
+          placeholder="Select Job Type"
+        >
+          {jobTypes?.map((job: any) => (
+            <Option key={job?.id} value={job?.id}>
+              {job?.name}
+            </Option>
+          ))}
+        </Select>
+      </Space>
+      <Button onClick={handleNextWeek}>Next Week</Button>
+      </Space>
+      {/* </div> */}
+      {/* Tabs for Job Areas */}
+      <Tabs
+        defaultActiveKey={jobAreaPid?.toString()}
+        onChange={(key) => setJobAreaPid(key)}
+        style={{ marginBottom: 16 }}
+      >
+        {jobAreas?.map((jobArea: any) => (
+          <TabPane tab={jobArea?.name} key={jobArea?.id}>
+            <Table
+              loading={loading}
+              columns={columns}
+              dataSource={transformData(data || [])}
+              bordered
+              rowKey="key"
+              scroll={{ x: 1400 }}
+              pagination={{
+                onChange: (page) => {
+                  const date = moment()
+                    .startOf('isoWeek')
+                    .add((page - 1) * 10, 'days');
+                  console.log(date.format('YYYY-MM-DD'));
+                },
+                pageSize: 10,
+              }}
+              rowClassName={(record) =>
+                record.shift === 'Night Shift' ? 'night-shift-row' : ''
+              }
+            />
+          </TabPane>
+        ))}
+      </Tabs>
+      {/* job edit modal */}
+      <ModalForm
+        title="Edit Job Details"
+        visible={isJobEditModalVisible}
+        form={form}
+        footer={null}
+        onVisibleChange={setIsCustomModalVisible}
+        onCancel={() => setIsJobEditModalVisible(false)}
+        onFinish={handleEditJobSubmit}
+      >
+        <ProFormText
+          name="job_number"
+          label="Job Number"
+          readonly
+        />
+        <ProFormText
+          name="description"
+          label="Description"
+          readonly
+        />
+        <ProFormText
+          name="capacity"
+          label="Capacity"
+        />
+        <ProFormText
+          name="produced_qty"
+          label="Produced Quantity"
+        />
+        <ProFormText
+          name="yield_qty"
+          label="Yield Quantity"
+        />
+        <ProFormText
+          name="job_status"
+          label="Job Status"
+        />
+             <Form.Item name="schedule_status_id" label="Job Status">
+    <Select>
+        {jobStatuses.map(status => (
+            <Option key={status.id} value={status.value}>
+                {status.name}
+            </Option>
+        ))}
+    </Select>
+</Form.Item>
+        <ProFormText
+          name="validation"
+          label="Need Validation"
+          valuePropName="checked"
+        />
+      </ModalForm>
+      <ModalForm
+        title="Job Details"
+        visible={isCustomModalVisible}
+        form={form}
+        onVisibleChange={setIsCustomModalVisible}
+        onCancel={() => setIsCustomModalVisible(false)}
+        onFinish={async (values) => {
+          console.log("Submitted form values:", values);
+          // Handle form submission
+          return true;
+        }}
+      >
+        <ProFormText
+          name="job_number"
+          label="Job Number"
+          readonly
+        />
+        <ProFormText
+          name="description"
+          label="Description"
+          readonly
+        />
+        <ProFormText
+          name="capacity"
+          label="Capacity"
+        />
+        <ProFormText
+          name="produced_qty"
+          label="Produced Quantity"
+        />
+        <ProFormText
+          name="yield_qty"
+          label="Yield Quantity"
+        />
+        <ProFormText
+          name="job_status"
+          label="Job Status"
+        />
+        <ProFormText
+          name="validation"
+          label="Need Validation"
+          valuePropName="checked"
+        />
+      </ModalForm>
+    </div>
+  );
+};
+export default ManufacturingPlanner;
