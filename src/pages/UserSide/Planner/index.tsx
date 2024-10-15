@@ -8,7 +8,6 @@ const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 const { TabPane } = Tabs;
-// const { Option, OptGroup } = Select; 
 const ManufacturingPlanner = () => {
   const [existingJobs, setExistingJobs] = useState<any[]>([]);
   const [selectedJob, setSelectedJob] = useState(null); 
@@ -19,7 +18,6 @@ const ManufacturingPlanner = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<any>(null); 
   const [form] = Form.useForm();
-  // const [jobData, setJobData] = useState<any[]>([]);
   const [jobData, setJobData] = useState([]); 
   const [jobStatuses, setJobStatuses] = useState([]);
   const [clickedSchedule, setClickedSchedule] = useState<any>(null);
@@ -32,8 +30,7 @@ const ManufacturingPlanner = () => {
   const [isCustomModalVisible, setIsCustomModalVisible] = useState(false);
   const [isAnotherModalVisible, setIsAnotherModalVisible] = useState(false);
   const [isJobEditModalVisible, setIsJobEditModalVisible] = useState(false);
-  const [activeTabKey, setActiveTabKey] = useState<string>('1'); // Track the active tab
-  // const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false); // State for AddNewJobModal visibility
+  const [activeTabKey, setActiveTabKey] = useState<string>('1'); 
   // Load job types on mount
   const { data: jobTypes, loading: jobTypesLoading } = useRequest(() =>
     request('/job-types').then((res) => ({ data: res?.data?.data }))
@@ -81,21 +78,18 @@ const ManufacturingPlanner = () => {
           shift,
           jobs: schedulesForDayShift?.map((schedule: any) => ({
             id: schedule?.schedule_job_id,
-            // job_count: schedule?.booked_qty,
             job_description: schedule?.job_description,
             booked_qty: schedule?.booked_qty,
             schedule_job_number: schedule?.schedule_job_number,
             schedule_status_name: schedule?.schedule_status_name,
             job_line_id: schedule?.job_line_id,
             job_validation_required: schedule.job_validation_required ? 1 : 0 , 
-            // need_validation: schedule.need_validation,
             bgColor: schedule?.status_background_color,
             textColor: schedule?.status_text_color,
           })),
         });
       });
     });
-
     return transformedData;
   };
  // Fetch job details and set the modal visibility
@@ -103,10 +97,8 @@ const ManufacturingPlanner = () => {
   try {
     const response = await request(`/schedule-jobs/${jobId}`);
     if (response.success) {
-      setSelectedJob(response.data); // Update state with the fetched job details
+      setSelectedJob(response.data); 
       console.log("Job details:", response.data);
-      
-      // Set form fields with fetched job data
       form.setFieldsValue({
         job_number: response.data.job_number,
         description: response.data.description,
@@ -128,42 +120,23 @@ const ManufacturingPlanner = () => {
     message.error("Error fetching job details");
   }
 };
-
 // Handle job selection
 const handleJobSelect = (value: string) => {
-  setSelectedJob(value); // Set selected job
-  fetchJobDetails(value); // Fetch job details
+  setSelectedJob(value); 
+  fetchJobDetails(value); 
 };
-// const handleEditJobSubmit = async (values) => {
-//   try {
-//     const response = await request(`/schedule-jobs/${selectedJob.id}`, {
-//       method: 'PUT',
-//       data: values, // Send the updated job details
-//     });
-//     if (response.success) {
-//       message.success("Job updated successfully");
-//       setIsJobEditModalVisible(false); // Close the modal
-//       fetchJobData(); // Refresh job data
-//     } else {
-//       message.error("Failed to update job");
-//     }
-//   } catch (error) {
-//     console.error("Error updating job:", error);
-//     message.error("Error updating job");
-//   }
-// };
 const handleEditJobSubmit = async (values) => {
-  if (!selectedJob) return; // Ensure selectedJob is not null
+  if (!selectedJob) return;
 
   try {
     const response = await request(`/schedule-jobs/${selectedJob.id}`, {
       method: 'PUT',
-      data: values, // Send the updated job details
+      data: values,
     });
     if (response.success) {
       message.success("Job updated successfully");
-      setIsJobEditModalVisible(false); // Close the modal
-      fetchJobData(); // Refresh job data
+      setIsJobEditModalVisible(false);
+      fetchJobData();
     } else {
       message.error("Failed to update job");
     }
@@ -174,34 +147,32 @@ const handleEditJobSubmit = async (values) => {
 };
 
   useEffect(() => {
-    fetchJobData(); // Fetch job data on mount
+    fetchJobData(); 
   }, []);
-   // Handle the tab change
+   // Handling the tab change
    const handleTabChange = (key: string) => {
     setActiveTabKey(key);
-    // Optionally, you can trigger different data fetches based on the tab here
     console.log(`Active tab: ${key}`);
   };
   const handleJobLineSelection = (value) => {
-    setSelectedJobLineId(value); // Set job_line_id based on selection
+    setSelectedJobLineId(value); 
   };
  // Handle Job Type Change (Dropdown)
   const handleJobTypeChange = (value: string) => {
     setJobType(value);
-    fetchJobAreas(value); // Fetch the corresponding job areas
+    fetchJobAreas(value); 
   };
   useEffect(() => {
-    fetchJobData();  // Fetch job data when the component mounts or jobType changes
-  }, [jobType]);  // Add jobType to the dependency array to refetch if jobType changes
+    fetchJobData();  
+  }, [jobType]);  
   useEffect(() => {
     const fetchData = async () => {
       const res = await request('/schedules');
       const transformedSchedules = transformData(res?.data);
       setTableData(transformedSchedules)
-      // setData(transformedSchedules);  // Update transformed data
     };
     fetchData();
-  }, [currentWeek, data]);  // Add currentWeek dependency to refetch data when the week changes
+  }, [currentWeek, data]);
   const fetchJobData = async () => {
     try {
       const response = await request("/schedule-jobs");
@@ -235,10 +206,10 @@ const handleCustomModalCancel = () => {
 };
     // Handle search
     const  handleSearch = async (value: string) => {
-      setSearchTerm(value); // Update search term state
+      setSearchTerm(value); 
       try {
         const response = await request(`/schedule-jobs`, {
-          params: { search: value }, // Pass the search parameter
+          params: { search: value }, 
         });
         if (response.success) {
           setJobData(
@@ -260,7 +231,6 @@ const handleCustomModalCancel = () => {
         message.error("Error fetching search results");
       }
     };
-  
   const fetchJobStatuses = async (jobTypeId) => {
     try {
       const response = await request(`/schedule-statuses/job-type/${jobTypeId}`);
@@ -279,7 +249,6 @@ const handleCustomModalCancel = () => {
     setSelectedJob(job);
     if (job) {
       form.setFieldsValue({
-        // capacity: job.capacity,
         capacity: selectedJob?.capacity || 'default capacity value', 
       });
       setSelectedScheduleJobId(job.key);
@@ -288,8 +257,6 @@ const handleCustomModalCancel = () => {
   };
   const fetchSlotJobs = async (params:any) => {
     try {
-      // Construct the endpoint URL with the required parameters
-     
       const response = await request(`/schedules`,{params}); 
       setSelectedJob(response?.original?.data);
       console.log(response);
@@ -301,8 +268,6 @@ const handleCustomModalCancel = () => {
   const menu = (
     <Menu>
        <Menu.Item key="2" onClick={() => {
-      // setSelectedJobForStatusChange(selectedSlot); // assuming selectedSlot is the currently selected job
-      // setChangeStatusModalVisible(true);
     }}>
       Change Job Status
     </Menu.Item>
@@ -380,12 +345,10 @@ const handleCustomModalCancel = () => {
                   }}
                   onClick={() => {
                     console.log('Selected job:', job?.id,getShiftId?.id,moment(record?.day).format('YYYY-MM-DD'));
-                    // Handle adding a new job
                     setSelectedSlot(job);
                     setExistingJobs(record.jobs);
                     fetchSlotJobs({schedule_date:moment(record?.day).format('YYYY-MM-DD'),shift:getShiftId?.id,job_line:job?.id});
                     setIsModalVisible(true);
-                    // handleAddJobModalClick(record)
                   }}
                 >
                   Add New Job
@@ -394,8 +357,7 @@ const handleCustomModalCancel = () => {
               }
   {jobs
     ?.filter((j: any) => j?.job_line_id === job?.id)
-    ?.map((job: any) => (
-      
+    ?.map((job: any) => (    
 <Card
   key={job?.id}
   size="small"
@@ -411,7 +373,6 @@ const handleCustomModalCancel = () => {
     display:'flex',
     flexDirection:'column',
     justifyContent:'space-between',
-    // minHeight: '70px', 
   }}
   onClick={() => {
     setClickedSchedule(job);
@@ -422,7 +383,7 @@ const handleCustomModalCancel = () => {
       display: 'flex', 
       justifyContent: 'space-between', 
       alignItems: 'center',
-      marginBottom: '0px', // Reduced margin for a compact look
+      marginBottom: '0px', 
     }}>
     {/* Validation Icon (on the left) */}
     {job?.isValid && (
@@ -434,38 +395,35 @@ const handleCustomModalCancel = () => {
         style={{ 
           fill: 'green', 
           fontSize: '1.2em',
-          marginRight: '8px' // Spacing between validation mark and job number
+          marginRight: '8px' 
         }}
       >
         <path d="M456 231a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0m0 280a56 56 0 1 0 112 0a56 56 0 1 0-112 0" />
       </svg>
     )}
-
     {/* Job Number (centered between validation and dropdown) */}
     <Button
       type="link"
       style={{ 
         fontWeight: 'bold', 
         color: '#000', 
-        fontSize: '12px',  // Font size for job number
-        lineHeight: '1',  // Compact line height
-        // margin: 0,
+        fontSize: '12px',  
+        lineHeight: '1', 
         margin: '0px 0',
         padding: 0,
         marginTop:'-10px',
-        flex: '1',  // Allow job number to take space between
-        textAlign: 'center',  // Center the job number between elements
+        flex: '1', 
+        textAlign: 'center', 
       }}
     >
       {job?.schedule_job_number}
     </Button>
-
     {/* Dropdown Menu (on the right) */}
     <Dropdown overlay={menu} trigger={['click']}>
       <div
         style={{
           cursor: 'pointer',
-          marginLeft: '4px' // Spacing between elements
+          marginLeft: '4px'
         }}
         aria-label="More options"
       >
@@ -484,13 +442,6 @@ const handleCustomModalCancel = () => {
       </div>
     </Dropdown>
   </div>
-  {/* <div style={{ textAlign: 'center' }}> */}
-  {/* <Button
-          type="link"
-          style={{ fontWeight: 'bold', color: '#000', fontSize: '11px',lineHeight:'1',marginBottom:'0px',marginTop:'0px' }}
-        >
-          {job?.schedule_job_number} 
-        </Button> */}
     <Tooltip title={job.job_description} placement="top">
       <div style={{ 
          color: 'grey',
@@ -499,8 +450,8 @@ const handleCustomModalCancel = () => {
          textOverflow: 'ellipsis',
          maxWidth: '300px',
          fontSize: '12px',
-         marginTop: '-4px', // Adjust margin for a smaller gap
-         textAlign: 'center', // Center text
+         marginTop: '-4px',
+         textAlign: 'center', 
        }}>
         {job.job_description.split(' ').slice(0, 3).join(' ') + (job.job_description.split(' ').length > 3 ? '...' : '')}
       </div>
@@ -521,8 +472,7 @@ const handleCustomModalCancel = () => {
           display: 'flex',
           textAlign:'center',
           marginTop:'-6px',
-          // alignItems: 'center',
-          fontSize: '11px', // Reduce font size
+          fontSize: '11px', 
         }}
       >
         <svg
@@ -540,7 +490,6 @@ const handleCustomModalCancel = () => {
     {job.job_validation_required === 1 && (
     <div style={{ position: 'absolute', top: '5px', left: '5px', color: '#FFD700' ,fontSize: '24px'}}>★</div>
   )}
-  {/* </div> */}
 </Card>   
     ))}
 </div>
@@ -591,13 +540,11 @@ onVisibleChange={async (visible) => {
   if (visible && selectedJobLineId) {
       const selectedJob = jobData.find((job) => job.id === selectedJobLineId);
       if (selectedJob) {
-          await fetchJobStatuses(selectedJob.jobType); // Make sure to pass the job type ID
+          await fetchJobStatuses(selectedJob.jobType); 
       }
   }
 }}
 >
-{/* Replace here with content for the form i.e Job Number, booked qty, ...rest */}
-{/* <ProFormText name="name" label="Job Number" /> */}
 <ProForm>
       <Row gutter={24}>
           <Col span={8}>
@@ -609,17 +556,16 @@ onVisibleChange={async (visible) => {
         style={{ 
           marginBottom: '10px', 
           width: '150px', 
-          backgroundColor: 'white', // White background
-          color: 'black',            // Black text
-          fontWeight: 'bold',        // Bold text
-          // border: '1px solid #d9d9d9', // Border for a clean look
+          backgroundColor: 'white', 
+          color: 'black',           
+          fontWeight: 'bold',       
         }}
         onClick={() => fetchJobDetails(job?.id)}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = '#d9d9d9'; // Grey background on hover
+          e.currentTarget.style.backgroundColor = '#d9d9d9'; 
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'white'; // Reset to white on leave
+          e.currentTarget.style.backgroundColor = 'white'; 
         }}
       >
         Job #: {job?.schedule_job_number}
@@ -710,457 +656,9 @@ onVisibleChange={async (visible) => {
         </Col>
       </Row>
     </ProForm>
-                   
                     </ModalForm>
                     {jobs?.filter((j: any) => j?.job_line_id === job?.id)?.length <=
                       0 && (
-//                       <ModalForm
-//                         title="Add Job"
-//                         submitter={{
-//                           searchConfig: {
-//                             submitText: 'Add Job',
-//                             resetText: 'Cancel',
-//                           },
-//                         }}
-//                         trigger={
-                        
-// <Card
-//       style={{ width: '80%', borderRadius: 0, cursor: 'pointer',height:'40px',display:'flex',justifyContent:'center',alignItems:'center',padding:'0',backgroundColor:'#F8F4FE',color:'#6200EE',border:'none' }}
-//       onClick={() => {
-//         setSelectedJobLineId(job?.id); // Update the selected job line
-//         const selectedShift = shiftsFromApi?.find(
-//           (shift) => shift.name === record?.shift
-//         );
-//         const selectedScheduleDate = moment(record?.day).format('YYYY-MM-DD'); // Capture the schedule date
-//         setClickedSchedule({
-//           job_line_id: job?.id,
-//           shift_id: selectedShift?.id,
-//           schedule_date: selectedScheduleDate,
-//           job_description: job?.job_description,
-//           // need_validation: job?.need_validation,
-//         });
-//         setIsModalVisible(true); // Open the modal
-//       }}
-//     >
-//       <span style={{color:'#6200EE'}}>FREE</span>
-//     </Card>
-                      
-//                         }
-//                         onFinish={async (values: any) => {
-//                           console.log(values);
-    
-//                           // const getShiftId = shiftsFromApi?.find(
-//                           //   (shift: any) => shift?.name === record?.shift,
-//                           // );
-//                           // // you have the day here with the standard format
-//                           console.log(moment(record?.day).format('YYYY-MM-DD'));
-    
-//                           // // you have the shift id here
-//                           console.log(getShiftId?.id);
-    
-//                           // Do your POST here for Adding a new job
-                          
-//                           const formattedScheduleDate = moment(values.schedule_date).format('YYYY-MM-DD');
-//                           try {
-//                             await request('/schedules', {
-//                               method: 'POST',
-//                               data: {
-//                                 ...values,
-//                                 job_line_id: selectedJobLineId, // Include the job_line_id
-//                                 schedule_job_id: selectedScheduleJobId,
-//                                 shift_id: getShiftId?.id,
-//                                 job_validation_required: values.job_validation_required ? 1 : 0,
-//                                 // schedule_date: record?.day,
-//                                 schedule_date: formattedScheduleDate,
-//                                 capacity: selectedJob?.capacity || values.capacity,
-//                               },
-//                             })   
-//                             console.log({
-//                               job_line_id: selectedJobLineId,
-//                               schedule_job_id: selectedScheduleJobId,
-//                               shift_id: getShiftId?.id,
-//                               schedule_date: record?.day,
-//                               capacity: selectedJob?.capacity || values.capacity,
-//                             });
-
-//                             const updatedSchedules = await request('/schedules'); // Refetch the schedules data
-//                             const transformedSchedules = transformData(updatedSchedules?.data);
-//                             setJobData(updatedSchedules?.data);
-//                             data(transformedSchedules);
-
-//                             // you have success MESSAGE here and REFRESH the schedules on the table i.e
-//                             message.success('Job added successfully');
-//                             // this keeps modal open when success
-//                             setIsModalVisible(false);
-//                             return true;
-//                           } catch (error) {
-//                             // this keeps modal open when there is an error
-//                             return false;
-//                           }
-//                         }}
-//                         // onVisibleChange={(visible) => setIsModalVisible(visible)}
-//                         onVisibleChange={async (visible) => {
-//                           setIsModalVisible(visible);
-//                           if (visible && selectedJobLineId) {
-//                               const selectedJob = jobData.find((job) => job.id === selectedJobLineId);
-//                               if (selectedJob) {
-//                                   await fetchJobStatuses(selectedJob.jobType); // Make sure to pass the job type ID
-//                               }
-//                           }
-//                       }}
-//                       >
-//                         {/* Replace here with content for the form i.e Job Number, booked qty, ...rest */}
-//                         {/* <ProFormText name="name" label="Job Number" /> */}
-//                         <ProFormText name="job_number" label="Job Number">
-//                        <Select
-//           placeholder="Select Job Number"
-//           onChange={handleJobNumberChange}
-//           showSearch
-//           filterOption={(input, option) =>
-//             option.children
-//               .toLowerCase()
-//               .includes(input.toLowerCase())
-//           }
-//         >
-//           {jobData?.length > 0 ? (
-//   jobData.map((job) => (
-//     <Option key={job.key} value={job.jobNumber}>
-//       {job.jobNumber} - {job.itemDetails}
-//     </Option>
-//   ))
-// ) : (
-//   <p>No jobs available</p>
-// )}
-//         </Select>
-//                     </ProFormText>
-//                     <ProFormText name="booked_qty" label="Booked Quantity" />
-//                     {/* <ProFormText name="capacity" label="Capacity" /> */}
-//                     <ProFormText 
-//   name="capacity" 
-//   label="Capacity" 
-//   value={selectedJob?.capacity} // Ensure it's being populated correctly
-//   disabled={true} // Mark the field as read-only
-// />
-//                     <ProFormText name="comments" label="Comments" />
-                    
-//                     <Form.Item name="schedule_status_id" label="Job Status">
-//     <Select>
-//         {jobStatuses.map(status => (
-//             <Option key={status.id} value={status.value}>
-//                 {status.name}
-//             </Option>
-//         ))}
-//     </Select>
-// </Form.Item>
-// {/* <Checkbox name="need_validation" label="Need Validation" /> */}
-// <Form.Item
-//   name="job_validation_required"
-//   valuePropName="checked" // This maps the checked state to the form value
-// >
-//   <Checkbox>Need Validation</Checkbox>
-// </Form.Item>
-
-//                       </ModalForm>
-// {/* <ModalForm
-//   title="Add Job"
-//   submitter={{
-//     searchConfig: {
-//       submitText: 'Add Job',
-//       resetText: 'Cancel',
-//     },
-//   }}
-//   trigger={
-//     <Card
-//       style={{
-//         width: '80%',
-//         borderRadius: 0,
-//         cursor: 'pointer',
-//         height: '40px',
-//         display: 'flex',
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         padding: '0',
-//         backgroundColor: '#F8F4FE',
-//         color: '#6200EE',
-//         border: 'none',
-//       }}
-//       onClick={() => {
-//         setSelectedJobLineId(job?.id);
-//         const selectedShift = shiftsFromApi?.find(
-//           (shift) => shift.name === record?.shift
-//         );
-//         const selectedScheduleDate = moment(record?.day).format('YYYY-MM-DD');
-//         setClickedSchedule({
-//           job_line_id: job?.id,
-//           shift_id: selectedShift?.id,
-//           schedule_date: selectedScheduleDate,
-//           job_description: job?.job_description,
-//         });
-//         setIsModalVisible(true);
-//       }}
-//     >
-//       <span style={{ color: '#6200EE' }}>FREE</span>
-//     </Card>
-//   }
-//   onFinish={async (values: any) => {
-//     const formattedScheduleDate = moment(values.schedule_date).format('YYYY-MM-DD');
-//     try {
-//       await request('/schedules', {
-//         method: 'POST',
-//         data: {
-//           ...values,
-//           job_line_id: selectedJobLineId,
-//           schedule_job_id: selectedScheduleJobId,
-//           shift_id: getShiftId?.id,
-//           job_validation_required: values.job_validation_required ? 1 : 0,
-//           schedule_date: formattedScheduleDate,
-//           capacity: selectedJob?.capacity || values.capacity,
-//         },
-//       });
-//       const updatedSchedules = await request('/schedules');
-//       const transformedSchedules = transformData(updatedSchedules?.data);
-//       setJobData(updatedSchedules?.data);
-//       data(transformedSchedules);
-
-//       message.success('Job added successfully');
-//       setIsModalVisible(false);
-//       return true;
-//     } catch (error) {
-//       return false;
-//     }
-//   }}
-//   onVisibleChange={async (visible) => {
-//     setIsModalVisible(visible);
-//     if (visible && selectedJobLineId) {
-//       const selectedJob = jobData.find((job) => job.id === selectedJobLineId);
-//       if (selectedJob) {
-//         await fetchJobStatuses(selectedJob.jobType);
-//       }
-//     }
-//   }}
-// >
-//   {/* Display Selected Slot Details */}
-//   <div style={{ marginBottom: '20px' }}>
-//     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-//       <div>
-//         <strong>Selected Shift:</strong> {record?.shift || 'N/A'}
-//       </div>
-//       <div>
-//         <strong>Line ID:</strong> {job?.id || 'N/A'}
-//       </div>
-//     </div>
-//     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-//       <div>
-//         <strong>Scheduled Date:</strong> {moment(record?.day).format('YYYY-MM-DD') || 'N/A'}
-//       </div>
-//       <div>
-//         <strong>Job Type:</strong> {job?.job_type || 'N/A'}
-//       </div>
-//     </div>
-//   </div>
-
-//   {/* Form Fields */}
-//   <ProFormText name="job_number" label="Job Number">
-//     <Select
-//       placeholder="Select Job Number"
-//       onChange={handleJobNumberChange}
-//       showSearch
-//       filterOption={(input, option) =>
-//         option.children.toLowerCase().includes(input.toLowerCase())
-//       }
-//     >
-//       {jobData?.length > 0 ? (
-//         jobData.map((job) => (
-//           <Option key={job.key} value={job.jobNumber}>
-//             {job.jobNumber} - {job.itemDetails}
-//           </Option>
-//         ))
-//       ) : (
-//         <p>No jobs available</p>
-//       )}
-//     </Select>
-//   </ProFormText>
-//   <ProFormText name="booked_qty" label="Booked Quantity" />
-//   <ProFormText
-//     name="capacity"
-//     label="Capacity"
-//     value={selectedJob?.capacity}
-//     disabled={true}
-//   />
-//   <ProFormText name="comments" label="Comments" />
-  
-//   <Form.Item name="schedule_status_id" label="Job Status">
-//     <Select>
-//       {jobStatuses.map((status) => (
-//         <Option key={status.id} value={status.value}>
-//           {status.name}
-//         </Option>
-//       ))}
-//     </Select>
-//   </Form.Item>
-  
-//   <Form.Item name="job_validation_required" valuePropName="checked">
-//     <Checkbox>Need Validation</Checkbox>
-//   </Form.Item>
-// </ModalForm> */}
-// {/* <ModalForm
-//   title={
-//     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-//       <h3 style={{ margin: 0 }}>SCHEDULER</h3>
-//       <button
-//         style={{ background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}
-//         onClick={() => setIsModalVisible(false)}
-//       >
-//         ×
-//       </button>
-//     </div>
-//   }
-//   submitter={{
-//     searchConfig: {
-//       submitText: 'Add Job',
-//       resetText: 'Cancel',
-//     },
-//   }}
-//   trigger={
-//     <Card
-//       style={{
-//         width: '80%',
-//         borderRadius: 0,
-//         cursor: 'pointer',
-//         height: '40px',
-//         display: 'flex',
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         padding: '0',
-//         backgroundColor: '#F8F4FE',
-//         color: '#6200EE',
-//         border: 'none',
-//       }}
-//       onClick={() => {
-//         setSelectedJobLineId(job?.id);
-//         const selectedShift = shiftsFromApi?.find((shift) => shift.name === record?.shift);
-//         const selectedScheduleDate = moment(record?.day).format('YYYY-MM-DD');
-//         setClickedSchedule({
-//           job_line_id: job?.id,
-//           shift_id: selectedShift?.id,
-//           schedule_date: selectedScheduleDate,
-//           job_description: job?.job_description,
-//         });
-//         setIsModalVisible(true);
-//       }}
-//     >
-//       <span style={{ color: '#6200EE' }}>FREE</span>
-//     </Card>
-//   }
-//   onFinish={async (values) => {
-//     const formattedScheduleDate = moment(values.schedule_date).format('YYYY-MM-DD');
-//     try {
-//       await request('/schedules', {
-//         method: 'POST',
-//         data: {
-//           ...values,
-//           job_line_id: selectedJobLineId,
-//           schedule_job_id: selectedScheduleJobId,
-//           shift_id: getShiftId?.id,
-//           job_validation_required: values.job_validation_required ? 1 : 0,
-//           schedule_date: formattedScheduleDate,
-//           capacity: selectedJob?.capacity || values.capacity,
-//         },
-//       });
-//       const updatedSchedules = await request('/schedules');
-//       const transformedSchedules = transformData(updatedSchedules?.data);
-//       setJobData(updatedSchedules?.data);
-//       data(transformedSchedules);
-
-//       message.success('Job added successfully');
-//       setIsModalVisible(false); // Close the modal on success
-//       return true;
-//     } catch (error) {
-//       return false;
-//     }
-//   }}
-//   onVisibleChange={async (visible) => {
-//     setIsModalVisible(visible);
-//     if (visible && selectedJobLineId) {
-//       const selectedJob = jobData.find((job) => job.id === selectedJobLineId);
-//       if (selectedJob) {
-//         await fetchJobStatuses(selectedJob.jobType);
-//       }
-//     }
-//   }}
-// >
-//   {/* Top Section with Slot Details */}
-//   <div style={{ marginBottom: '20px', textAlign: 'right' }}>
-//     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-//       <div>
-//         <strong>Date:</strong> {moment(record?.day).format('dddd DD MMM, YYYY')}
-//       </div>
-//       <div>
-//         <strong>Time:</strong> {record?.shift || 'N/A'}
-//       </div>
-//     </div>
-//     <div>
-//       <strong>Job Type:</strong> {job?.job_type || 'N/A'}
-//     </div>
-//     <div>
-//       <strong>Job Area:</strong> Home Care (Area 1)
-//     </div>
-//     <div>
-//       <strong>Line:</strong> {job?.id || 'N/A'}
-//     </div>
-//   </div>
-
-//   {/* Add New Job Button */}
-//   <Button type="primary" onClick={() => console.log('Add new job')} style={{ marginBottom: '20px' }}>
-//     Add New Job
-//   </Button>
-
-//   {/* Search Job Number */}
-//   <ProFormText name="job_number" label="Search Job Number">
-//     <Select
-//       placeholder="Select Job Number"
-//       onChange={handleJobNumberChange}
-//       showSearch
-//       filterOption={(input, option) =>
-//         option.children.toLowerCase().includes(input.toLowerCase())
-//       }
-//     >
-//       {jobData?.length > 0 ? (
-//         jobData.map((job) => (
-//           <Option key={job.key} value={job.jobNumber}>
-//             {job.jobNumber} - {job.itemDetails}
-//           </Option>
-//         ))
-//       ) : (
-//         <p>No jobs available</p>
-//       )}
-//     </Select>
-//   </ProFormText>
-
-//   {/* Form Fields - Initially hidden, shown after job selection */}
-//   {selectedJob && (
-//     <>
-//       <ProFormText name="booked_qty" label="Booked Quantity" />
-//       <ProFormText name="capacity" label="Capacity" value={selectedJob?.capacity} disabled />
-//       <ProFormText name="comments" label="Comments" />
-//     </>
-//   )}
-
-//   {/* Status Checkboxes */}
-//   <Form.Item name="schedule_status_id" label="Job Status">
-//     <Checkbox.Group>
-//       {jobStatuses.map((status) => (
-//         <Checkbox key={status.id} value={status.value}>
-//           {status.name}
-//         </Checkbox>
-//       ))}
-//     </Checkbox.Group>
-//   </Form.Item>
- 
-//   <Form.Item name="job_validation_required" valuePropName="checked">
-//     <Checkbox>Need Validation</Checkbox>
-//   </Form.Item>
-// </ModalForm> */}
 <ModalForm
   title={
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1344,32 +842,15 @@ onVisibleChange={async (visible) => {
           Hi System Administrator, welcome back! Here's your planner summary.
         </h2>
       </div>
-      {/* <div style={{ display: 'flex', marginBottom:'16',justifyContent:'flex-end' }}>
-      <Select
-        showSearch
-        value={selectedJob}
-        placeholder="Search Jobs"
-        style={{ width: 300 }}
-        onSearch={handleSearch} // Trigger search when typing
-        onSelect={handleJobSelect} // Set selected job
-        filterOption={false} // Disable built-in filter since we're fetching from API
-      >
-        {jobData.map((job) => (
-          <Option key={job.key} value={job.key}>
-            {job.jobNumber}
-          </Option>
-        ))}
-      </Select>
-    </div> */}
    <div style={{ display: 'flex', marginBottom: '16px', justifyContent: 'flex-end' }}>
   <Select
     showSearch
     value={selectedJob}
     placeholder="Search Jobs"
     style={{ width: 300 }}
-    onSearch={handleSearch} // Trigger search when typing
-    onSelect={handleJobSelect} // Set selected job
-    filterOption={false} // Disable built-in filter since we're fetching from API
+    onSearch={handleSearch} 
+    onSelect={handleJobSelect} 
+    filterOption={false}
     dropdownRender={(menu) => (
       <>
         <div style={{ padding: '8px', fontWeight: 'bold' }}>Search Results</div>
@@ -1388,22 +869,10 @@ onVisibleChange={async (visible) => {
     <Option disabled>No jobs available</Option>  // Fallback message if no jobs
   )}
 </Select.OptGroup>
-
-    {/* <Select.OptGroup label="Types">  {/* Correct usage of OptGroup */}
-      {/* {jobData.map((job) => (
-        <Option key={`jobTypeSymbol-${job.key}`} value={job.key}>
-          {job.jobTypeSymbol}
-        </Option>
-      ))}
-    </Select.OptGroup> */} 
   </Select>
 </div>
-
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
       <Space style={{ marginBottom: 16,display:'flex',alignItems:'center' }}>
-        {/* <div style={{display:'flex',alignItems:'center'}}> */}
-        {/* <Button icon={<LeftOutlined/>} onClick={handlePreviousWeek}>Previous Week</Button>
-         */}
           <Button
         icon={<ArrowLeftOutlined />} // Left arrow icon
         onClick={handlePreviousWeek}
@@ -1412,8 +881,6 @@ onVisibleChange={async (visible) => {
         Previous Week
       </Button>
         {/* </div> */}
-      {/* Dropdown for Job Type Selection */}
-      {/* <Space style={{ marginBottom: 16 }}> */}
       <RangePicker
           // disabled
           picker="week"
@@ -1422,22 +889,6 @@ onVisibleChange={async (visible) => {
           style={{ width: 300, height: 32 }}
           format="YYYY-wo"
         />
-        {/* <Button onClick={handleNextWeek}>Next Week</Button> */}
-        {/* <Select
-          showSearch
-          value={selectedJob}
-          placeholder="Search Jobs"
-          style={{ width: 200 }}
-          onSearch={handleSearch} // Trigger search when typing
-          onSelect={handleJobSelect} // Set selected job
-          filterOption={false} // Disable built-in filter since we're fetching from API
-        >
-          {jobData.map((job) => (
-            <Option key={job.key} value={job.key}>
-              {job.jobNumber} 
-            </Option>
-          ))}
-        </Select> */}
         <Select
           defaultValue={jobType}
           style={{ width: 300,height:'40' }}
@@ -1458,29 +909,8 @@ onVisibleChange={async (visible) => {
       >
         Next Week
       </Button>
-        {/* <Button icon={<RightOutlined/>}onClick={handleNextWeek}>Next Week</Button> */}
-      </Space>
-      {/* <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Select
-        showSearch
-        value={selectedJob}
-        placeholder="Search Jobs"
-        style={{ width: 200 }}
-        onSearch={handleSearch} // Trigger search when typing
-        onSelect={handleJobSelect} // Set selected job
-        filterOption={false} // Disable built-in filter since we're fetching from API
-      >
-        {jobData.map((job) => (
-          <Option key={job.key} value={job.key}>
-            {job.jobNumber}
-          </Option>
-        ))}
-      </Select>
-    </div> */}
+      </Space>   
     </div>
-      {/* <Button onClick={handleNextWeek}>Next Week</Button> */}
-      {/* </Space> */}
-      {/* </div> */}
       {/* Tabs for Job Areas */}
       <Tabs
         defaultActiveKey={jobAreaPid?.toString()}
