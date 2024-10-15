@@ -31,10 +31,16 @@ const ManufacturingPlanner = () => {
   const [isAnotherModalVisible, setIsAnotherModalVisible] = useState(false);
   const [isJobEditModalVisible, setIsJobEditModalVisible] = useState(false);
   const [activeTabKey, setActiveTabKey] = useState<string>('1'); 
-  // Load job types on mount
   const { data: jobTypes, loading: jobTypesLoading } = useRequest(() =>
     request('/job-types').then((res) => ({ data: res?.data?.data }))
   );
+  useEffect(() => {
+    if (jobTypes && jobTypes.length > 0) {
+      const firstJobTypeId = jobTypes[0].id; // Get the ID of the first job type
+      setJobType(firstJobTypeId); // Set the job type to the first one
+      fetchJobAreas(firstJobTypeId); // Fetch job areas for the first job type
+    }
+  }, [jobTypes]);
   // Fetch job areas when the job type is changed
   const fetchJobAreas = async (jobTypeId: string) => {
     const res = await request(`/job-types/${jobTypeId}`);
@@ -53,6 +59,11 @@ const ManufacturingPlanner = () => {
     },
     { refreshDeps: [jobAreaPid] }
   );
+  useEffect(() => {
+    if (jobAreaPid) {
+      fetchJobDetails(jobAreaPid); // Pass the first job area's ID to fetch job details
+    }
+  }, [jobAreaPid]);
   const { data: shiftsFromApi } = useRequest(() =>
         request('/shifts').then((res) => ({ data: res?.data?.data })),
       );
