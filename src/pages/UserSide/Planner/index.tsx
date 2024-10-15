@@ -121,7 +121,7 @@ const ManufacturingPlanner = () => {
       });
 
       // Open the modal
-      setIsJobEditModalVisible(true)
+      // setIsJobEditModalVisible(true)
       setIsCustomModalVisible(true);
     } else {
       message.error("Failed to fetch job details");
@@ -670,7 +670,7 @@ onVisibleChange={async (visible) => {
                     </ModalForm>
                     {jobs?.filter((j: any) => j?.job_line_id === job?.id)?.length <=
                       0 && (
-<ModalForm
+                      <ModalForm
   title={
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <h3 style={{ margin: 0 }}>SCHEDULER</h3>
@@ -678,7 +678,7 @@ onVisibleChange={async (visible) => {
         style={{ background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}
         onClick={() => setIsModalVisible(false)}
       >
-        {/* × */}
+        {/* Close button */}
       </button>
     </div>
   }
@@ -716,7 +716,7 @@ onVisibleChange={async (visible) => {
         setIsModalVisible(true);
       }}
     >
-      <span style={{ color: '#6200EE',alignSelf:'center' }}>FREE</span>
+      <span style={{ color: '#6200EE', alignSelf: 'center' }}>FREE</span>
     </Card>
   }
   onFinish={async (values) => {
@@ -740,7 +740,7 @@ onVisibleChange={async (visible) => {
       data(transformedSchedules);
 
       message.success('Job added successfully');
-      setIsModalVisible(false); // Close the modal on success
+      setIsModalVisible(false); 
       return true;
     } catch (error) {
       return false;
@@ -756,35 +756,100 @@ onVisibleChange={async (visible) => {
     }
   }}
 >
-  {/* Top Section with Slot Details */}
-  <div style={{ marginBottom: '20px', textAlign: 'right' }}>
-    {/* Date and Time in a row */}
-    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-      <div style={{ marginRight: '20px' }}>
-        <strong>Date:</strong> {moment(record?.day).format('dddd DD MMM, YYYY')}
+  <div style={{ 
+  display: 'flex', 
+  flexDirection: 'column', 
+  marginBottom: '20px', 
+  padding: '15px', 
+  borderRadius: '8px', 
+  backgroundColor: '#fafafa' 
+}}>
+  {/* Date and Time Section */}
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    padding: '12px', 
+    borderRadius: '6px', 
+    border: '1px solid #e0e0e0', 
+    backgroundColor: '#fff', 
+    transition: 'all 0.3s ease', 
+    gap: '15px',
+  }}>
+    <div style={{ textAlign: 'center', flex: 1 }}>
+      <strong style={{ 
+        display: 'block', 
+        marginBottom: '6px', 
+        fontSize: '14px', 
+        fontWeight: '500', 
+        color: '#007BFF' 
+      }}>
+        Date
+      </strong>
+      <div style={{ fontSize: '13px', color: '#555' }}>
+        {moment(record?.day).format('dddd DD MMM, YYYY')}
       </div>
-      <div>
-        <strong>Time:</strong> {record?.shift || 'N/A'}
+    </div>
+    <div style={{ textAlign: 'center', flex: 1 }}>
+      <strong style={{ 
+        display: 'block', 
+        marginBottom: '6px', 
+        fontSize: '14px', 
+        fontWeight: '500', 
+        color: '#007BFF' 
+      }}>
+        Time
+      </strong>
+      <div style={{ fontSize: '13px', color: '#555' }}>
+        {record?.shift || 'N/A'}
       </div>
-    </div>
-
-    {/* Job Type below Date */}
-    <div style={{ marginBottom: '5px', textAlign: 'right' }}>
-      <strong>Job Type:</strong> {job?.job_type || 'N/A'}
-    </div>
-
-    {/* Job Area below Time */}
-    <div style={{ marginBottom: '5px', textAlign: 'right' }}>
-      <strong>Job Area:</strong> Home Care (Area 1)
-    </div>
-
-    {/* Job Line below Job Type */}
-    <div style={{ textAlign: 'right' }}>
-      <strong>Line:</strong> {job?.id || 'N/A'}
     </div>
   </div>
+
+  {/* Job Area and Job Line Section */}
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    padding: '12px', 
+    borderRadius: '6px', 
+    border: '1px solid #e0e0e0', 
+    backgroundColor: '#fff', 
+    transition: 'all 0.3s ease', 
+    gap: '15px', 
+    marginTop: '10px'
+  }}>
+    <div style={{ textAlign: 'center', flex: 1 }}>
+      <strong style={{ 
+        display: 'block', 
+        marginBottom: '6px', 
+        fontSize: '14px', 
+        fontWeight: '500', 
+        color: '#007BFF' 
+      }}>
+        Job Area
+      </strong>
+      <div style={{ fontSize: '13px', color: '#555' }}>
+        Home Care (Area 1)
+      </div>
+    </div>
+    <div style={{ textAlign: 'center', flex: 1 }}>
+      <strong style={{ 
+        display: 'block', 
+        marginBottom: '6px', 
+        fontSize: '14px', 
+        fontWeight: '500', 
+        color: '#007BFF' 
+      }}>
+        Job Line
+      </strong>
+      <div style={{ fontSize: '13px', color: '#555' }}>
+        {job?.id || 'N/A'}
+      </div>
+    </div>
+  </div>
+</div>
+
   {/* Search Job Number */}
-  <ProFormText name="job_number" label="Search Job Number" >
+  <ProFormText name="job_number" label="Search Job Number">
     <Select
       placeholder="Select Job Number"
       onChange={handleJobNumberChange}
@@ -804,27 +869,184 @@ onVisibleChange={async (visible) => {
       )}
     </Select>
   </ProFormText>
+
   {/* Form Fields - Initially hidden, shown after job selection */}
   {selectedJob && (
     <>
-    <ProFormText name="booked_qty" label="Booked Quantity" style={{ width: '300px', textAlign: 'right' }} />
-    <ProFormText name="capacity" label="Capacity" value={selectedJob?.capacity} disabled style={{ width: '300px', textAlign: 'right' }} />
-    <ProFormText name="comments" label="Comments" style={{ width: '300px', textAlign: 'right' }} />
-    <Form.Item name="schedule_status_id" label="Job Status" style={{ textAlign: 'right' }}>
-      <Select>
-        {jobStatuses.map((status) => (
-          <Option key={status.id} value={status.value}>
-            {status.name}
-          </Option>
-        ))}
-      </Select>
-    </Form.Item>
-    <Form.Item name="job_validation_required" valuePropName="checked" style={{ textAlign: 'right' }}>
-      <Checkbox>Need Validation</Checkbox>
-    </Form.Item>
-  </>
-  )} 
+      <ProFormText name="booked_qty" label="Booked Quantity" style={{ width: '300px' }} />
+      <ProFormText name="capacity" label="Capacity" value={selectedJob?.capacity} disabled style={{ width: '300px' }} />
+      <ProFormText name="comments" label="Comments" style={{ width: '300px' }} />
+      <Form.Item name="schedule_status_id" label="Job Status">
+        <Select>
+          {jobStatuses.map((status) => (
+            <Option key={status.id} value={status.value}>
+              {status.name}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Form.Item name="job_validation_required" valuePropName="checked">
+        <Checkbox>Need Validation</Checkbox>
+      </Form.Item>
+    </>
+  )}
 </ModalForm>
+
+// {/* <ModalForm
+//   title={
+//     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+//       <h3 style={{ margin: 0 }}>SCHEDULER</h3>
+//       <button
+//         style={{ background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer' }}
+//         onClick={() => setIsModalVisible(false)}
+//       >
+//         {/* × */}
+//       </button>
+//     </div>
+//   }
+//   submitter={{
+//     searchConfig: {
+//       submitText: 'Add Job',
+//       resetText: 'Cancel',
+//     },
+//   }}
+//   trigger={
+//     <Card
+//       style={{
+//         width: '80%',
+//         borderRadius: 0,
+//         cursor: 'pointer',
+//         height: '40px',
+//         display: 'flex',
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         padding: '0',
+//         backgroundColor: '#F8F4FE',
+//         color: '#6200EE',
+//         border: 'none',
+//       }}
+//       onClick={() => {
+//         setSelectedJobLineId(job?.id);
+//         const selectedShift = shiftsFromApi?.find((shift) => shift.name === record?.shift);
+//         const selectedScheduleDate = moment(record?.day).format('YYYY-MM-DD');
+//         setClickedSchedule({
+//           job_line_id: job?.id,
+//           shift_id: selectedShift?.id,
+//           schedule_date: selectedScheduleDate,
+//           job_description: job?.job_description,
+//         });
+//         setIsModalVisible(true);
+//       }}
+//     >
+//       <span style={{ color: '#6200EE',alignSelf:'center' }}>FREE</span>
+//     </Card>
+//   }
+//   onFinish={async (values) => {
+//     const formattedScheduleDate = moment(values.schedule_date).format('YYYY-MM-DD');
+//     try {
+//       await request('/schedules', {
+//         method: 'POST',
+//         data: {
+//           ...values,
+//           job_line_id: selectedJobLineId,
+//           schedule_job_id: selectedScheduleJobId,
+//           shift_id: getShiftId?.id,
+//           job_validation_required: values.job_validation_required ? 1 : 0,
+//           schedule_date: formattedScheduleDate,
+//           capacity: selectedJob?.capacity || values.capacity,
+//         },
+//       });
+//       const updatedSchedules = await request('/schedules');
+//       const transformedSchedules = transformData(updatedSchedules?.data);
+//       setJobData(updatedSchedules?.data);
+//       data(transformedSchedules);
+
+//       message.success('Job added successfully');
+//       setIsModalVisible(false); // Close the modal on success
+//       return true;
+//     } catch (error) {
+//       return false;
+//     }
+//   }}
+//   onVisibleChange={async (visible) => {
+//     setIsModalVisible(visible);
+//     if (visible && selectedJobLineId) {
+//       const selectedJob = jobData.find((job) => job.id === selectedJobLineId);
+//       if (selectedJob) {
+//         await fetchJobStatuses(selectedJob.jobType);
+//       }
+//     }
+//   }}
+// >
+//   {/* Top Section with Slot Details */}
+//   <div style={{ marginBottom: '20px', textAlign: 'right' }}>
+//     {/* Date and Time in a row */}
+//     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+//       <div style={{ marginRight: '20px' }}>
+//         <strong>Date:</strong> {moment(record?.day).format('dddd DD MMM, YYYY')}
+//       </div>
+//       <div>
+//         <strong>Time:</strong> {record?.shift || 'N/A'}
+//       </div>
+//     </div>
+
+//     {/* Job Type below Date */}
+//     <div style={{ marginBottom: '5px', textAlign: 'right' }}>
+//       <strong>Job Type:</strong> {job?.job_type || 'N/A'}
+//     </div>
+
+//     {/* Job Area below Time */}
+//     <div style={{ marginBottom: '5px', textAlign: 'right' }}>
+//       <strong>Job Area:</strong> Home Care (Area 1)
+//     </div>
+
+//     {/* Job Line below Job Type */}
+//     <div style={{ textAlign: 'right' }}>
+//       <strong>Line:</strong> {job?.id || 'N/A'}
+//     </div>
+//   </div>
+//   {/* Search Job Number */}
+//   <ProFormText name="job_number" label="Search Job Number" >
+//     <Select
+//       placeholder="Select Job Number"
+//       onChange={handleJobNumberChange}
+//       showSearch
+//       filterOption={(input, option) =>
+//         option.children.toLowerCase().includes(input.toLowerCase())
+//       }
+//     >
+//       {jobData?.length > 0 ? (
+//         jobData.map((job) => (
+//           <Option key={job.key} value={job.jobNumber}>
+//             {job.jobNumber} - {job.itemDetails}
+//           </Option>
+//         ))
+//       ) : (
+//         <p>No jobs available</p>
+//       )}
+//     </Select>
+//   </ProFormText>
+//   {/* Form Fields - Initially hidden, shown after job selection */}
+//   {selectedJob && (
+//     <>
+//     <ProFormText name="booked_qty" label="Booked Quantity" style={{ width: '300px', textAlign: 'right' }} />
+//     <ProFormText name="capacity" label="Capacity" value={selectedJob?.capacity} disabled style={{ width: '300px', textAlign: 'right' }} />
+//     <ProFormText name="comments" label="Comments" style={{ width: '300px', textAlign: 'right' }} />
+//     <Form.Item name="schedule_status_id" label="Job Status" style={{ textAlign: 'right' }}>
+//       <Select>
+//         {jobStatuses.map((status) => (
+//           <Option key={status.id} value={status.value}>
+//             {status.name}
+//           </Option>
+//         ))}
+//       </Select>
+//     </Form.Item>
+//     <Form.Item name="job_validation_required" valuePropName="checked" style={{ textAlign: 'right' }}>
+//       <Checkbox>Need Validation</Checkbox>
+//     </Form.Item>
+//   </>
+//   )} 
+// </ModalForm> */}
 
 
                     )}
