@@ -127,8 +127,8 @@ const ManufacturingPlanner = () => {
       message.error("Failed to fetch job details");
     }
   } catch (error) {
-    console.error("Error fetching job details:", error);
-    message.error("Error fetching job details");
+    // console.error("Error fetching job details:", error);
+    // message.error("Error fetching job details");
   }
 };
 // Handle job selection
