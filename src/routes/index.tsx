@@ -1,7 +1,7 @@
 const routes: any[] = [
   {
     path: '/',
-    redirect: '/access',
+    redirect: '/planner',
   },
   {
     name: '',
