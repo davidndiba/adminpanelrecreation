@@ -506,7 +506,7 @@ const handleCustomModalCancel = () => {
       </div>
     </Tooltip>
 
-    <div style={{ display: 'flex', gap:'40px', marginTop: '0px',marginBottom:'0px',fontSize:'12px',textAlign:'center' }}>
+    <div style={{ display: 'flex', gap:'70px', marginTop: '0px',marginBottom:'0px',fontSize:'12px',textAlign:'center' }}>
       {/* Status Name */}
       <div >
         {job?.schedule_status_name}
@@ -1207,7 +1207,7 @@ onVisibleChange={async (visible) => {
         setIsModalVisible(true);
       }}
     >
-      <span style={{ color: '#6200EE' }}>FREE</span>
+      <span style={{ color: '#6200EE',alignSelf:'center' }}>FREE</span>
     </Card>
   }
   onFinish={async (values) => {
@@ -1419,7 +1419,7 @@ onVisibleChange={async (visible) => {
           picker="week"
           value={currentWeek}
           onChange={handleWeekChange}
-          style={{ width: 300, height: 40 }}
+          style={{ width: 300, height: 32 }}
           format="YYYY-wo"
         />
         {/* <Button onClick={handleNextWeek}>Next Week</Button> */}
