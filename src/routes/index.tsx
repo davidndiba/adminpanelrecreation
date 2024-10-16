@@ -26,6 +26,13 @@ const routes: any[] = [
     ],
   },
   {
+    name: 'Reset Password',
+    path: '/reset-password',
+    component: './ResetPassword/ResetPassword', 
+    layout: false,
+  },
+  
+  {
     name: 'Profile',
     path: '/users/:id',
     component: './Access/Components/users/Profile',

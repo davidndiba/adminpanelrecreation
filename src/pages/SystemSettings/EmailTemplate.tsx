@@ -79,7 +79,7 @@ const EmailTemplate = () => {
   const templateColumns = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
     {
-      title: 'Status',
+      title: 'Description',
       render: (text, record) => (
         <Switch
           checked={record.status === 'Active'}
@@ -164,7 +164,7 @@ const EmailTemplate = () => {
                 <Input />
               </Form.Item>
               <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
-                <ReactQuill theme="snow" />
+                <ReactQuill theme="snow" style={{height:'200px',width:'100%'}} />
               </Form.Item>
             </Form>
           </Modal>

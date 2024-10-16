@@ -199,7 +199,7 @@
           </Col>
           <Col span={6}>
             <Card bordered style={{ backgroundColor: '#fff7e6', color: '#fa8c16' }}>
-              <Title level={4}>Inactive Users</Title>
+              <Title level={4}>Deactivated Users</Title>
               <Statistic
                 title="Inactive Users"
                 value={inactiveUsers}
@@ -220,26 +220,6 @@
         </Row>
 
         {/* Search field above the table */}
-        {/* <Row gutter={16} style={{ marginBottom: '16px' }}>
-          <Col span={24}>
-            <Input
-              placeholder="Search Users"
-              value={searchTerm}
-              onChange={(e) => {
-                const value = e.target.value;
-                setSearchTerm(value);
-
-                // If input is cleared, reload the table
-                if (value === '') {
-                  handleSearch();
-                }
-              }}
-              onPressEnter={handleSearch} // Trigger search on Enter
-              style={{ width: 200, marginBottom: '16px' }} // Make search field smaller
-              allowClear // Add a clear button
-            />
-          </Col>
-        </Row> */}
 <Row gutter={16} style={{ marginBottom: '16px' }}>
         <Col span={24}>
           <Input
@@ -327,12 +307,12 @@
             name="username"
             rules={[{ required: true }]}
           />
-          <ProFormSelect
+          {/* <ProFormSelect
             label="Status"
             name={['status', 'name']}
             options={statuses?.map((status) => ({ label: status.name, value: status.name })) || []}
             rules={[{ required: true }]}
-          />
+          /> */}
           <ProFormSelect
             request={async () => {
               const resp = await request('/roles');
@@ -358,11 +338,11 @@
           rowKey="id"
           rowSelection={{ selectedRowKeys, onChange: handleRowSelection }}
           pagination={{
-            defaultCurrent: 1,
-            defaultPageSize: 10,
+            // defaultCurrent: 1,
+            defaultPageSize: 15,
             showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50', '100'],
-            hideOnSinglePage: true,
+            // pageSizeOptions: ['15', '30', '45', '65'],
+            // hideOnSinglePage: true,
           }}
           search={false}
           request={async (params) => {

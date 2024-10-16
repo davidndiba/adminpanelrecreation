@@ -321,7 +321,7 @@
             <Form.Item
               name="description"
               label="Description"
-              rules={[{ required: true, message: 'Please input the role description!' }]}
+              // rules={[{ required: true, message: 'Please input the role description!' }]}
             >
               <Input />
             </Form.Item>
