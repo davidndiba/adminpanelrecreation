@@ -140,7 +140,7 @@ import { useLocation, history } from 'umi';
 import { ProCard, ProForm, ProFormText } from '@ant-design/pro-components';
 import { Button, message } from 'antd';
 import { request } from 'umi';
-import './ResetPassword.less'; // Ensure this CSS file is included
+import './ResetPassword.less';
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -159,7 +159,7 @@ const ResetPassword: React.FC = () => {
   const handlePasswordReset = async () => {
     setLoading(true);
     try {
-      await request(`/reset-password`, {
+      await request(`auth/reset-password`, {
         method: 'POST',
         data: {
           email,
@@ -180,7 +180,7 @@ const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="reset-password-container"> {/* Custom styling */}
+    <div className="reset-password-container"> 
       <ProCard title="Reset Your Password" bordered style={{ width: 400 }}>
         <ProForm
           onFinish={() => {}}
