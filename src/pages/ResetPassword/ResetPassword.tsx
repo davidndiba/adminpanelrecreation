@@ -159,7 +159,7 @@ const ResetPassword: React.FC = () => {
   const handlePasswordReset = async () => {
     setLoading(true);
     try {
-      await request(`auth/reset-password`, {
+      await request(`/auth/reset-password`, {
         method: 'POST',
         data: {
           email,
