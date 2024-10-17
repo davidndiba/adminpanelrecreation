@@ -18,7 +18,7 @@
     Typography,
     Statistic,
   } from 'antd';
-  import { UserOutlined, TeamOutlined, LoginOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
+  import { UserOutlined, TeamOutlined, LoginOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
   import moment from 'moment';
   import React, { useRef, useState, useEffect } from 'react';
   import { history, request, useRequest } from 'umi';
@@ -100,6 +100,7 @@
       addUserRef.current?.setFieldsValue({
         ...user,
         status: { key: user.name }, 
+        role: user.roles[0],
       });
     
       // Open the modal form
@@ -107,7 +108,15 @@
       setVisible(true);
     };
     
-
+    const handleDelete = async (id: string) => {
+      try {
+        await request(`/users/${id}`, { method: 'DELETE' });
+        message.success('User deleted successfully');
+        tableActionRef.current?.reload(); 
+      } catch (error) {
+        message.error('Failed to delete user');
+      }
+    };
     const columns: ProColumns<User>[] = [
       {
         title: 'Display Name',
@@ -148,7 +157,7 @@
         dataIndex: 'last_login',
         key: 'last_login',
         // render: (text: any) => moment(text).format('ll'),
-        render: (text: any) => moment(text).format('YYYY-MM-DD HH:mm:ss'),
+        render: (text: any) => moment(text).format('YYYY-MM-DD HH:mm:ss') ,
       },
       { title: 'Login Count', dataIndex: 'login_count', key: 'login_count' },
       {
@@ -169,10 +178,19 @@
             >
               Edit
             </Button>
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.id)} 
+              type="link"
+              danger
+            >
+              Delete
+            </Button>
           </Space>
         ),
       },
     ];
+  
 
     return (
       <div style={{ padding: '24px', backgroundColor: '#fff' }}>
@@ -243,7 +261,14 @@
           formRef={addUserRef}
           title={formValues ? 'Edit User' : 'Add New User'}
           visible={visible}
-          onVisibleChange={setVisible} // Control modal visibility
+          onVisibleChange={(vis) => {
+            setVisible(vis);
+            if (!vis) {
+              addUserRef.current?.resetFields(); // Reset fields when closing modal
+              setFormValues(undefined); // Clear form values
+            }
+          }}
+          // onVisibleChange={setVisible} // Control modal visibility
           onFinish={async (values) => {
             try {
               if (formValues?.id) {

@@ -279,33 +279,34 @@ const ActivityLogs = () => {
   onValuesChange={handleFormValuesChange}
 >
   <Form.Item 
-    name="user" 
-    label="User"
-    style={{ width: '30%', marginRight: '16px' }}
-  >
-    <ProFormSelect
-      options={[{ value: '', label: 'All Users' }, ...users]}
-      fieldProps={{
-        showSearch: true,  // Enable search functionality
-        filterOption: (input, option) =>
-          option?.label.toLowerCase().includes(input.toLowerCase()),
-        // Detect when the search input is cleared
-        onSearch: (value) => {
-          if (value === '') {
-            form.setFieldsValue({ user: '' });
-            setFilters({ ...filters, user: '' });
-            fetchData(); // Re-fetch data with empty user filter
-          }
-        },
-        // Detect when a selection is made from the dropdown
-        onSelect: (value) => {
-          setFilters({ ...filters, user: value });
-          fetchData(); // Re-fetch data with the selected user
-        },
-      }}
-    />
-  </Form.Item>
-  
+  name="user" 
+  label="User"
+  style={{ width: '30%', marginRight: '16px' }}
+>
+  <ProFormSelect
+    options={[{ value: '', label: 'All Users' }, ...users]}
+    fieldProps={{
+      showSearch: true,  
+      filterOption: (input, option) =>
+        option?.label.toLowerCase().includes(input.toLowerCase()),
+
+      // Remove redundant data fetching on search
+      onSearch: (value) => {
+        if (value === '') {
+          // Clear user filter and do not refetch data unnecessarily
+          form.setFieldsValue({ user: '' });
+          setFilters((prevFilters) => ({ ...prevFilters, user: '' }));
+        }
+      },
+
+      onSelect: (value) => {
+        // Only update the user filter, do not fetch data here
+        setFilters((prevFilters) => ({ ...prevFilters, user: value }));
+      },
+    }}
+  />
+</Form.Item>
+
   <Form.Item 
     name="dateRange" 
     label="Date Range"

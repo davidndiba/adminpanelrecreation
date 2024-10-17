@@ -13,7 +13,8 @@ const Settings = () => {
   const [currentConfig, setCurrentConfig] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [testEmail, setTestEmail] = useState('');
-
+  const [selectedMailer, setSelectedMailer] = useState('');
+  const [mailerConfigurations, setMailerConfigurations] = useState({});
   // Fetch mail configuration and available mailers
   useEffect(() => {
     const fetchMailConfig = async () => {
@@ -32,6 +33,7 @@ const Settings = () => {
             fromEmail: configResponse.data.configurations.fromEmail,
             password: configResponse.data.configurations.password,
           });
+          setSelectedMailer(configResponse.data.mailer); 
         } else {
           message.error(configResponse.message || 'Failed to fetch mail configuration');
         }
@@ -81,7 +83,85 @@ const Settings = () => {
       message.error('Error sending test email');
     }
   };
+  // const handleMailerChange = (mailer) => {
+  //   setSelectedMailer(mailer);
+  //   form.resetFields();
+  //   // Set default values based on mailer if needed
+  // };
+  const handleMailerChange = (mailer) => {
+    // Save the current form values for the currently selected mailer
+    const currentValues = form.getFieldsValue();
+    setMailerConfigurations((prevConfigs) => ({
+      ...prevConfigs,
+      [selectedMailer]: currentValues,
+    }));
 
+    // Set the newly selected mailer
+    setSelectedMailer(mailer);
+
+    // Restore the form values for the new mailer if they exist, otherwise reset
+    const savedConfig = mailerConfigurations[mailer];
+    if (savedConfig) {
+      form.setFieldsValue(savedConfig);
+    } else {
+      form.resetFields(); // Reset the form if there's no saved configuration for the new mailer
+    }
+  };
+   // Render different fields based on selected mailer
+   const renderMailerFields = () => {
+    switch (selectedMailer) {
+      case 'smtp':
+        return (
+          <>
+            <Form.Item label="Host" name="host" rules={[{ required: true, message: 'Please input the host!' }]}>
+              <Input placeholder="e.g. smtp.gmail.com" />
+            </Form.Item>
+            <Form.Item label="Port" name="port" rules={[{ required: true, message: 'Please input the port!' }]}>
+              <Input type="number" placeholder="e.g. 587" />
+            </Form.Item>
+            <Form.Item label="Username" name="username" rules={[{ required: true, message: 'Please input the username!' }]}>
+              <Input placeholder="e.g. sosmongare@gmail.com" />
+            </Form.Item>
+            <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Please input the password!' }]}>
+              <Input.Password placeholder="Password" />
+            </Form.Item>
+          </>
+        );
+      case 'mailgun':
+        return (
+          <>
+            <Form.Item label="Mailgun Domain" name="mailgun_domain" rules={[{ required: true, message: 'Please input the Mailgun domain!' }]}>
+              <Input placeholder="e.g. mg.example.com" />
+            </Form.Item>
+            <Form.Item label="Mailgun Secret" name="mailgun_secret" rules={[{ required: true, message: 'Please input the Mailgun secret!' }]}>
+              <Input placeholder="Your Mailgun secret key" />
+            </Form.Item>
+          </>
+        );
+      case 'ses':
+        return (
+          <>
+            <Form.Item label="AWS Access Key ID" name="aws_access_key_id" rules={[{ required: true, message: 'Please input the AWS Access Key ID!' }]}>
+              <Input placeholder="Your AWS Access Key ID" />
+            </Form.Item>
+            <Form.Item label="AWS Secret Access Key" name="aws_secret_access_key" rules={[{ required: true, message: 'Please input the AWS Secret Access Key!' }]}>
+              <Input placeholder="Your AWS Secret Access Key" />
+            </Form.Item>
+            <Form.Item label="AWS Region" name="aws_default_region" rules={[{ required: true, message: 'Please input the AWS Region!' }]}>
+              <Input placeholder="e.g. us-east-1" />
+            </Form.Item>
+          </>
+        );
+      case 'sendmail':
+        return (
+          <Form.Item label="Sendmail Path" name="sendmail_path" rules={[{ required: true, message: 'Please input the Sendmail path!' }]}>
+            <Input placeholder="e.g. /usr/sbin/sendmail -bs" />
+          </Form.Item>
+        );
+      default:
+        return null;
+    }
+  };
   return (
     <PageContainer>
       <Row justify="center" align="middle" style={{ minHeight: '40vh' }}>
@@ -98,7 +178,7 @@ const Settings = () => {
               name="mailer"
               rules={[{ required: true, message: 'Please select the mailer!' }]}
             >
-              <Select placeholder="Select mailer">
+              <Select placeholder="Select mailer" onChange={handleMailerChange}>
                 {serverOptions.map((option) => (
                   <Option key={option.value} value={option.value}>
                     {option.label}
@@ -106,6 +186,7 @@ const Settings = () => {
                 ))}
               </Select>
             </Form.Item>
+            {renderMailerFields()}
             <Form.Item
               label="Host"
               name="host"

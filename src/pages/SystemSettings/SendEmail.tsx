@@ -109,7 +109,7 @@ const SendEmail = () => {
     <PageContainer>
       <ProCard>
         <Form form={form} layout="vertical">
-          <Form.Item label="To Users" name="to" rules={[{ required: true, message: 'Please select users!' }]}>
+          <Form.Item label="To Users(Multiple)" name="to" rules={[{ required: true, message: 'Please select users!' }]}>
             <Select
               mode="multiple"
               placeholder="Select users to send email"
@@ -178,7 +178,7 @@ const SendEmail = () => {
                 },
                 language: 'en'
               }}
-              style={{ width: '100%', minHeight: '500px' }} // Increased height for better usability
+              style={{ width: '100%', minHeight: '1500px' }} // Increased height for better usability
             />
           </Form.Item>
 

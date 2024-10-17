@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import { history, request, useModel } from 'umi';
 import './login.less';
-
 const LoginPage: React.FC = () => {
   const [isSignUpVisible, setIsSignUpVisible] = useState(false);
   const [isResetPasswordVisible, setIsResetPasswordVisible] = useState(false);
@@ -18,7 +17,6 @@ const LoginPage: React.FC = () => {
         method: 'POST',
         data: { login: email, password },
       });
-
       if (response.success) {
         message.success('Login successful!');
         localStorage.setItem('planner_t', response.token);
@@ -51,29 +49,56 @@ const LoginPage: React.FC = () => {
       message.error('An error occurred. Please try again.');
     }
   };
-
   const handleGoogleSignIn = () => {
     // Implement Google Sign-In logic here
   };
+  // const handleForgotPassword = async (email: string) => {
+  //   try {
+  //     const response = await request('/auth/forgot-password', {
+  //       method: 'POST',
+  //       data: { email },
+  //     });
+  //     console.log("Forgot Password Response:", response); 
 
+  //     if (response.status === 200) {
+  //       message.success('Password reset link sent to your email!');
+  //       setIsResetPasswordVisible(false); 
+  //     } else {
+  //       message.error(response.message || 'Failed to send password reset link.');
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Error:", error);
+  //     message.error(
+  //       error?.response?.data?.message || 'An error occurred. Please try again.'
+  //     );
+  //   }
+  // };
   const handleForgotPassword = async (email: string) => {
     try {
       const response = await request('/auth/forgot-password', {
         method: 'POST',
         data: { email },
       });
-
+      console.log("Forgot Password Response:", response);
+  
       if (response.success) {
         message.success('Password reset link sent to your email!');
-        setIsResetPasswordVisible(false); // Close the reset password modal
+        
+        // Ensure state updates immediately after success
+        flushSync(() => {
+          setIsResetPasswordVisible(false);
+        });
       } else {
-        message.error('Failed to send password reset link.');
+        message.error(response.message || 'Failed to send password reset link.');
       }
-    } catch (error) {
-      message.error('An error occurred. Please try again.');
+    } catch (error: any) {
+      console.error("Error:", error);
+      message.error(
+        error?.response?.data?.message || 'An error occurred. Please try again.'
+      );
     }
   };
-
+  
   const handleSignUp = async (values: any) => {
     try {
       const response = await request('/auth/register', {
@@ -88,16 +113,25 @@ const LoginPage: React.FC = () => {
           role: '9cffe655-dc69-4d80-b4b3-2dde5f0cfb85',
         },
       });
-
-      if (response.success) {
-        message.success('Sign-up successful! Please log in.');
-        setTimeout(() => setIsSignUpVisible(false), 300);
+      console.log("Response:", response);
+      if (response.status === true) {
+        message.success(response.message || 'Sign-up successful! Please log in.');
+        console.log("Modal closing...");
+        setIsSignUpVisible(false);
+      } else if (response.errors) {
+        message.error(response.errors[0]?.message || 'An error occurred. Please try again.');
+      } else {
+        message.error('Sign-up failed. Please try again.');
       }
-    } catch (error) {
-      message.error('An error occurred. Please try again.');
+    } catch (error: any) {
+      console.error("Error:", error);
+      if (error?.response?.data?.errors) {
+        message.error(error.response.data.errors[0]?.message || 'An error occurred on the server.');
+      } else {
+        message.error('An error occurred. Please try again.');
+      }
     }
-  };
-
+  };  
   return (
     <div className="login-container">
       <ProCard bordered className="login-card">
@@ -236,44 +270,35 @@ const LoginPage: React.FC = () => {
 
       {/* Reset Password Modal */}
       <Modal
-        title="Reset Password"
+        title="Forgot Password"
         visible={isResetPasswordVisible}
         onCancel={() => setIsResetPasswordVisible(false)}
         footer={null}
         className="reset-password-modal"
       >
-        <ProForm
-          onFinish={(values) => handleForgotPassword(values.email)}
-          layout="vertical"
-          submitter={{
-            render: (props) => (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: '10px',
-                }}
-              >
-                <Button
-                  type="default"
-                  onClick={() => props?.reset?.()} // Reset fields on button click
-                >
-                  Reset
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  Send Reset Link
-                </Button>
-              </div>
-            ),
-          }}
-        >
-          <ProFormText
-            name="email"
-            label="Email"
-            placeholder="Enter your email"
-            rules={[{ required: true, message: 'Email is required' }]}
-          />
-        </ProForm>
+       <ProForm
+  onFinish={(values) => handleForgotPassword(values.email)}
+  layout="vertical"
+  submitter={{
+    render: (props) => (
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+        <Button type="default" onClick={() => props?.reset?.()}>
+          Reset
+        </Button>
+        <Button type="primary" htmlType="submit">
+          Send Reset Link
+        </Button>
+      </div>
+    ),
+  }}
+>
+  <ProFormText
+    name="email"
+    label="Email"
+    placeholder="Enter your email"
+    rules={[{ required: true, message: 'Email is required' }]}
+  />
+</ProForm>
       </Modal>
     </div>
   );

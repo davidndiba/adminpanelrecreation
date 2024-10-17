@@ -59,7 +59,8 @@
     const fetchRoles = async () => {
       try {
         const response = await request('/roles');
-        setRoles(response.data);
+        console.log(response)
+        setRoles(response.data.data);
       } catch (error) {
         message.error('Failed to fetch roles');
       }
@@ -169,25 +170,48 @@
       { title: 'Can Be Deleted', dataIndex: 'can_be_deleted', key: 'can_be_deleted', render: (text) => (text ? 'Yes' : 'No') },
       { title: 'Status', dataIndex: 'status', key: 'status', render: (text) => statusMap[text] || 'Unknown' }, // Map status ID to name
       {
-        title: 'Permissions',
-        dataIndex: 'permissions',
-        key: 'permissions',
-        render: (permissions: string[]) => (
-          <>
-            {permissions.map((permissionId) => {
-              const perm = allPermissions.find(p => p.id === permissionId);
-              return perm ? <div key={permissionId}>{perm.name}</div> : null;
-            })}
-          </>
+        title: 'Users Count',
+        dataIndex: 'users_count',
+        key: 'users_count',
+        render: (usersCount: number) => (
+          <div>{usersCount}</div>
         ),
       },
+      // {
+      //   title: 'Actions',
+      //   key: 'actions',
+      //   render: (_, record) => (
+      //     <Space size="middle">
+      //       <Button
+      //         icon={<EditOutlined />}
+      //         onClick={() => {
+      //           setIsEditing(true);
+      //           setSelectedRole(record);
+      //           form.setFieldsValue({
+      //             ...record,
+      //             permissions: record.permissions.map((p: any) => ({ id: p })),
+      //           });
+      //           setIsModalVisible(true);
+      //         }}
+      //       />
+      //       <Popconfirm
+      //         title="Are you sure you want to delete this role?"
+      //         onConfirm={() => handleDeleteRole(record.id)}
+      //         okText="Yes"
+      //         cancelText="No"
+      //       >
+      //         <Button icon={<DeleteOutlined />} />
+      //       </Popconfirm>
+      //     </Space>
+      //   ),
+      // },
       {
         title: 'Actions',
         key: 'actions',
         render: (_, record) => (
           <Space size="middle">
             <Button
-              icon={<EditOutlined />}
+              icon={<EditOutlined style={{color: '#1890ff'}} />}
               onClick={() => {
                 setIsEditing(true);
                 setSelectedRole(record);
@@ -197,18 +221,27 @@
                 });
                 setIsModalVisible(true);
               }}
-            />
+              type="text" // Use text button style for better alignment
+            >
+              <span style={{ color: '#1890ff' }}>Edit</span>
+            </Button>
             <Popconfirm
               title="Are you sure you want to delete this role?"
               onConfirm={() => handleDeleteRole(record.id)}
               okText="Yes"
               cancelText="No"
             >
-              <Button icon={<DeleteOutlined />} />
+              <Button
+                icon={<DeleteOutlined style={{ color:'#ff4d4f'}} />}
+                type="text" // Use text button style for better alignment
+              >
+                <span style={{ color: '#ff4d4f' }}>Delete</span>
+              </Button>
             </Popconfirm>
           </Space>
         ),
-      },
+      }
+      
     ];
   
     const stats = {
@@ -266,6 +299,7 @@
           dataSource={roles}
           rowKey="id"
           search={false}
+          loading={!roles.length}
           toolBarRender={() => [
             <Button
               key="add"
