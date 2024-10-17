@@ -31,7 +31,12 @@ const routes: any[] = [
     component: './ResetPassword/ResetPassword', 
     layout: false,
   },
-  
+  {
+    name: 'Confirm Email',
+    path: '/auth/confirm-email/:token',
+    component: './ConfirmEmail/ConfirmEmail', 
+    layout: false,
+  },
   {
     name: 'Profile',
     path: '/users/:id',
