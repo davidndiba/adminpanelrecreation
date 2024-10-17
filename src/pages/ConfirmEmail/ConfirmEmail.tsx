@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'umi';
+import { history, useNavigate, useLocation } from 'umi';
 import { Button, Typography, message, Spin, Input, Modal } from 'antd';
 import { MailOutlined, CheckCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import { request } from 'umi';
@@ -27,7 +27,7 @@ const ConfirmEmail = () => {
         method: 'GET',
       });
       message.success('Email successfully confirmed!');
-      navigate('/user/login'); // Redirect to login page
+      history.push('/user/login'); // Redirect to login page
     } catch (error) {
       message.error('Failed to confirm email. Please try again.');
     } finally {
