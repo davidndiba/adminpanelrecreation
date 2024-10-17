@@ -135,7 +135,11 @@ const EmailTemplate = () => {
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => setIsModalVisible(true)}style={{
+                backgroundColor: '#6c5ce7',
+                color: '#ffffff',
+                borderColor: '#6c5ce7',
+              }}>
               Create Template
             </Button>
           </div>
@@ -153,7 +157,8 @@ const EmailTemplate = () => {
             title="Create Email Template"
             visible={isModalVisible}
             onCancel={() => setIsModalVisible(false)}
-            onOk={() => form.submit()}
+            // onOk={() => form.submit()}
+            footer={null}
             centered
           >
             <Form form={form} layout="vertical" onFinish={handleCreateTemplate}>
@@ -166,6 +171,14 @@ const EmailTemplate = () => {
               <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
                 <ReactQuill theme="snow" style={{height:'200px',width:'100%'}} />
               </Form.Item>
+              <div style={{ textAlign: 'right', marginTop: '20px' }}>
+                <Button onClick={() => setIsModalVisible(false)} style={{ marginRight: 8 }}>
+                    Cancel
+                </Button>
+                <Button type="primary" onClick={() => form.submit()}>
+                      OK
+               </Button>
+             </div>
             </Form>
           </Modal>
 
