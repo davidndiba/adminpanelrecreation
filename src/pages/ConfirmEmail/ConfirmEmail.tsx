@@ -188,22 +188,59 @@ const ConfirmEmail = () => {
   const navigate = useNavigate();
 
   // Handle email verification
-  const handleConfirmEmail = async () => {
+//   const handleConfirmEmail = async () => {
+//     setLoading(true);
+//     try {
+//       const response = await request(`/auth/confirm-email`, {
+//         method: 'GET',
+//         params: { token }, // Include the token in the request
+//       });
+
+//       // Assuming the API returns a message in response.data.message
+//       if (response?.data?.message) {
+//         message.success(response.data.message); // Use the message from the response
+//       } else {
+//         message.success('Email successfully confirmed!'); // Fallback message
+//       }
+//       navigate('/user/login'); // Redirect to login page after confirmation
+//     } catch (error) {
+//       // Handle error response
+//       message.error(error.response?.data?.message || 'Failed to confirm email. Please try again.');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+const handleConfirmEmail = async () => {
     setLoading(true);
     try {
       const response = await request(`/auth/confirm-email`, {
         method: 'GET',
         params: { token }, // Include the token in the request
       });
-      message.success('Email successfully confirmed!');
+  
+      // Assuming the API returns a message in response.data.message
+      if (response?.data?.message) {
+        message.success(response.data.message); // Use the message from the response
+      } else {
+        message.success('Email successfully confirmed!'); // Fallback message
+      }
       navigate('/user/login'); // Redirect to login page after confirmation
     } catch (error) {
-      message.error('Failed to confirm email. Please try again.');
+      // Use type assertion to handle the error properly
+      if (error instanceof Response) {
+        const errorData = await error.json(); // Assuming the error is a Response object
+        message.error(errorData?.message || 'Failed to confirm email. Please try again.');
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        // This covers if the error object has a message property
+        message.error((error as { message?: string }).message || 'Failed to confirm email. Please try again.');
+      } else {
+        message.error('Failed to confirm email. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
-
+  
   // Handle resend confirmation email
   const handleResendConfirmation = async () => {
     if (!email) {
