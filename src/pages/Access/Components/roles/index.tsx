@@ -233,7 +233,7 @@
             >
               <Button
                 icon={<DeleteOutlined style={{ color:'#ff4d4f'}} />}
-                type="text" // Use text button style for better alignment
+                type="text" 
               >
                 <span style={{ color: '#ff4d4f' }}>Delete</span>
               </Button>

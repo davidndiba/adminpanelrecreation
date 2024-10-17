@@ -332,12 +332,6 @@
             name="username"
             rules={[{ required: true }]}
           />
-          {/* <ProFormSelect
-            label="Status"
-            name={['status', 'name']}
-            options={statuses?.map((status) => ({ label: status.name, value: status.name })) || []}
-            rules={[{ required: true }]}
-          /> */}
           <ProFormSelect
             request={async () => {
               const resp = await request('/roles');
