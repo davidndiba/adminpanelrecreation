@@ -23,7 +23,7 @@ export async function getInitialState(): Promise<{
     }
   };
 
-  if (history.location.pathname !== '/user/login') {
+  if (history.location.pathname !== '/user/login' && !history.location.pathname.includes("/auth/confirm-email")) {
     const currentUser = await fetchUserInfo();
     return {
       currentUser: {

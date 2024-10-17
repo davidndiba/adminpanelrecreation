@@ -36,6 +36,8 @@ export const errorConfig: RequestConfig = {
       if (
         error?.response?.status === 401 &&
         history.location.pathname !== '/user/login'
+        && 
+        !history.location.pathname.includes("/auth/confirm-email")
       ) {
         return history.push('/user/login');
       }
