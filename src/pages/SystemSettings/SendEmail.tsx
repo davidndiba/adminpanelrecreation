@@ -4,6 +4,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'; // Or your custom build
 import { request } from 'umi';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { MailOutlined } from '@ant-design/icons';
 
 const SendEmail = () => {
   const [editorContent, setEditorContent] = useState('');
@@ -147,7 +148,7 @@ const SendEmail = () => {
             />
           </Form.Item>
 
-          <Form.Item label="Email Content" name="body" rules={[{ required: true, message: 'Email content is required!' }]}>
+          {/* <Form.Item label="Email Content" name="body" rules={[{ required: true, message: 'Email content is required!' }]}>
             <CKEditor
               editor={ClassicEditor}
               data={editorContent}
@@ -180,17 +181,71 @@ const SendEmail = () => {
               }}
               style={{ width: '100%', minHeight: '1500px' }} // Increased height for better usability
             />
-          </Form.Item>
+          </Form.Item> */}
+<Form.Item
+  label="Email Content"
+  name="body"
+  rules={[{ required: true, message: 'Email content is required!' }]}
+>
+  <CKEditor
+    editor={ClassicEditor}
+    data={editorContent}
+    onChange={(event, editor) => {
+      const data = editor.getData();
+      setEditorContent(data);
+    }}
+    config={{
+      toolbar: {
+        items: [
+          'heading', '|',
+          'bold', 'italic', 'underline', 'strikethrough', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+          'link', 'blockQuote', 'insertTable', 'mediaEmbed', 'imageUpload', 'codeBlock', '|',
+          'undo', 'redo'
+        ]
+      },
+      image: {
+        toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side']
+      },
+      table: {
+        contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
+      },
+      fontFamily: {
+        options: ['default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana']
+      },
+      fontSize: {
+        options: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72]
+      },
+      language: 'en'
+    }}
+    style={{ width: '100%', minHeight: '500px' }} // Set initial minHeight to a large value for appearance
+  />
+</Form.Item>
 
           <Form.Item>
-            <Button
+            {/* <Button
               type="primary"
               onClick={handleSubmit}
               loading={loading}
               disabled={selectedUsers.length === 0 || !editorContent || !subject}
             >
               Send Email
-            </Button>
+            </Button> */}
+            <Button
+  icon={<MailOutlined />} // Using the Mail icon from Ant Design
+  style={{
+    backgroundColor: '#1890ff', 
+    color: '#fff', 
+    border: 'none', 
+    borderRadius: '4px'
+  }}
+  type="primary"
+  onClick={handleSubmit}
+  loading={loading}
+  disabled={selectedUsers.length === 0 || !editorContent || !subject}
+>
+  Send Email
+</Button>
+
           </Form.Item>
         </Form>
       </ProCard>

@@ -112,26 +112,58 @@ const SystemBackup = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button
+          {/* <Button
             type="primary"
             icon={<DownloadOutlined />}
             onClick={() => handleDownloadBackup(record.file_name)}
           >
             Download
-          </Button>
+          </Button> */}
+          <Button
+      type="primary"
+      icon={<DownloadOutlined style={{ color: '#258F5E' }} />} // Set icon color
+      onClick={() => handleDownloadBackup(record.file_name)}
+      style={{
+        color: '#258F5E', // Set text color
+        background: 'transparent', // Remove default background
+        border: 'none', // Remove border
+        padding: '8px 24px', // Increase padding for larger button
+        fontSize: '18px', // Increase font size
+        lineHeight: '1.5', // Adjust line height if necessary
+      }}
+    >
+      Download
+    </Button>
           <Popconfirm
             title="Are you sure to delete this backup?"
             onConfirm={() => handleDeleteBackup(record.file_name)}
             okText="Yes"
             cancelText="No"
           >
-            <Button
+            {/* <Button
               type="primary"
               icon={<DeleteOutlined />}
               danger
+              style={{ color: '#ff4d4f' }}
             >
               Delete
-            </Button>
+            </Button> */}
+            <Button
+  type="primary"
+  icon={<DeleteOutlined style={{ color: '#ff4d4f' }} />}
+  danger
+  size="large" // Set button size to large
+  style={{
+    color: '#ff4d4f',
+    background: 'transparent', // Remove default background
+    border: 'none', // Remove border
+    padding: '0 16px', // Adjust padding for larger button
+    fontSize: '16px', // Increase font size
+  }}
+>
+  Delete
+</Button>
+
           </Popconfirm>
         </Space>
       ),
@@ -145,21 +177,51 @@ const SystemBackup = () => {
         bordered
         extra={
           <Space>
-            <Button
+            {/* <Button
               type="primary"
               icon={<CloudUploadOutlined />}
               onClick={() => setIsBackupModalVisible(true)}
             >
               Start Manual Backup
-            </Button>
-            <Button
+            </Button> */}
+             <Button
+      type="primary"
+      icon={<CloudUploadOutlined style={{ color: '#f22d55' }} />} // Set icon color
+      onClick={() => setIsBackupModalVisible(true)}
+      style={{
+        color: '#f22d55', // Set text color
+        background: 'transparent', // Remove default background
+        border: 'none', // Remove border
+        padding: '8px 24px', // Increase padding for larger button
+        fontSize: '18px', // Increase font size
+        lineHeight: '1.5', // Adjust line height if necessary
+      }}
+    >
+      Start Manual Backup
+    </Button>
+            {/* <Button
               type="default"
               icon={<ClockCircleOutlined />}
               style={{ backgroundColor: '#1890ff', color: '#ffffff' }}
               onClick={() => setIsScheduleBackupVisible(true)}
             >
               Schedule Backup
-            </Button>
+            </Button> */}
+             <Button
+      type="primary"
+      icon={<ClockCircleOutlined style={{ color: '#f22d55' }} />} // Set icon color
+      onClick={() => setIsBackupModalVisible(true)}
+      style={{
+        color: '#f22d55', // Set text color
+        background: 'transparent', // Remove default background
+        border: 'none', // Remove border
+        padding: '8px 24px', // Increase padding for larger button
+        fontSize: '18px', // Increase font size
+        lineHeight: '1.5', // Adjust line height if necessary
+      }}
+    >
+      Schedule Backup
+    </Button>
           </Space>
         }
       >

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Switch, message, Modal, Form, Input, Card } from 'antd';
+import { Table, Button, Switch, message, Modal, Form, Input, Card, Divider } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { PlusOutlined, EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { request } from 'umi';
@@ -78,14 +78,12 @@ const EmailTemplate = () => {
 
   const templateColumns = [
     { title: 'Name', dataIndex: 'name', key: 'name' },
+    // { title: 'Description', dataIndex: 'description', key: 'description' },
     {
       title: 'Description',
-      render: (text, record) => (
-        <Switch
-          checked={record.status === 'Active'}
-          onChange={(checked) => handleStatusChange(record.id, checked)}
-        />
-      ),
+      dataIndex: 'description',
+      key: 'description',
+       render: (text) => text ? text : <hr style={{ width: '20%', margin: '0 auto', border: '1px solid #ccc' }} /> 
     },
     {
       title: 'Actions',
@@ -93,28 +91,47 @@ const EmailTemplate = () => {
       render: (text, record) => (
         <>
           <Button 
-            icon={<EyeOutlined />} 
-            onClick={() => handleViewTemplate(record)} 
-            style={{ marginRight: 18, color: '#faad14', borderColor: '#faad14', borderRadius: '4px' }}
-            
-          >
-            View
-          </Button>
-          <Button 
-            icon={<EditOutlined />} 
-            onClick={() => handleEditTemplate(record)} 
-            style={{ marginRight: 18, color: '#1890ff', borderColor: '#1890ff', borderRadius: '4px' }}
-          >
-            Edit
-          </Button>
-          <Button 
-            danger 
-            icon={<DeleteOutlined />} 
-            onClick={() => handleDelete(record.id)}
-            style={{ color: '#ff4d4f', borderColor: '#ff4d4f', borderRadius: '4px' }}
-          >
-            Delete
-          </Button>
+  icon={<EyeOutlined />} 
+  onClick={() => handleViewTemplate(record)} 
+  style={{ 
+    marginRight: 18, 
+    color: '#faad14', 
+    borderColor: 'transparent', // Remove the border color
+    border: 'none', // Remove the border
+    borderRadius: '4px' 
+  }}
+>
+  View
+</Button>
+
+<Button 
+  icon={<EditOutlined />} 
+  onClick={() => handleEditTemplate(record)} 
+  style={{ 
+    marginRight: 18, 
+    color: '#1890ff', 
+    borderColor: 'transparent', // Remove the border color
+    border: 'none', // Remove the border
+    borderRadius: '4px' 
+  }}
+>
+  Edit
+</Button>
+
+<Button 
+  danger 
+  icon={<DeleteOutlined />} 
+  onClick={() => handleDelete(record.id)}
+  style={{ 
+    color: '#ff4d4f', 
+    borderColor: 'transparent', // Remove the border color
+    border: 'none', // Remove the border
+    borderRadius: '4px' 
+  }}
+>
+  Delete
+</Button>
+
         </>
       ),
       className:'column-actions'
@@ -150,38 +167,52 @@ const EmailTemplate = () => {
             bordered
             pagination={{ pageSize: 10 }}
             title={() => null} // Removes the default title
-          />
-          
+          />  
           {/* Create Template Modal */}
-          <Modal
-            title="Create Email Template"
-            visible={isModalVisible}
-            onCancel={() => setIsModalVisible(false)}
-            // onOk={() => form.submit()}
-            footer={null}
-            centered
-          >
-            <Form form={form} layout="vertical" onFinish={handleCreateTemplate}>
-              <Form.Item label="Template Name" name="name" rules={[{ required: true, message: 'Please enter the template name' }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item label="Subject" name="subject" rules={[{ required: true, message: 'Please enter the subject' }]}>
-                <Input />
-              </Form.Item>
-              <Form.Item label="Body" name="body" rules={[{ required: true, message: 'Please enter the body' }]}>
-                <ReactQuill theme="snow" style={{height:'200px',width:'100%'}} />
-              </Form.Item>
-              <div style={{ textAlign: 'right', marginTop: '20px' }}>
-                <Button onClick={() => setIsModalVisible(false)} style={{ marginRight: 8 }}>
-                    Cancel
-                </Button>
-                <Button type="primary" onClick={() => form.submit()}>
-                      OK
-               </Button>
-             </div>
-            </Form>
-          </Modal>
+<Modal
+      title="Create Email Template"
+      visible={isModalVisible}
+      onCancel={() => setIsModalVisible(false)}
+      footer={null}
+      centered
+      width={800} // Adjust the width as needed
+    >
+      <Form form={form} layout="vertical" onFinish={handleCreateTemplate}>
+        <Form.Item
+          label="Template Name"
+          name="name"
+          rules={[{ required: true, message: 'Please enter the template name' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Subject"
+          name="subject"
+          rules={[{ required: true, message: 'Please enter the subject' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Body"
+          name="body"
+          rules={[{ required: true, message: 'Please enter the body' }]}
+        >
+          <ReactQuill theme="snow" style={{ height: '200px', width: '100%' }} />
+        </Form.Item>
 
+        {/* Divider for separating content from buttons */}
+        <Divider style={{ margin: '24px 0', backgroundColor: 'transparent' }} />
+
+        <div style={{ textAlign: 'left', marginBottom: '10px' }}>
+          <Button onClick={() => setIsModalVisible(false)} style={{ marginRight: 8 }}>
+            Cancel
+          </Button>
+          <Button type="primary" onClick={() => form.submit()}>
+            OK
+          </Button>
+        </div>
+      </Form>
+    </Modal>
           {/* View Template Modal */}
           {selectedTemplate && (
             <Modal
