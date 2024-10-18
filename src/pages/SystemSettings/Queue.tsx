@@ -226,12 +226,19 @@ const Queue = () => {
           >
             Delete Selected
           </Button>
-          <Button
+          {/* <Button
             danger
             onClick={() => message.info('Bulk delete functionality is not yet implemented.')}
           >
             Clear All
-          </Button>
+          </Button> */}
+          <Button
+  danger
+  onClick={handleClearAll}
+>
+  Clear All
+</Button>
+
         </div>
 
         <Table
