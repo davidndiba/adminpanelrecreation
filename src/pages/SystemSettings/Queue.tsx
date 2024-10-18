@@ -78,25 +78,69 @@ const Queue = () => {
     }
   };
 
+  // const handleDeleteSelected = async () => {
+  //   if (selectedEmails.length === 0) {
+  //     message.error('No emails selected');
+  //     return;
+  //   }
+
+  //   try {
+  //     await request('/emails', {
+  //       method: 'DELETE',
+  //       data: { ids: selectedEmails },
+  //     });
+  //     message.success('Selected emails deleted successfully');
+  //     setSelectedEmails([]);
+  //     fetchEmails();
+  //   } catch (error) {
+  //     message.error('Failed to delete selected emails');
+  //   }
+  // };
   const handleDeleteSelected = async () => {
     if (selectedEmails.length === 0) {
       message.error('No emails selected');
       return;
     }
-
+  
     try {
-      await request('/delete-emails', {
-        method: 'POST',
-        data: { ids: selectedEmails },
-      });
+      // Create an array of delete requests for selected emails
+      const deletePromises = selectedEmails.map(emailId =>
+        request(`/emails/${emailId}`, { method: 'DELETE' })
+      );
+  
+      await Promise.all(deletePromises);
       message.success('Selected emails deleted successfully');
       setSelectedEmails([]);
-      fetchEmails();
+      fetchEmails(); // Refresh emails after deletion
     } catch (error) {
       message.error('Failed to delete selected emails');
     }
   };
-
+  
+  const handleClearAll = async () => {
+    if (selectedEmails.length === 0) {
+      message.error('No emails selected to clear');
+      return;
+    }
+  
+    try {
+      // Fetch the current date range from the range picker (or keep it in state if you prefer)
+      const { startDate, endDate } = dateRange; // Assuming you have a state for the date range
+      const response = await request(`/emails?start_date=${startDate}&end_date=${endDate}`);
+      
+      // Perform bulk delete for all emails that match the current filters
+      const deletePromises = response.data.map(email =>
+        request(`/emails/${email.id}`, { method: 'DELETE' })
+      );
+  
+      await Promise.all(deletePromises);
+      message.success('All filtered emails cleared successfully');
+      setSelectedEmails([]);
+      fetchEmails(); // Refresh emails after deletion
+    } catch (error) {
+      message.error('Failed to clear all emails');
+    }
+  };
   const handleRetryEmail = async (emailId) => {
     try {
       await request(`/emails/retry/${emailId}`, { method: 'POST' });
