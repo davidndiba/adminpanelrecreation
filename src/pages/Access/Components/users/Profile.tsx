@@ -1,224 +1,17 @@
-
-// import {
-//   Button,
-//   Card,
-//   Col,
-//   Descriptions,
-//   Form,
-//   Input,
-//   Modal,
-//   Row,
-//   Spin,
-//   Table,
-//   Typography,
-//   Progress,
-//   Statistic,
-//   Divider,
-//   message,
-// } from 'antd';
-// import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-// import React, { useEffect, useState } from 'react';
-// import { request, useParams, history } from 'umi';
-
-// const { Title, Text } = Typography;
-
-// interface ProfileData {
-//   id: string;
-//   display_name: string;
-//   email: string;
-//   ip_address: string | null;
-//   status: string;
-//   last_login: string | null;
-//   login_count: number;
-//   phone: string;
-//   location: string;
-//   website: string;
-//   [key: string]: any;
-// }
-
-// interface ActivityLog {
-//   id: string;
-//   action: string;
-//   timestamp: string;
-// }
-
-// const statusMap: Record<string, string> = {
-//   'bfd022d1-655e-42fe-8aec-cb8eead81e54': 'Active',
-// };
-
-// const Profile: React.FC = () => {
-//   const { id } = useParams<{ id: string }>();
-//   const [profile, setProfile] = useState<ProfileData | null>(null);
-//   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [editing, setEditing] = useState(false);
-//   const [form] = Form.useForm();
-
-//   useEffect(() => {
-//     const fetchProfile = async () => {
-//       try {
-//         const response = await request(`/users/${id || 'profile'}`);
-//         if (response.data) {
-//           setProfile(response.data.user);
-//           setActivityLogs(response.data.activity_logs);
-//           form.setFieldsValue(response.data.user);
-//         } else {
-//           message.error('Failed to fetch profile');
-//         }
-//       } catch (error) {
-//         message.error('Failed to fetch profile');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchProfile();
-//   }, [id, form]);
-
-//   const handleSave = async () => {
-//     try {
-//       const values = await form.validateFields();
-//       await request(`/users/${id}`, {
-//         method: 'PUT',
-//         data: values,
-//       });
-//       message.success('Profile updated successfully');
-//       setProfile(values);
-//       setEditing(false);
-//     } catch (error) {
-//       message.error('Failed to update profile');
-//     }
-//   };
-
-//   if (loading) {
-//     return <Spin />;
-//   }
-
-//   const columns = [
-//     { title: 'Action', dataIndex: 'action', key: 'action' },
-//     { title: 'Timestamp', dataIndex: 'timestamp', key: 'timestamp' },
-//   ];
-
-//   return (
-//     <Card bordered={false} style={{ maxWidth: 1000, margin: 'auto' }}>
-//       <Row>
-//         <Col span={16}>
-//           <Title level={2}>System Administrator</Title>
-//           <Text strong>Administrator</Text>
-//           <Divider />
-//           <Text>Welcome to your user account profile. View recent activity and edit your user credentials and information.</Text>
-//         </Col>
-//         <Col span={8} style={{ textAlign: 'right' }}>
-//           <Statistic title="Login Count" value={profile?.login_count || 'N/A'} />
-//         </Col>
-//       </Row>
-
-//       <Row gutter={16} style={{ marginTop: 24 }}>
-//         <Col span={12}>
-//           <Card title="Websites & User Guide">
-//             <Descriptions column={1}>
-//               <Descriptions.Item label="Website">
-//                 <a href={profile?.website || '#'}>{profile?.website || 'N/A'}</a>
-//               </Descriptions.Item>
-//               <Descriptions.Item label="Help">
-//                 <a href="/user-guide.pdf">User Guide pdf</a>
-//               </Descriptions.Item>
-//             </Descriptions>
-//           </Card>
-//         </Col>
-
-//         <Col span={12}>
-//           <Card title="Activities per Month">
-//             <Statistic title="Activities" value={171} suffix="past 10 months" />
-//           </Card>
-//         </Col>
-//       </Row>
-
-//       <Row gutter={16} style={{ marginTop: 24 }}>
-//         <Col span={12}>
-//           <Card title="Activity by Modules">
-//             <Descriptions bordered column={1}>
-//               <Descriptions.Item label="Users Module">
-//                 <Progress percent={66.1} format={(percent) => `${percent}% (113)`} />
-//               </Descriptions.Item>
-//               <Descriptions.Item label="Planner Module">
-//                 <Progress percent={30.4} format={(percent) => `${percent}% (52)`} />
-//               </Descriptions.Item>
-//               <Descriptions.Item label="Mappings Module">
-//                 <Progress percent={2.9} format={(percent) => `${percent}% (5)`} />
-//               </Descriptions.Item>
-//               <Descriptions.Item label="User Accounts Module">
-//                 <Progress percent={0.6} format={(percent) => `${percent}% (1)`} />
-//               </Descriptions.Item>
-//             </Descriptions>
-//           </Card>
-//         </Col>
-
-//         <Col span={12}>
-//           <Card title="Contact Information">
-//             <Descriptions bordered column={1}>
-//               <Descriptions.Item label="Mobile">{profile?.phone || 'N/A'}</Descriptions.Item>
-//               <Descriptions.Item label="Email">{profile?.email || 'N/A'}</Descriptions.Item>
-//               <Descriptions.Item label="Location">{profile?.location || 'N/A'}</Descriptions.Item>
-//             </Descriptions>
-//           </Card>
-//         </Col>
-//       </Row>
-
-//       <Row gutter={16} style={{ marginTop: 24 }}>
-//         <Col span={24}>
-//           <Card title="Recent Activity">
-//             <Table columns={columns} dataSource={activityLogs} rowKey="id" pagination={false} />
-//           </Card>
-//         </Col>
-//       </Row>
-
-//       {editing && (
-//         <Modal
-//           visible={editing}
-//           title="Edit Profile"
-//           onCancel={() => setEditing(false)}
-//           onOk={handleSave}
-//         >
-//           <Form form={form} layout="vertical">
-//             <Form.Item label="Display Name" name="display_name">
-//               <Input />
-//             </Form.Item>
-//             <Form.Item label="Email" name="email">
-//               <Input />
-//             </Form.Item>
-//           </Form>
-//         </Modal>
-//       )}
-//     </Card>
-//   );
-// };
-
-// export default Profile;
-import {
-  Avatar,
-  Button,
-  Card,
-  Col,
-  Descriptions,
-  Form,
-  Input,
-  Modal,
-  Row,
-  Spin,
-  Table,
-  Typography,
-  Progress,
-  Statistic,
-  Divider,
+import {  Avatar,  Card, Form, Input, Row, Spin, Table, Typography, Divider,
   message,
+  Tabs,
+  Layout,
+  DatePicker,
+  Select,
+  Col,
 } from 'antd';
-import { UserOutlined, FilePdfOutlined } from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import { request, useParams } from 'umi';
-import { Bar } from '@ant-design/plots'; // Bar chart library for activity graph
-
 const { Title, Text } = Typography;
+const { TabPane } = Tabs;
+const { Sider, Content } = Layout;
 
 interface ProfileData {
   id: string;
@@ -239,34 +32,26 @@ interface ActivityLog {
   action: string;
   timestamp: string;
 }
-
-// Function to derive location from IP address
-const deriveLocationFromIp = (ip: string | null): string => {
-  if (!ip) return 'N/A';
-  // Normally, you'd call an external service, but for this example, we simulate it
-  if (ip.startsWith('102.209')) return 'South Africa'; // Example logic
-  return 'Unknown Location';
-};
-
+const { RangePicker } = DatePicker;
+const { Option } = Select;
 const Profile: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Used to check if an admin is viewing another user's profile
+  
+  const { id } = useParams<{ id: string }>();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
   const [form] = Form.useForm();
-
+  const [activeTab, setActiveTab] = useState('edit-profile');
+  const [modules, setModules] = useState([]);
+  const [selectedModule, setSelectedModule] = useState(null);
+  const [dateRange, setDateRange] = useState([null, null]);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Fetch the current user's profile if no ID is provided, otherwise fetch the specific user profile by ID
-        const response = await request(`/users/${id ? id : 'profile'}`);
+        const response = await request(`/user/profile`);
         if (response.data) {
           const user = response.data.user;
-          setProfile({
-            ...user,
-            location: deriveLocationFromIp(user.ip_address), // Derive location from IP
-          });
+          setProfile(user);
           setActivityLogs(response.data.activity_logs);
           form.setFieldsValue(user);
         } else {
@@ -278,156 +63,491 @@ const Profile: React.FC = () => {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, [id, form]);
-
-  const handleSave = async () => {
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const moduleData = await request('/modules');
+        if (Array.isArray(moduleData)) {
+          setModules(moduleData);
+        } else {
+          setModules([]); // Set as an empty array if the data is not as expected
+        }
+      } catch (error) {
+        message.error('Failed to fetch modules');
+        setModules([]); // Set as an empty array in case of error
+      }
+    };
+    fetchModules();
+  }, []);  
+  const handleFilterChange = async () => {
+    const filters = {
+      module: selectedModule,
+      startDate: dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
+      endDate: dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
+    };
     try {
-      const values = await form.validateFields();
-      await request(`/users/${id || 'profile'}`, {
+      const filteredLogs = await request('/activity-logs', {
+        method: 'GET',
+        params: filters,
+      });
+      setActivityLogs(filteredLogs);
+    } catch (error) {
+      message.error('Failed to fetch filtered activity logs');
+    }
+  };
+  const handleFieldChange = async (changedFields: any, allFields: any) => {
+    try {
+      await request(`/users/${profile?.id || 'profile'}`, {
         method: 'PUT',
-        data: values,
+        data: allFields,
       });
       message.success('Profile updated successfully');
-      setProfile(values);
-      setEditing(false);
     } catch (error) {
       message.error('Failed to update profile');
     }
   };
 
   if (loading) {
-    return <Spin />;
-  }
-
-  const columns = [
-    { title: 'Action', dataIndex: 'action', key: 'action' },
-    { title: 'Timestamp', dataIndex: 'timestamp', key: 'timestamp' },
-  ];
-
-  const activityData = [
-    { month: 'Jan', activities: 30 },
-    { month: 'Feb', activities: 20 },
-    { month: 'Mar', activities: 15 },
-    { month: 'Apr', activities: 35 },
-  ];
-
-  const config = {
-    data: activityData,
-    xField: 'activities',
-    yField: 'month',
-    seriesField: 'month',
-    barWidthRatio: 0.8,
+    return <Spin />; 
   };
+  
+  const columns = [
+    { title: 'Module', dataIndex: 'module', key: 'module' },
+    { title: 'Description', dataIndex: 'description', key: 'description' },
+    { title: 'Created At', dataIndex: 'updated_at', key: 'updated_at' },
+  ];
 
   return (
-    <Card bordered={false} style={{ maxWidth: 1000, margin: 'auto' }}>
-      {/* Admin Icon + Title */}
-      <Row>
-        <Col span={16}>
-          <Row align="middle">
-            <Avatar size={64} icon={<UserOutlined />} style={{ marginRight: 16 }} />
-            <div>
-              <Title level={2}>{profile?.display_name || 'System Administrator'}</Title>
-              <Text strong>Administrator</Text>
-            </div>
-          </Row>
-          <Divider />
-          <Text>
-            Welcome to your user account profile. View recent activity and edit your user credentials and information.
-          </Text>
-        </Col>
-        <Col span={8} style={{ textAlign: 'right' }}>
-          <Statistic title="Login Count" value={profile?.login_count || 'N/A'} />
-        </Col>
-      </Row>
-
-      {/* Website & User Guide */}
-      <Row gutter={16} style={{ marginTop: 24 }}>
-        <Col span={12}>
-          <Card title="Websites & User Guide">
-            <Descriptions column={1}>
-              <Descriptions.Item label="Website">
-                <a href={profile?.website || '#'}>{profile?.website || 'trtmanufacturing.com'}</a>
-              </Descriptions.Item>
-              <Descriptions.Item label="Help">
-                <a href="/user-guide.pdf">
-                  <FilePdfOutlined /> User Guide pdf
-                </a>
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
-        </Col>
-
-        {/* Activity Graph */}
-        <Col span={12}>
-          <Card title="Activities by Month">
-            <Bar {...config} />
-          </Card>
-        </Col>
-      </Row>
-
-      <Row gutter={16} style={{ marginTop: 24 }}>
-        <Col span={12}>
-          <Card title="Activity by Modules">
-            <Descriptions bordered column={1}>
-              <Descriptions.Item label="Users Module">
-                <Progress percent={66.1} format={(percent) => `${percent}% (113)`} />
-              </Descriptions.Item>
-              <Descriptions.Item label="Planner Module">
-                <Progress percent={30.4} format={(percent) => `${percent}% (52)`} />
-              </Descriptions.Item>
-              <Descriptions.Item label="Mappings Module">
-                <Progress percent={2.9} format={(percent) => `${percent}% (5)`} />
-              </Descriptions.Item>
-              <Descriptions.Item label="User Accounts Module">
-                <Progress percent={0.6} format={(percent) => `${percent}% (1)`} />
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
-        </Col>
-
-        {/* Contact Information */}
-        <Col span={12}>
-          <Card title="Contact Information">
-            <Descriptions bordered column={1}>
-              <Descriptions.Item label="Mobile">{profile?.data?.phone || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Email">{profile?.email || 'N/A'}</Descriptions.Item>
-              <Descriptions.Item label="Location">{profile?.location || 'N/A'}</Descriptions.Item>
-            </Descriptions>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Recent Activity */}
-      <Row gutter={16} style={{ marginTop: 24 }}>
-        <Col span={24}>
-          <Card title="Recent Activity">
-            <Table columns={columns} dataSource={activityLogs} rowKey="id" pagination={false} />
-          </Card>
-        </Col>
-      </Row>
-
-      {editing && (
-        <Modal
-          visible={editing}
-          title="Edit Profile"
-          onCancel={() => setEditing(false)}
-          onOk={handleSave}
+    <Layout>
+      <Sider
+        width={200}
+        style={{ backgroundColor: '#f0f2f5', padding: '16px' }}
+      >
+        <Title level={4}>Profile Management</Title>
+        <Tabs
+          defaultActiveKey="edit-profile"
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          tabPosition="left"
         >
-          <Form form={form} layout="vertical">
-            <Form.Item label="Display Name" name="display_name">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Email" name="email">
-              <Input />
-            </Form.Item>
-          </Form>
-        </Modal>
-      )}
-    </Card>
+          <TabPane tab="Edit Profile" key="edit-profile" />
+          <TabPane tab="Activity Logs" key="activity-logs" />
+          <TabPane tab="Change Password" key="change-password" />
+        </Tabs>
+      </Sider>
+
+      <Layout style={{ padding: '24px' }}>
+        <Content>
+          {activeTab === 'edit-profile' && (
+            <Card bordered={false}>
+              <Row align="middle" justify="space-between">
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <Avatar size={64} icon={<UserOutlined />} style={{ marginRight: 16 }} />
+                  
+                  <div>
+                    <Title level={2}>
+                      {profile?.display_name || 'System Administrator'}
+                    </Title>
+                    <Text strong>Super Admin</Text>
+                    <br />
+                    <Text type="secondary">
+                      Responsible for overseeing system-wide functions and user management.
+                    </Text>
+                  </div>
+                </div>
+                {/* <Text strong>Login Count: {profile?.login_count}</Text> */}
+                <div style={{ textAlign: 'right' }}>
+                  <Text type="secondary" style={{ fontWeight: 'bold', color: '#faad14' }}>Login Count</Text>
+                  <Title level={5} >{profile?.login_count}</Title>
+                </div>
+              </Row>
+              <Divider />
+              <Form
+                form={form}
+                layout="vertical"
+                onValuesChange={handleFieldChange} // Automatically update on field change
+              >
+                <Form.Item label="Display Name" name="display_name">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Email" name="email">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Username" name="username">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Phone" name="phone">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Timezone" name="timezone">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Language" name="language">
+                  <Input />
+                </Form.Item>
+              </Form>
+            </Card>
+          )}
+
+          {/* {activeTab === 'activity-logs' && (
+            <Card title="Activity Logs">
+              <Table columns={columns} dataSource={activityLogs} rowKey="id" pagination={false} />
+            </Card>
+          )} */}
+          {activeTab === 'activity-logs' && (
+            <Card title="Activity Logs">
+              <Row gutter={16}>
+                <Col>
+                  <RangePicker
+                    onChange={(dates) => setDateRange(dates || [null, null])}
+                  />
+                </Col>
+                <Col>
+                {/* <Select
+              placeholder="Filter by Module"
+              onChange={(value) => setSelectedModule(value)}
+               >
+              {Array.isArray(modules) && modules.map((module) => (
+              <Option key={module.id} value={module.id}>
+              {module.name}
+             </Option>
+             ))}
+             </Select> */}
+             <Select
+  placeholder="Filter by Module"
+  onChange={(value) => setSelectedModule(value)}
+>
+  {Array.isArray(modules) && modules.map((module) => (
+    <Option key={module} value={module}>
+      {module} {/* Since it's a string, directly use `module` */}
+    </Option>
+  ))}
+</Select>
+
+                </Col>
+                <Col>
+                  <button onClick={handleFilterChange} className="ant-btn ant-btn-primary">
+                    Apply Filters
+                  </button>
+                </Col>
+              </Row>
+              <Table columns={columns} dataSource={activityLogs} rowKey="id" pagination={false} />
+            </Card>
+          )}
+
+          {activeTab === 'change-password' && (
+            <Card title="Change Password">
+              <Form
+                layout="vertical"
+                onFinish={async (values) => {
+                  try {
+                    await request(`/auth/reset-password`, {
+                      method: 'POST',
+                      data: {
+                        password: values.password,
+                        password_confirmation: values.password_confirmation,
+                      },
+                    });
+                    message.success('Password changed successfully');
+                  } catch (error) {
+                    message.error('Failed to change password');
+                  }
+                }}
+              >
+                <Form.Item label="New Password" name="password" rules={[{ required: true }]}>
+                  <Input.Password />
+                </Form.Item>
+                <Form.Item label="Confirm Password" name="password_confirmation" rules={[{ required: true }]}>
+                  <Input.Password />
+                </Form.Item>
+                <Form.Item>
+                  <button type="submit" className="ant-btn ant-btn-primary">
+                    Change Password
+                  </button>
+                </Form.Item>
+              </Form>
+            </Card>
+          )}
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 
 export default Profile;
+// import {
+//   Avatar,
+//   Card,
+//   Form,
+//   Input,
+//   Row,
+//   Spin,
+//   Table,
+//   Typography,
+//   Divider,
+//   message,
+//   Tabs,
+//   Layout,
+//   DatePicker,
+//   Select,
+//   Col,
+// } from 'antd';
+// import { UserOutlined } from '@ant-design/icons';
+// import React, { useEffect, useState } from 'react';
+// import { request, useParams } from 'umi';
+// const { Title, Text } = Typography;
+// const { TabPane } = Tabs;
+// const { Sider, Content } = Layout;
+
+// interface ProfileData {
+//   id: string;
+//   display_name: string;
+//   email: string;
+//   ip_address: string | null;
+//   status: string;
+//   last_login: string | null;
+//   login_count: number;
+//   phone: string | null;
+//   location: string | null;
+//   website: string;
+//   [key: string]: any;
+// }
+
+// interface ActivityLog {
+//   id: string;
+//   action: string;
+//   timestamp: string;
+// }
+// const { RangePicker } = DatePicker;
+// const { Option } = Select;
+// const Profile: React.FC = () => {
+  
+//   const { id } = useParams<{ id: string }>();
+//   const [profile, setProfile] = useState<ProfileData | null>(null);
+//   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [form] = Form.useForm();
+//   const [activeTab, setActiveTab] = useState('edit-profile');
+//   const [modules, setModules] = useState([]);
+//   const [selectedModule, setSelectedModule] = useState(null);
+//   const [dateRange, setDateRange] = useState([null, null]);
+
+//   useEffect(() => {
+//     const fetchProfile = async () => {
+//       try {
+//         // Use the id if it exists, otherwise fetch the logged-in user
+//         const response = await request(id ? `/users/${id}` : `/user/profile`);
+//         if (response.data) {
+//           const user = response.data.user || response.data.user; // Use response.data.user for /user/profile
+//           setProfile(user);
+//           setActivityLogs(response.data.activity_logs);
+//           form.setFieldsValue(user);
+//         } else {
+//           message.error('Failed to fetch profile');
+//         }
+//       } catch (error) {
+//         message.error('Failed to fetch profile');
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProfile();
+//   }, [id, form]);
+  
+//   useEffect(() => {
+//     const fetchModules = async () => {
+//       try {
+//         const moduleData = await request('/modules');
+//         if (Array.isArray(moduleData)) {
+//           setModules(moduleData);
+//         } else {
+//           setModules([]); // Set as an empty array if the data is not as expected
+//         }
+//       } catch (error) {
+//         message.error('Failed to fetch modules');
+//         setModules([]); // Set as an empty array in case of error
+//       }
+//     };
+//     fetchModules();
+//   }, []);  
+
+//   const handleFilterChange = async () => {
+//     const filters = {
+//       module: selectedModule,
+//       startDate: dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : null,
+//       endDate: dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : null,
+//     };
+//     try {
+//       const filteredLogs = await request('/activity-logs', {
+//         method: 'GET',
+//         params: filters,
+//       });
+//       setActivityLogs(filteredLogs);
+//     } catch (error) {
+//       message.error('Failed to fetch filtered activity logs');
+//     }
+//   };
+
+//   const handleFieldChange = async (changedFields: any, allFields: any) => {
+//     try {
+//       await request(`/users/${profile?.id || 'profile'}`, {
+//         method: 'PUT',
+//         data: allFields,
+//       });
+//       message.success('Profile updated successfully');
+//     } catch (error) {
+//       message.error('Failed to update profile');
+//     }
+//   };
+
+//   if (loading) {
+//     return <Spin />; 
+//   }
+  
+//   const columns = [
+//     { title: 'Module', dataIndex: 'module', key: 'module' },
+//     { title: 'Description', dataIndex: 'description', key: 'description' },
+//     { title: 'Created At', dataIndex: 'updated_at', key: 'updated_at' },
+//   ];
+
+//   return (
+//     <Layout>
+//       <Sider
+//         width={200}
+//         style={{ backgroundColor: '#f0f2f5', padding: '16px' }}
+//       >
+//         <Title level={4}>Profile Management</Title>
+//         <Tabs
+//           defaultActiveKey="edit-profile"
+//           activeKey={activeTab}
+//           onChange={setActiveTab}
+//           tabPosition="left"
+//         >
+//           <TabPane tab="Edit Profile" key="edit-profile" />
+//           <TabPane tab="Activity Logs" key="activity-logs" />
+//           <TabPane tab="Change Password" key="change-password" />
+//         </Tabs>
+//       </Sider>
+
+//       <Layout style={{ padding: '24px' }}>
+//         <Content>
+//           {activeTab === 'edit-profile' && (
+//             <Card bordered={false}>
+//               <Row align="middle" justify="space-between">
+//                 <div style={{ display: 'flex', alignItems: 'center' }}>
+//                   <Avatar size={64} icon={<UserOutlined />} style={{ marginRight: 16 }} />
+                  
+//                   <div>
+//                     <Title level={2}>
+//                       {profile?.display_name || 'System Administrator'}
+//                     </Title>
+//                     <Text strong>Super Admin</Text>
+//                     <br />
+//                     <Text type="secondary">
+//                       Responsible for overseeing system-wide functions and user management.
+//                     </Text>
+//                   </div>
+//                 </div>
+//                 <div style={{ textAlign: 'right' }}>
+//                   <Text type="secondary" style={{ fontWeight: 'bold', color: '#faad14' }}>Login Count</Text>
+//                   <Title level={5} >{profile?.login_count}</Title>
+//                 </div>
+//               </Row>
+//               <Divider />
+//               <Form
+//                 form={form}
+//                 layout="vertical"
+//                 onValuesChange={handleFieldChange}
+//               >
+//                 <Form.Item label="Display Name" name="display_name">
+//                   <Input />
+//                 </Form.Item>
+//                 <Form.Item label="Email" name="email">
+//                   <Input />
+//                 </Form.Item>
+//                 <Form.Item label="Username" name="username">
+//                   <Input />
+//                 </Form.Item>
+//                 <Form.Item label="Phone" name="phone">
+//                   <Input />
+//                 </Form.Item>
+//                 <Form.Item label="Timezone" name="timezone">
+//                   <Input />
+//                 </Form.Item>
+//                 <Form.Item label="Language" name="language">
+//                   <Input />
+//                 </Form.Item>
+//               </Form>
+//             </Card>
+//           )}
+
+//           {activeTab === 'activity-logs' && (
+//             <Card title="Activity Logs">
+//               <Row gutter={16}>
+//                 <Col>
+//                   <RangePicker
+//                     onChange={(dates) => setDateRange(dates || [null, null])}
+//                   />
+//                 </Col>
+//                 <Col>
+//                   <Select
+//                     placeholder="Filter by Module"
+//                     onChange={(value) => setSelectedModule(value)}
+//                   >
+//                     {Array.isArray(modules) && modules.map((module) => (
+//                       <Option key={module.id} value={module.id}>
+//                         {module.name}
+//                       </Option>
+//                     ))}
+//                   </Select>
+//                 </Col>
+//                 <Col>
+//                   <button onClick={handleFilterChange} className="ant-btn ant-btn-primary">
+//                     Apply Filters
+//                   </button>
+//                 </Col>
+//               </Row>
+//               <Table columns={columns} dataSource={activityLogs} rowKey="id" pagination={false} />
+//             </Card>
+//           )}
+
+//           {activeTab === 'change-password' && (
+//             <Card title="Change Password">
+//               <Form
+//                 layout="vertical"
+//                 onFinish={async (values) => {
+//                   try {
+//                     await request(`/auth/reset-password`, {
+//                       method: 'POST',
+//                       data: {
+//                         password: values.password,
+//                         password_confirmation: values.password_confirmation,
+//                       },
+//                     });
+//                     message.success('Password changed successfully');
+//                   } catch (error) {
+//                     message.error('Failed to change password');
+//                   }
+//                 }}
+//               >
+//                 <Form.Item label="New Password" name="password" rules={[{ required: true }]}>
+//                   <Input.Password />
+//                 </Form.Item>
+//                 <Form.Item label="Confirm Password" name="password_confirmation" rules={[{ required: true }]}>
+//                   <Input.Password />
+//                 </Form.Item>
+//                 <Form.Item>
+//                   <button type="submit" className="ant-btn ant-btn-primary">Change Password</button>
+//                 </Form.Item>
+//               </Form>
+//             </Card>
+//           )}
+//         </Content>
+//       </Layout>
+//     </Layout>
+//   );
+// };
+
+// export default Profile;

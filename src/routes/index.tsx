@@ -38,6 +38,12 @@ const routes: any[] = [
     layout: false,
   },
   {
+    name: 'Activate Email Account',
+    path: '/auth/activate',
+    component: './Activate/Activate', 
+    layout: false,
+  },
+  {
     name: 'Profile',
     path: '/users/:id',
     component: './Access/Components/users/Profile',
