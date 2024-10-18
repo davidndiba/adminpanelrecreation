@@ -3,7 +3,7 @@ import { Table, Checkbox, Button, message, DatePicker, Form, Modal, Select, Inpu
 import { request } from 'umi';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-import moment from 'moment'; // Import moment
+import moment from 'moment';
 import { MailOutlined } from '@ant-design/icons';
 
 const { RangePicker } = DatePicker;
@@ -17,8 +17,8 @@ const Queue = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [form] = Form.useForm();
   const [editorContent, setEditorContent] = useState('');
-  const [composedEmail, setComposedEmail] = useState({ recipient: '', subject: '' });
-  const [loading, setLoading] = useState(false); // Loading state
+  const [subject, setSubject] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchEmails();
@@ -44,7 +44,7 @@ const Queue = () => {
   };
 
   const handleComposeEmail = async (values) => {
-    const { recipient, subject } = values;
+    const { recipient } = values;
 
     if (!recipient || !editorContent || (!subject && !selectedTemplate)) {
       message.error('Recipient and body are required. Subject is required if no template is used.');
@@ -58,7 +58,7 @@ const Queue = () => {
       body: editorContent,
     };
 
-    setLoading(true); // Show loader
+    setLoading(true);
     try {
       await request('/compose-email', {
         method: 'POST',
@@ -69,11 +69,12 @@ const Queue = () => {
       form.resetFields();
       setEditorContent('');
       setSelectedTemplate(null);
-      fetchEmails();
+      setSubject('');
+      fetchEmails(); // Refresh emails after sending
     } catch (error) {
       message.error('Failed to send email');
     } finally {
-      setLoading(false); // Hide loader
+      setLoading(false);
     }
   };
 
@@ -89,8 +90,8 @@ const Queue = () => {
         data: { ids: selectedEmails },
       });
       message.success('Selected emails deleted successfully');
-      setSelectedEmails([]); // Clear selected emails after deletion
-      fetchEmails(); // Refresh email list after deletion
+      setSelectedEmails([]);
+      fetchEmails();
     } catch (error) {
       message.error('Failed to delete selected emails');
     }
@@ -100,9 +101,18 @@ const Queue = () => {
     try {
       await request(`/emails/retry/${emailId}`, { method: 'POST' });
       message.success('Retrying email sending');
-      fetchEmails(); // Refresh email list after retry
+      fetchEmails();
     } catch (error) {
       message.error('Failed to retry sending email');
+    }
+  };
+
+  const handleDateFilter = (dates) => {
+    if (dates && dates.length === 2) {
+      const [startDate, endDate] = dates;
+      fetchEmails({ start_date: startDate.format('YYYY-MM-DD'), end_date: endDate.format('YYYY-MM-DD') });
+    } else {
+      fetchEmails(); // Reset or fetch all emails if no date is selected
     }
   };
 
@@ -124,8 +134,8 @@ const Queue = () => {
     { title: 'Recipient', dataIndex: 'to', key: 'recipient' },
     { title: 'Subject', dataIndex: 'subject', key: 'subject' },
     { title: 'Date Sent', dataIndex: 'sent_at', key: 'dateSent', render: (text) => moment(text).format('YYYY-MM-DD') },
-    { title: 'Retry Count', dataIndex: 'retry_count', key: 'retryCount' }, // Column for retry count
-    { title: 'Sent', dataIndex: 'sent', key: 'sent', render: (text) => (text === 'Yes' ? 'Yes' : 'No') }, // New column for sent status
+    { title: 'Retry Count', dataIndex: 'retry_count', key: 'retryCount' },
+    { title: 'Sent', dataIndex: 'sent', key: 'sent', render: (text) => (text === 'Yes' ? 'Yes' : 'No') },
     {
       title: 'Actions',
       key: 'actions',
@@ -152,20 +162,18 @@ const Queue = () => {
         </div>
 
         <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-          {/* <Button type="primary" onClick={() => setEmailFormVisible(true)} style={{ marginRight: '8px' }}>
-            Compose Email
-          </Button> */}
           <Button 
-  icon={<MailOutlined />} 
-  style={{ 
-    backgroundColor: '#1890ff', 
-    color: '#fff', 
-    border: 'none', 
-    borderRadius: '4px' 
-  }}
->
-  Compose Email
-</Button>
+            icon={<MailOutlined />} 
+            onClick={() => setEmailFormVisible(true)} // Open the compose email modal
+            style={{ 
+              backgroundColor: '#1890ff', 
+              color: '#fff', 
+              border: 'none', 
+              borderRadius: '4px' 
+            }}
+          >
+            Compose Email
+          </Button>
 
           <Button
             danger
@@ -201,14 +209,20 @@ const Queue = () => {
               name="recipient"
               rules={[{ required: true, message: 'Please enter the recipient email!' }]}
             >
-              <Input />
+              <Select
+                mode="multiple"
+                placeholder="Select users to send email"
+                options={emails.map(email => ({ label: email.to, value: email.to }))} // Assuming emails have a `to` field
+                onChange={(value) => form.setFieldsValue({ recipient: value })}
+                style={{ width: '100%' }}
+              />
             </Form.Item>
             <Form.Item
               label="Subject"
               name="subject"
               rules={[{ required: !selectedTemplate, message: 'Please enter the subject!' }]}
             >
-              <Input />
+              <Input onChange={(e) => setSubject(e.target.value)} value={subject} />
             </Form.Item>
             <Form.Item label="Select Template" name="template">
               <Select onChange={(value) => setSelectedTemplate(value)} placeholder="Select a template">
