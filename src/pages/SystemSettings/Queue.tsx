@@ -4,6 +4,7 @@ import { request } from 'umi';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import moment from 'moment'; // Import moment
+import { MailOutlined } from '@ant-design/icons';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -151,9 +152,21 @@ const Queue = () => {
         </div>
 
         <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-          <Button type="primary" onClick={() => setEmailFormVisible(true)} style={{ marginRight: '8px' }}>
+          {/* <Button type="primary" onClick={() => setEmailFormVisible(true)} style={{ marginRight: '8px' }}>
             Compose Email
-          </Button>
+          </Button> */}
+          <Button 
+  icon={<MailOutlined />} 
+  style={{ 
+    backgroundColor: '#1890ff', 
+    color: '#fff', 
+    border: 'none', 
+    borderRadius: '4px' 
+  }}
+>
+  Compose Email
+</Button>
+
           <Button
             danger
             onClick={handleDeleteSelected}

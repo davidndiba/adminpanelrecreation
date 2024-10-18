@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Select, message, Row, Col, Typography, Input, Button, Modal } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { request } from 'umi';
+import { SaveOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -232,9 +233,23 @@ const Settings = () => {
             <Form.Item>
               <Row justify="space-between">
                 <Col>
-                  <Button type="primary" htmlType="submit">
+                  {/* <Button type="primary" htmlType="submit">
                     Save Settings
-                  </Button>
+                  </Button> */}
+                  <Button 
+  icon={<SaveOutlined />} // Using the Save icon from Ant Design
+  style={{
+    backgroundColor: '#1890ff', 
+    color: '#fff', 
+    border: 'none', 
+    borderRadius: '4px'
+  }} 
+  type="primary" 
+  htmlType="submit"
+>
+  Save Settings
+</Button>
+
                 </Col>
                 <Col>
                   <Button type="dashed" onClick={showTestModal}>
